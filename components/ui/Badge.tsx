@@ -9,7 +9,9 @@ const tones: Record<BadgeTone, string> = {
   secondary: "bg-secondary-600/10 text-secondary-700",
   danger: "bg-danger-50 text-danger-600",
   warning: "bg-warning-50 text-warning-600",
-  accent: "bg-accent-500/15 text-accent-600",
+  // accent-600 (#0284c7) hanya ~3,5:1 di atas latar badge terang/gelap ->
+  // pakai shade lebih gelap di mode terang & lebih terang di mode gelap.
+  accent: "bg-accent-500/15 text-accent-700 dark:text-accent-400",
 };
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {

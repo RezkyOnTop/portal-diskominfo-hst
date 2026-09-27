@@ -112,7 +112,7 @@ export function Footer() {
       </div>
 
       <div className="border-t border-white/10 py-5">
-        <p className="mx-auto max-w-7xl px-4 text-center text-xs text-neutral-500">
+        <p className="mx-auto max-w-7xl px-4 text-center text-xs text-neutral-400">
           © {new Date().getFullYear()} {SITE.shortName}. Hak Cipta Dilindungi.
         </p>
       </div>

@@ -46,7 +46,7 @@ export function SubscriberForm() {
       </div>
       <div className="space-y-1">
         <label htmlFor="phone" className="text-sm font-medium text-neutral-700">
-          Nomor telepon <span className="text-neutral-400">(opsional)</span>
+          Nomor telepon <span className="text-neutral-500">(opsional)</span>
         </label>
         <input
           id="phone"

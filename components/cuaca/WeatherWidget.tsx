@@ -46,7 +46,7 @@ export async function WeatherWidget({ className }: { className?: string } = {}) 
           </p>
         </div>
         <span
-          className="rounded-full bg-secondary-600/10 px-3 py-1 text-xs font-semibold text-secondary-700"
+          className="rounded-full bg-secondary-600/10 px-3 py-1 text-xs font-semibold text-secondary-700 dark:bg-secondary-400/15 dark:text-secondary-400"
           title="Sumber: Badan Meteorologi, Klimatologi, dan Geofisika"
         >
           Sumber: BMKG
