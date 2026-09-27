@@ -9,12 +9,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * Klik indikator untuk pindah slide; ada tombol jeda.
  */
 const SLIDES = [
-  { src: "/brand/carousel-1.jpg", alt: "Monumen Kabupaten Hulu Sungai Tengah", label: "Monumen HST" },
-  { src: "/brand/carousel-2.jpg", alt: "Kantor Pemerintah Kabupaten Hulu Sungai Tengah", label: "Pusat Pemerintahan" },
-  { src: "/brand/hst-aktivitas-1.jpg", alt: "Kegiatan masyarakat Hulu Sungai Tengah", label: "Kegiatan Warga" },
-  { src: "/brand/hst-aktivitas-2.jpg", alt: "Pasar murah di Hulu Sungai Tengah", label: "Pasar Murah" },
-  { src: "/brand/hst-aktivitas-3.jpg", alt: "Upacara di Hulu Sungai Tengah", label: "Upacara Resmi" },
-  { src: "/brand/hst-aktivitas-4.jpg", alt: "Aktivitas pemerintahan Hulu Sungai Tengah", label: "Pemerintahan" },
+  { src: "/brand/carousel-1.jpg", label: "Monumen Kabupaten Hulu Sungai Tengah" },
+  { src: "/brand/carousel-2.jpg", label: "Kantor Pemerintah Kabupaten Hulu Sungai Tengah" },
+  { src: "/brand/hst-aktivitas-1.jpg", label: "Kegiatan masyarakat Hulu Sungai Tengah" },
+  { src: "/brand/hst-aktivitas-2.jpg", label: "Pasar murah di Hulu Sungai Tengah" },
+  { src: "/brand/hst-aktivitas-3.jpg", label: "Upacara di Hulu Sungai Tengah" },
+  { src: "/brand/hst-aktivitas-4.jpg", label: "Aktivitas pemerintahan Hulu Sungai Tengah" },
 ];
 
 const INTERVAL = 4500;
@@ -54,7 +54,7 @@ export function HeroSlideshow() {
           >
             <Image
               src={s.src}
-              alt={s.alt}
+              alt=""
               fill
               priority={i === 0}
               sizes="(max-width: 1024px) 100vw, 45vw"
@@ -67,13 +67,8 @@ export function HeroSlideshow() {
 
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-neutral-950/75 via-neutral-950/10 to-transparent"
+          className="absolute inset-0 bg-gradient-to-t from-neutral-950/60 via-transparent to-transparent"
         />
-
-        {/* Label dinamis */}
-        <span className="absolute left-3 top-3 rounded-full bg-black/50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur">
-          Kabupaten HST · {SLIDES[index].label}
-        </span>
 
         {/* Kontrol putar/jeda */}
         <button
