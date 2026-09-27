@@ -1,11 +1,31 @@
 import { describe, it, expect, afterEach } from "vitest";
-import { SITE, LAYANAN, NAV_LINKS, radioStreamUrl } from "./config";
+import {
+  SITE,
+  LAYANAN,
+  NAV_MENU,
+  LINK_TERKAIT,
+  SOSIAL,
+  RADIO_NAME,
+  radioStreamUrl,
+} from "./config";
+
+/** Kumpulkan seluruh href dari struktur menu (termasuk submenu). */
+function allMenuHrefs(): string[] {
+  const out: string[] = [];
+  for (const item of NAV_MENU) {
+    if (item.href) out.push(item.href);
+    for (const child of item.children ?? []) {
+      if (child.href) out.push(child.href);
+    }
+  }
+  return out;
+}
 
 describe("config", () => {
-  it("memuat kontak resmi", () => {
-    expect(SITE.email).toBe("diskominfo@hstkab.go.id");
-    expect(SITE.phone).toContain("0517");
+  it("memuat kontak resmi sesuai situs", () => {
+    expect(SITE.email).toBe("diskominfosp@hstkab.go.id");
     expect(SITE.address).toContain("Barabai");
+    expect(SITE.address).toContain("71314");
   });
 
   it("semua tautan layanan diarahkan ke domain resmi", () => {
@@ -15,10 +35,23 @@ describe("config", () => {
   });
 
   it("navigasi memuat rute utama", () => {
-    const hrefs = NAV_LINKS.map((n) => n.href);
+    const hrefs = allMenuHrefs();
     expect(hrefs).toContain("/berita");
     expect(hrefs).toContain("/hoaks");
     expect(hrefs).toContain("/radio");
+    expect(hrefs).toContain("/pengumuman");
+    expect(hrefs).toContain("/layanan");
+    expect(hrefs).toContain("/kontak");
+  });
+
+  it("link terkait & media sosial menunjuk domain tepercaya", () => {
+    for (const l of [...LINK_TERKAIT, ...SOSIAL]) {
+      expect(l.href).toMatch(/^https:\/\//);
+    }
+  });
+
+  it("memakai nama radio resmi", () => {
+    expect(RADIO_NAME).toContain("Swara Murakata");
   });
 
   describe("radioStreamUrl", () => {

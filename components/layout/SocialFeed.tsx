@@ -49,7 +49,7 @@ export async function SocialFeed() {
         </ul>
       )}
       <p className="mt-4 text-xs text-neutral-600">
-        Sumber informasi resmi: {SITE.name}.
+        Sumber informasi resmi: {SITE.fullName}.
       </p>
     </div>
   );

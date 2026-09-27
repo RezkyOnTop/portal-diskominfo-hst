@@ -1,76 +1,119 @@
-import Link from "next/link";
-import { Container } from "@/components/layout/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+"use client";
 
-const CEPAT = [
-  { href: "https://ppid.hstkab.go.id/", label: "PPID HST — Informasi Publik", external: true },
-  { href: "https://opendata.hstkab.go.id/", label: "Open Data + ONE DATA HST", external: true },
-  { href: "/pengumuman", label: "Pengumuman Resmi", external: false },
-  { href: "/hoaks", label: "Cek Klarifikasi Hoaks", external: false },
+import Link from "next/link";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { HERO } from "@/lib/config";
+import { cn } from "@/lib/utils/cn";
+
+const SLIDES = [
+  { src: "/brand/carousel-1.jpg", alt: "Monumen Kabupaten Hulu Sungai Tengah" },
+  { src: "/brand/carousel-2.jpg", alt: "Kantor Pemerintah Kabupaten Hulu Sungai Tengah" },
 ];
 
+/**
+ * Hero carousel dengan foto asli daerah. Autoplay, kontrol manual,
+ * indikator, dan menghormati prefers-reduced-motion.
+ */
 export function Hero() {
+  const [i, setI] = useState(0);
+
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+    const t = setInterval(() => setI((v) => (v + 1) % SLIDES.length), 7000);
+    return () => clearInterval(t);
+  }, []);
+
   return (
-    <section className="border-b border-neutral-200 bg-gradient-to-b from-primary-700 to-primary-600 text-white">
-      <Container className="grid gap-8 py-14 lg:grid-cols-[1.4fr_1fr] lg:items-center lg:py-20">
-        <div className="space-y-5">
-          <p className="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
-            Media Center &amp; Portal Informasi Publik
-          </p>
-          <h1 className="font-heading text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-            Dinas Komunikasi, Informatika, Statistik, dan Persandian
-            <span className="block text-accent-500">Kabupaten Hulu Sungai Tengah</span>
-          </h1>
-          <p className="max-w-xl text-base text-white/90">
-            Sumber informasi resmi daerah: berita, pengumuman, klarifikasi hoaks,
-            layanan digital, dan siaran radio pemerintah daerah.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/berita"
-              className="rounded-lg bg-white px-5 py-3 text-sm font-semibold text-primary-700 hover:bg-neutral-100"
-            >
-              Lihat Berita
-            </Link>
-            <Link
-              href="/radio"
-              className="rounded-lg border border-white/40 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
-            >
-              Dengarkan Radio
-            </Link>
-          </div>
+    <section className="relative isolate -mt-[var(--header-h)] flex min-h-[92vh] items-center overflow-hidden bg-primary-950 pt-[var(--header-h)] text-white">
+      {SLIDES.map((s, idx) => (
+        <div
+          key={s.src}
+          aria-hidden={idx !== i}
+          className={cn(
+            "absolute inset-0 -z-10 transition-opacity duration-1000",
+            idx === i ? "opacity-100" : "opacity-0",
+          )}
+        >
+          <Image
+            src={s.src}
+            alt={s.alt}
+            fill
+            priority={idx === 0}
+            sizes="100vw"
+            className="object-cover"
+          />
         </div>
-        <div className="rounded-2xl border border-white/15 bg-white/5 p-6 backdrop-blur">
-          <SectionHeading as="h2" className="text-white">
-            Layanan Cepat
-          </SectionHeading>
-          <ul className="mt-4 space-y-3 text-sm">
-            {CEPAT.map((item) => (
-              <li key={item.href}>
-                {item.external ? (
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between rounded-lg bg-white/10 px-4 py-3 font-medium hover:bg-white/20"
-                  >
-                    <span>{item.label}</span>
-                    <span aria-hidden="true">↗</span>
-                  </a>
-                ) : (
-                  <Link
-                    href={item.href}
-                    className="flex items-center justify-between rounded-lg bg-white/10 px-4 py-3 font-medium hover:bg-white/20"
-                  >
-                    <span>{item.label}</span>
-                    <span aria-hidden="true">→</span>
-                  </Link>
+      ))}
+      {/* Overlay gradien agar teks terbaca (WCAG AA). */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-gradient-to-b from-primary-950/85 via-primary-950/70 to-primary-950/90"
+      />
+
+      <div className="mx-auto w-full max-w-7xl px-4 py-24 text-center">
+        <p className="animate-fade-up text-xs font-semibold uppercase tracking-[0.25em] text-primary-200 sm:text-sm">
+          {HERO.region}
+        </p>
+        <h1 className="animate-fade-up mt-4 font-heading text-4xl font-extrabold uppercase leading-tight tracking-tight sm:text-6xl lg:text-7xl">
+          {HERO.title}
+        </h1>
+        <p className="animate-fade-up mx-auto mt-4 max-w-3xl text-sm uppercase tracking-wide text-white/90 sm:text-base">
+          {HERO.subtitle}
+        </p>
+
+        <div className="animate-fade-up mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href="/profil/sejarah"
+            className="rounded-full bg-primary-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-primary-700"
+          >
+            Tentang Kami
+          </Link>
+          <Link
+            href="/layanan"
+            className="rounded-full border border-white/50 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/20"
+          >
+            Layanan Kami
+          </Link>
+        </div>
+
+        {/* Kontrol carousel */}
+        <div className="mt-10 flex items-center justify-center gap-3">
+          <button
+            type="button"
+            aria-label="Slide sebelumnya"
+            onClick={() => setI((v) => (v - 1 + SLIDES.length) % SLIDES.length)}
+            className="grid h-9 w-9 place-items-center rounded-full border border-white/40 text-white hover:bg-white/15"
+          >
+            ‹
+          </button>
+          <div className="flex items-center gap-2" role="tablist" aria-label="Pilih slide">
+            {SLIDES.map((s, idx) => (
+              <button
+                key={s.src}
+                type="button"
+                role="tab"
+                aria-selected={idx === i}
+                aria-label={`Slide ${idx + 1}`}
+                onClick={() => setI(idx)}
+                className={cn(
+                  "h-2 rounded-full transition-all",
+                  idx === i ? "w-6 bg-primary-400" : "w-2 bg-white/50 hover:bg-white/80",
                 )}
-              </li>
+              />
             ))}
-          </ul>
+          </div>
+          <button
+            type="button"
+            aria-label="Slide berikutnya"
+            onClick={() => setI((v) => (v + 1) % SLIDES.length)}
+            className="grid h-9 w-9 place-items-center rounded-full border border-white/40 text-white hover:bg-white/15"
+          >
+            ›
+          </button>
         </div>
-      </Container>
+      </div>
     </section>
   );
 }

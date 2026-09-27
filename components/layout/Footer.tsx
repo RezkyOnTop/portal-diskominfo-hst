@@ -1,55 +1,73 @@
+import Image from "next/image";
 import Link from "next/link";
-import { LAYANAN, NAV_LINKS, SITE } from "@/lib/config";
+import { LAYANAN, LINK_TERKAIT, NAV_MENU, SITE, SOSIAL } from "@/lib/config";
 
 export function Footer() {
   return (
-    <footer className="mt-16 border-t border-neutral-200 bg-white">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <span
-              aria-hidden="true"
-              className="grid h-10 w-10 place-items-center rounded-lg bg-primary-600 text-sm font-bold text-white"
-            >
-              HST
-            </span>
-            <span className="font-heading text-sm font-bold text-neutral-900">
-              Diskominfo SP HST
-            </span>
-          </div>
-          <p className="text-sm text-neutral-600">
-            Dinas Komunikasi, Informatika, Statistik, dan Persandian Kabupaten Hulu
-            Sungai Tengah.
+    <footer className="mt-auto bg-neutral-900 text-neutral-300">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 md:grid-cols-2 lg:grid-cols-4">
+        {/* Identitas */}
+        <div className="space-y-4">
+          <Image
+            src="/brand/logo-putih.png"
+            alt={`Logo ${SITE.shortName}`}
+            width={185}
+            height={54}
+            className="h-10 w-auto"
+          />
+          <p className="text-sm leading-relaxed text-neutral-400">
+            {SITE.fullName}. Media center, layanan informasi publik, dan radio
+            pemerintah daerah.
           </p>
+          <ul className="flex gap-3 text-sm">
+            {SOSIAL.map((s) => (
+              <li key={s.name}>
+                <a
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-md bg-white/10 px-3 py-1.5 font-medium text-white hover:bg-white/20"
+                >
+                  {s.name}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
 
+        {/* Navigasi */}
         <nav aria-labelledby="footer-nav" className="space-y-3">
-          <h2 id="footer-nav" className="font-heading text-sm font-bold text-neutral-900">
+          <h2 id="footer-nav" className="font-heading text-sm font-bold text-white">
             Navigasi
           </h2>
-          <ul className="space-y-2 text-sm text-neutral-600">
-            {NAV_LINKS.map((l) => (
-              <li key={l.href}>
-                <Link href={l.href} className="hover:text-primary-700">
-                  {l.label}
-                </Link>
+          <ul className="space-y-2 text-sm">
+            {NAV_MENU.map((l) => (
+              <li key={l.label}>
+                {l.href ? (
+                  <Link href={l.href} className="text-neutral-400 hover:text-white">
+                    {l.label}
+                  </Link>
+                ) : (
+                  <span className="text-neutral-400">{l.label}</span>
+                )}
               </li>
             ))}
           </ul>
         </nav>
 
+        {/* Layanan digital */}
         <nav aria-labelledby="footer-layanan" className="space-y-3">
-          <h2 id="footer-layanan" className="font-heading text-sm font-bold text-neutral-900">
+          <h2 id="footer-layanan" className="font-heading text-sm font-bold text-white">
             Layanan Digital
           </h2>
-          <ul className="space-y-2 text-sm text-neutral-600">
+          <ul className="space-y-2 text-sm">
             {LAYANAN.map((l) => (
               <li key={l.href}>
                 <a
                   href={l.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-primary-700"
+                  className="text-neutral-400 hover:text-white"
                 >
                   {l.name} ↗
                 </a>
@@ -58,22 +76,41 @@ export function Footer() {
           </ul>
         </nav>
 
+        {/* Kontak + tautan terkait */}
         <div className="space-y-3">
-          <h2 className="font-heading text-sm font-bold text-neutral-900">Kontak</h2>
-          <address className="space-y-2 text-sm not-italic text-neutral-600">
+          <h2 className="font-heading text-sm font-bold text-white">Kontak</h2>
+          <address className="space-y-2 text-sm not-italic text-neutral-400">
             <p>{SITE.address}</p>
             <p>
-              <a href={`mailto:${SITE.email}`} className="hover:text-primary-700">
+              <a href={`mailto:${SITE.email}`} className="hover:text-white">
                 {SITE.email}
               </a>
             </p>
             <p>Telp. {SITE.phone}</p>
           </address>
+          <h2 className="pt-2 font-heading text-sm font-bold text-white">
+            Link Terkait
+          </h2>
+          <ul className="space-y-1.5 text-sm">
+            {LINK_TERKAIT.map((l) => (
+              <li key={l.href}>
+                <a
+                  href={l.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-neutral-400 hover:text-white"
+                >
+                  {l.name} ↗
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
-      <div className="border-t border-neutral-200 py-4">
-        <p className="mx-auto max-w-6xl px-4 text-center text-xs text-neutral-600">
-          © {new Date().getFullYear()} {SITE.name}. Seluruh hak cipta dilindungi.
+
+      <div className="border-t border-white/10 py-5">
+        <p className="mx-auto max-w-7xl px-4 text-center text-xs text-neutral-500">
+          © {new Date().getFullYear()} {SITE.shortName}. Hak Cipta Dilindungi.
         </p>
       </div>
     </footer>

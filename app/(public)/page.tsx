@@ -8,6 +8,11 @@ import { NewsCard } from "@/components/news/NewsCard";
 import { SkeletonLoader } from "@/components/news/SkeletonLoader";
 import { ApiErrorFallback } from "@/components/news/ApiErrorFallback";
 import { SocialFeed } from "@/components/layout/SocialFeed";
+import { ProfilSection } from "@/components/layout/ProfilSection";
+import { LayananBidang } from "@/components/layout/LayananBidang";
+import { RadioSection } from "@/components/layout/RadioSection";
+import { KontakSection } from "@/components/layout/KontakSection";
+import { StatsBar } from "@/components/layout/StatsBar";
 import { getBerita, getPengumuman } from "@/lib/api/media-center";
 import { LAYANAN } from "@/lib/config";
 import { formatDate } from "@/lib/utils/format";
@@ -18,7 +23,13 @@ export default function HomePage() {
   return (
     <>
       <Hero />
-      <Container className="py-12">
+
+      <StatsBar />
+
+      <ProfilSection />
+
+      {/* Berita Mediacenter */}
+      <Container className="py-16">
         <SectionHeading
           action={
             <Link
@@ -29,10 +40,11 @@ export default function HomePage() {
             </Link>
           }
         >
-          Berita Terbaru
+          Berita Mediacenter
         </SectionHeading>
         <p className="mt-1 text-sm text-neutral-600">
-          Bersumber dari Media Center HST (mediacenter.hstkab.go.id).
+          Berita terbaru Kabupaten Hulu Sungai Tengah — bersumber dari Media
+          Center HST.
         </p>
         <div className="mt-6">
           <Suspense fallback={<SkeletonLoader count={6} />}>
@@ -41,8 +53,13 @@ export default function HomePage() {
         </div>
       </Container>
 
-      <Container className="py-4">
-        <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr]">
+      <RadioSection />
+
+      <LayananBidang />
+
+      {/* Pengumuman + Layanan Digital */}
+      <Container className="py-16">
+        <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr]">
           <section>
             <SectionHeading
               action={
@@ -72,7 +89,7 @@ export default function HomePage() {
                     href={l.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block rounded-[var(--radius-card)] border border-neutral-200 bg-white p-4 shadow-[var(--shadow-card)] hover:border-primary-600"
+                    className="block rounded-[var(--radius-card)] border border-neutral-200 bg-white p-4 shadow-[var(--shadow-card)] transition-colors hover:border-primary-300"
                   >
                     <span className="flex items-center justify-between font-semibold text-neutral-900">
                       {l.name} <span aria-hidden="true">↗</span>
@@ -88,9 +105,11 @@ export default function HomePage() {
         </div>
       </Container>
 
-      <Container className="py-8">
+      <Container className="pb-16">
         <SocialFeed />
       </Container>
+
+      <KontakSection />
     </>
   );
 }

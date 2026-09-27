@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { Pagination } from "@/components/ui/Pagination";
 import { ApiErrorFallback } from "@/components/news/ApiErrorFallback";
@@ -32,14 +32,17 @@ export default async function PengumumanPage({
   }
 
   return (
-    <Container className="py-10">
-      <SectionHeading as="h1">Pengumuman Resmi</SectionHeading>
-      <p className="mt-1 text-sm text-neutral-600">
+    <>
+      <PageHeader
+        title="Pengumuman Resmi"
+        eyebrow="Berita"
+        crumbs={[{ label: "Pengumuman" }]}
+      >
         {result
           ? `Sumber: Media Center HST · ${result.meta.total} pengumuman.`
           : "Sumber: Media Center HST."}
-      </p>
-
+      </PageHeader>
+      <Container className="py-10">
       {result === null ? (
         <div className="mt-8">
           <ApiErrorFallback />
@@ -99,6 +102,7 @@ export default async function PengumumanPage({
         </Link>
         .
       </p>
-    </Container>
+      </Container>
+    </>
   );
 }

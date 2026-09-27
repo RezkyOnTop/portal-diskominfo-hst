@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { HoaxBadge } from "@/components/news/HoaxBadge";
 import { ApiErrorFallback } from "@/components/news/ApiErrorFallback";
 import { getHoaks } from "@/lib/api/media-center";
@@ -24,13 +24,16 @@ export default async function HoaksPage() {
   }
 
   return (
-    <Container className="py-10">
-      <SectionHeading as="h1">Klarifikasi Hoaks</SectionHeading>
-      <p className="mt-1 max-w-2xl text-sm text-neutral-600">
+    <>
+      <PageHeader
+        title="Klarifikasi Hoaks"
+        eyebrow="Informasi"
+        crumbs={[{ label: "Klarifikasi Hoaks" }]}
+      >
         Verifikasi dan bantahan resmi atas informasi yang beredar di masyarakat.
         Sumber: Media Center HST.
-      </p>
-
+      </PageHeader>
+      <Container className="py-10">
       {result === null ? (
         <div className="mt-8">
           <ApiErrorFallback />
@@ -82,6 +85,7 @@ export default async function HoaksPage() {
           {result.meta.total} entri klarifikasi.
         </p>
       ) : null}
-    </Container>
+      </Container>
+    </>
   );
 }

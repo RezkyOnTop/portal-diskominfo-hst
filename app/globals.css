@@ -2,46 +2,69 @@
 
 /*
   Design tokens — Diskominfo SP HST
-  Sumber: DESIGN.md (palet Biru Pemerintah, Hijau/Emas, Neutral).
-  Pendekatan token ala Vercel/Linear/Stripe: kontras tinggi, tipografi tegas.
+  Palet mengikuti identitas situs resmi (biru pemerintah #3B5BDB),
+  tipografi Sora (heading) + DM Sans (body) seperti situs asli,
+  ditingkatkan dengan skala warna lengkap & bayangan berlapis.
 */
 @theme {
-  --color-primary-50: #eaf2fb;
-  --color-primary-100: #d3e3f6;
-  --color-primary-500: #1e63b3;
-  --color-primary-600: #0b4a8f;
-  --color-primary-700: #083a70;
-  --color-primary-800: #062c56;
+  --color-primary-50: #eef2fe;
+  --color-primary-100: #dde4fc;
+  --color-primary-200: #bcc9f8;
+  --color-primary-300: #94a7f1;
+  --color-primary-400: #6d82e8;
+  --color-primary-500: #4f66e0;
+  --color-primary-600: #3b5bdb;
+  --color-primary-700: #2f47b8;
+  --color-primary-800: #283c94;
+  --color-primary-900: #233270;
+  --color-primary-950: #171f47;
 
-  --color-secondary-600: #0f7b6c;
-  --color-secondary-700: #0b5e53;
-  --color-accent-500: #c8a44a;
-  --color-accent-600: #a9862f;
+  --color-accent-300: #fcd34d;
+  --color-accent-400: #fbbf24;
+  --color-accent-500: #f59f00;
+  --color-accent-600: #d97706;
+
+  --color-secondary-500: #0ea5a4;
+  --color-secondary-600: #0d8a89;
+  --color-secondary-700: #0f6f6e;
 
   --color-danger-50: #fdecea;
   --color-danger-600: #c0392b;
   --color-warning-50: #fdf6e3;
   --color-warning-600: #b7791f;
 
-  --color-neutral-50: #f9fafb;
-  --color-neutral-100: #f3f4f6;
-  --color-neutral-200: #e5e7eb;
-  --color-neutral-400: #9ca3af;
-  --color-neutral-600: #4b5563;
-  --color-neutral-700: #374151;
-  --color-neutral-900: #111827;
+  --color-neutral-50: #f8fafc;
+  --color-neutral-100: #f1f5f9;
+  --color-neutral-200: #e2e8f0;
+  --color-neutral-300: #cbd5e1;
+  --color-neutral-400: #94a3b8;
+  --color-neutral-500: #64748b;
+  --color-neutral-600: #475569;
+  --color-neutral-700: #334155;
+  --color-neutral-800: #1e293b;
+  --color-neutral-900: #0f172a;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-jakarta), var(--font-inter), ui-sans-serif, sans-serif;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-sora), var(--font-dm-sans), ui-sans-serif, sans-serif;
 
-  --radius-card: 0.875rem;
-  --shadow-card: 0 1px 2px rgb(17 24 39 / 0.06), 0 1px 3px rgb(17 24 39 / 0.1);
-  --shadow-card-hover: 0 10px 24px -8px rgb(11 74 143 / 0.25);
+  --radius-card: 1rem;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04),
+    0 4px 12px -2px rgb(15 23 42 / 0.08);
+  --shadow-card-hover: 0 12px 32px -8px rgb(59 91 219 / 0.28);
 }
 
 :root {
   --background: #ffffff;
   --foreground: var(--color-neutral-900);
+  /* Tinggi navbar (topbar + baris utama). Dipakai agar hero bisa
+     berada DI BAWAH header transparan tanpa celah. */
+  --header-h: 64px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-h: 98px;
+  }
 }
 
 html {
@@ -53,6 +76,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 h1,
@@ -60,7 +84,7 @@ h2,
 h3,
 h4 {
   font-family: var(--font-heading);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 /* Fokus terlihat untuk aksesibilitas keyboard (WCAG 2.1 AA). */
@@ -82,19 +106,45 @@ h4 {
   }
 }
 
+/* Animasi masuk lembut untuk section (ditingkatkan dari situs asli). */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Latar pola titik halus untuk section gelap. */
+.bg-grid {
+  background-image: radial-gradient(
+    rgb(255 255 255 / 0.08) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
+}
+
 /* Konten berita (HTML dari Media Center) — gaya baca. */
 .prose-berita {
-  line-height: 1.75;
+  line-height: 1.8;
   color: var(--color-neutral-700);
+  font-size: 1.0625rem;
 }
 .prose-berita p {
-  margin-bottom: 1rem;
+  margin-bottom: 1.15rem;
 }
 .prose-berita img {
   max-width: 100%;
   height: auto;
-  border-radius: 0.5rem;
-  margin: 1rem 0;
+  border-radius: 0.75rem;
+  margin: 1.25rem 0;
 }
 .prose-berita a {
   color: var(--color-primary-600);
@@ -102,6 +152,7 @@ h4 {
 }
 .prose-berita h2,
 .prose-berita h3 {
-  margin: 1.5rem 0 0.75rem;
+  margin: 1.75rem 0 0.75rem;
   color: var(--color-neutral-900);
+  font-family: var(--font-heading);
 }

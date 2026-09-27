@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
-import { SectionHeading } from "@/components/ui/SectionHeading";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { NewsCard } from "@/components/news/NewsCard";
 import { Pagination } from "@/components/ui/Pagination";
 import { ApiErrorFallback } from "@/components/news/ApiErrorFallback";
@@ -45,17 +45,20 @@ export default async function BeritaPage({ searchParams }: PageProps<"/berita">)
   };
 
   return (
-    <Container className="py-10">
-      <SectionHeading as="h1">Berita Hulu Sungai Tengah</SectionHeading>
-      <p className="mt-1 text-sm text-neutral-600">
+    <>
+      <PageHeader
+        title="Berita Hulu Sungai Tengah"
+        eyebrow="Berita"
+        crumbs={[{ label: "Berita" }]}
+      >
         {result
           ? `Sumber: Media Center HST. Total ${result.meta.total} berita${
               kategori ? ` dalam kategori “${kategori}”` : ""
             }.`
           : "Sumber: Media Center HST."}
-      </p>
-
-      <nav aria-label="Filter kategori" className="mt-5 flex flex-wrap gap-2">
+      </PageHeader>
+      <Container className="py-10">
+      <nav aria-label="Filter kategori" className="flex flex-wrap gap-2">
         <Link
           href="/berita"
           aria-current={!kategori ? "page" : undefined}
@@ -106,6 +109,7 @@ export default async function BeritaPage({ searchParams }: PageProps<"/berita">)
           makeHref={makeHref}
         />
       ) : null}
-    </Container>
+      </Container>
+    </>
   );
 }
