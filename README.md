@@ -77,6 +77,23 @@ npm run dev
 
 Buat hash password admin: `node -e "console.log(require('bcryptjs').hashSync('PASSWORD_ANDA',10))"`.
 
+### Mengaktifkan dashboard admin
+
+Dashboard admin ada di **`/dashboard`** (login di **`/masuk`**), dilindungi Auth.js. Berisi
+ringkasan statistik kunjungan & daftar subscriber radio. Berita/pengumuman **tidak** dikelola di
+sini (sumbernya Media Center HST).
+
+Aktifkan akun admin dengan script (password diketik langsung, tidak pernah masuk repo):
+
+```bash
+node scripts/setup-admin.mjs
+# lalu restart server
+```
+
+Script meminta email + password, menulis `ADMIN_EMAIL` & `ADMIN_PASSWORD_HASH` (bcrypt) ke
+`.env.local` (mode 600), dan membuat `AUTH_SECRET` bila belum ada. Selama kredensial ini belum
+diset, `/dashboard` tetap mengalihkan ke `/masuk` tetapi login tidak akan berhasil.
+
 ### Menyiapkan PostgreSQL (sekali saja)
 
 ```bash
@@ -108,7 +125,9 @@ npm run test:coverage  # coverage (lib/ & app/api/ >= 80%)
 app/(public)/            # beranda, berita, pengumuman, hoaks, radio, cari,
                          # data-terbuka, survei, kontak
 app/(admin)/dashboard/   # statistik + subscriber (Auth.js)
+app/masuk/               # halaman login administrator
 app/api/                 # visitor, subscriber, cari, survei, auth
+scripts/setup-admin.mjs  # aktifkan akun admin (tulis hash bcrypt ke .env.local)
 lib/api/media-center.ts  # SATU-SATUNYA pemanggil mediacenter.hstkab.go.id
 lib/api/opendata.ts      # SATU-SATUNYA pemanggil opendata.hstkab.go.id
 lib/api/bmkg.ts          # SATU-SATUNYA pemanggil api.bmkg.go.id (cuaca)
