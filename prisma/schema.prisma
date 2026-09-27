@@ -45,3 +45,33 @@ model SocialMediaCache {
 
   @@index([platform])
 }
+
+/// Survei kepuasan layanan masyarakat (data lokal).
+/// Mengikuti 9 unsur Indeks Kepuasan Masyarakat (IKM) — PermenPANRB 14/2017.
+/// Setiap unsur dinilai 1–4 (Tidak Baik / Kurang Baik / Baik / Sangat Baik).
+model ServiceSurvey {
+  id        String   @id @default(cuid())
+  /// Nama layanan yang dinilai (mis. "Layanan Publikasi & Dokumentasi").
+  layanan   String
+  /// 9 unsur IKM.
+  u1        Int
+  u2        Int
+  u3        Int
+  u4        Int
+  u5        Int
+  u6        Int
+  u7        Int
+  u8        Int
+  u9        Int
+  /// Nilai IKM terhitung (0–100) dan mutu pelayanan (A/B/C/D).
+  ikm       Float
+  mutu      String
+  /// Saran/masukan, identitas opsional (boleh anonim).
+  saran     String?
+  nama      String?
+  kontak    String?
+  createdAt DateTime @default(now())
+
+  @@index([layanan])
+  @@index([createdAt])
+}

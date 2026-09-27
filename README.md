@@ -8,7 +8,9 @@ Dokumentasi kontrak kerja ada di `~/diskominfosp-hst-docs/` (PRD, ARCHITECTURE, 
 
 - **Berita, pengumuman, hoaks** → diambil dari **API Media Center HST** (`https://mediacenter.hstkab.go.id`).
   **Tidak ada tabel `News`/`HoaxReport` dan tidak ada CRUD berita.** Hanya `lib/api/media-center.ts` yang boleh memanggil domain tersebut.
-- **Data lokal (PostgreSQL)** → hanya `VisitorStat`, `RadioSubscriber`, `SocialMediaCache`.
+- **Data terbuka** → katalog dataset dari **API publik Open Data HST** (`https://opendata.hstkab.go.id/api/public/datasets`), tanpa API key.
+  Hanya `lib/api/opendata.ts` yang boleh memanggil domain tersebut.
+- **Data lokal (PostgreSQL)** → hanya `VisitorStat`, `RadioSubscriber`, `SocialMediaCache`, `ServiceSurvey`.
 
 ### Bentuk API Media Center (hasil verifikasi langsung)
 
@@ -21,6 +23,28 @@ Dokumentasi kontrak kerja ada di `~/diskominfosp-hst-docs/` (PRD, ARCHITECTURE, 
 | Halaman detail | `https://mediacenter.hstkab.go.id/berita/{slug}` |
 
 Adapter menormalisasi bentuk mentah ini ke tipe internal (`Berita`, `Pengumuman`) dan memvalidasi dengan Zod. Bila tim Media Center menambah `/api/hoaks`, cukup ubah `getHoaks()` — UI tidak berubah.
+
+### Bentuk API Open Data (hasil verifikasi langsung)
+
+| Endpoint | Bentuk respons |
+|---|---|
+| `GET /api/public/datasets` | `{ success, data[], metadata{total,page,limit,total_pages}, filters{kategori,instansi} }` |
+| Parameter | `page`, `limit`, `kategori`, `instansi`, `tahun`, `search` |
+| Item dataset | `{ id, judul, slug, deskripsi(HTML), instansi, kategori, tahun, jenis_data, file_url, updated_at, views, status }` |
+| Halaman detail | `https://opendata.hstkab.go.id/public/datasets/{slug}` — **fallback ke `{id}`** |
+
+⚠️ **Sekitar 24% dataset tidak punya `slug`** (null/kosong). Adapter **tidak membuang** dataset tersebut: URL detail memakai `id` sebagai fallback (portal menerima keduanya).
+
+## Fitur
+
+- **Berita / Pengumuman / Hoaks** — bersumber dari Media Center HST (adapter + cache TTL + stale-while-error).
+- **Pencarian global** (`/cari`, `/api/cari`) — lintas berita, pengumuman, dan halaman statis; pencocokan berbasis token.
+- **Mode terang/gelap** — berbasis kelas `.dark` (pilihan pengguna persisten, tanpa flicker).
+- **Data Terbuka** (`/data-terbuka`) — katalog 301 dataset dari Open Data HST; pencarian, filter kategori/tahun, paginasi.
+- **Survei Kepuasan Layanan** (`/survei`) — Indeks Kepuasan Masyarakat (IKM), 9 unsur sesuai **PermenPANRB 14/2017**; nilai IKM & mutu (A/B/C/D) dihitung di server; ringkasan publik.
+- **Peta lokasi** — Google Maps embed di `/kontak` (tanpa API key), koordinat kantor terverifikasi.
+- **Radio Swara Murakata** — pemutar persisten lintas halaman + form subscriber.
+- **Dashboard admin** — statistik kunjungan & daftar subscriber (Auth.js).
 
 ## Tech stack
 
@@ -51,14 +75,16 @@ npm run test:coverage  # coverage (lib/ & app/api/ >= 80%)
 ## Struktur singkat
 
 ```
-app/(public)/            # beranda, berita, pengumuman, hoaks, radio
+app/(public)/            # beranda, berita, pengumuman, hoaks, radio, cari,
+                         # data-terbuka, survei, kontak
 app/(admin)/dashboard/   # statistik + subscriber (Auth.js)
-app/api/                 # visitor, subscriber, auth
+app/api/                 # visitor, subscriber, cari, survei, auth
 lib/api/media-center.ts  # SATU-SATUNYA pemanggil mediacenter.hstkab.go.id
-lib/services/            # subscriber, visitor, social (data lokal)
-lib/validations/         # skema Zod
-components/              # ui/, layout/, news/
-prisma/schema.prisma     # VisitorStat, RadioSubscriber, SocialMediaCache
+lib/api/opendata.ts      # SATU-SATUNYA pemanggil opendata.hstkab.go.id
+lib/services/            # subscriber, visitor, social, search, survey (data lokal)
+lib/validations/         # skema Zod (+ rumus IKM)
+components/              # ui/, layout/, news/, search/, survei/
+prisma/schema.prisma     # VisitorStat, RadioSubscriber, SocialMediaCache, ServiceSurvey
 ```
 
 ## Catatan verifikasi

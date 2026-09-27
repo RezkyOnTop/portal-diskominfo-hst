@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Container } from "@/components/layout/Container";
-import { SITE, SOSIAL } from "@/lib/config";
+import { SITE, SOSIAL, googleMapsEmbedUrl } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Kontak",
@@ -71,9 +71,11 @@ export default function KontakPage() {
           <div className="min-h-[320px] overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[var(--shadow-card)]">
             <iframe
               title="Peta lokasi Diskominfo SP HST"
-              src="https://www.openstreetmap.org/export/embed.html?bbox=115.5%2C-2.75%2C115.65%2C-2.65&layer=mapnik&marker=-2.7%2C115.58"
-              className="h-full min-h-[320px] w-full"
+              src={googleMapsEmbedUrl()}
+              className="h-full min-h-[320px] w-full border-0"
               loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
             />
           </div>
         </div>

@@ -60,6 +60,18 @@ export const HALAMAN_STATIS: {
   { title: "Pengumuman", excerpt: "Pengumuman resmi dari Media Center HST.", href: "/pengumuman" },
   { title: "Klarifikasi Hoaks", excerpt: "Klarifikasi berita bohong dan disinformasi.", href: "/hoaks" },
   { title: "Kontak", excerpt: "Alamat, email, telepon, dan media sosial Diskominfo SP HST.", href: "/kontak" },
+  {
+    title: "Survei Kepuasan Layanan",
+    excerpt:
+      "Survei Kepuasan Masyarakat (IKM) — nilai 9 unsur pelayanan sesuai PermenPANRB 14/2017.",
+    href: "/survei",
+  },
+  {
+    title: "Data Terbuka (Open Data)",
+    excerpt:
+      "Katalog dataset terbuka Kabupaten Hulu Sungai Tengah dari portal Open Data HST.",
+    href: "/data-terbuka",
+  },
 ];
 
 function norm(s: string): string {

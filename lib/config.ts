@@ -17,6 +17,37 @@ export const SITE = {
   url: "https://diskominfosp.hstkab.go.id",
 } as const;
 
+/**
+ * Koordinat kantor (terverifikasi dari Google Maps).
+ * Plus Code C92V+JFH — Jl. Perintis Kemerdekaan, Benawa Tengah, Barabai.
+ */
+export const OFFICE_COORDS = {
+  lat: -2.5986915,
+  lng: 115.3938058,
+} as const;
+
+/**
+ * URL embed Google Maps (tanpa API key) — pola yang sama dipakai situs lama.
+ * Mode `q=lat,lng&output=embed` di-redirect Google ke /maps/embed dan dapat
+ * dibingkai di iframe.
+ */
+export function googleMapsEmbedUrl(zoom = 16): string {
+  const { lat, lng } = OFFICE_COORDS;
+  return `https://maps.google.com/maps?q=${lat},${lng}&z=${zoom}&hl=id&output=embed`;
+}
+
+/** URL petunjuk arah (dibuka di tab baru). */
+export function googleMapsDirectionsUrl(): string {
+  const { lat, lng } = OFFICE_COORDS;
+  return `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+}
+
+/** URL tempat di Google Maps (dibuka di tab baru). */
+export function googleMapsPlaceUrl(): string {
+  const { lat, lng } = OFFICE_COORDS;
+  return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+}
+
 /** Tagline hero. */
 export const HERO = {
   region: "Kabupaten Hulu Sungai Tengah",
@@ -69,6 +100,7 @@ export const NAV_MENU: NavItem[] = [
     children: [
       { label: "Daftar Layanan", href: "/layanan" },
       { label: "Radio Swara Murakata", href: "/radio" },
+      { label: "Survei Kepuasan Layanan", href: "/survei" },
       {
         label: "PPID HST",
         href: "https://ppid.hstkab.go.id/",
@@ -84,8 +116,9 @@ export const NAV_MENU: NavItem[] = [
   {
     label: "Data",
     children: [
+      { label: "Data Terbuka (Open Data)", href: "/data-terbuka" },
       {
-        label: "Open Data HST",
+        label: "Portal Open Data HST",
         href: "https://opendata.hstkab.go.id/",
         external: true,
       },
