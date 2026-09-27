@@ -6,7 +6,7 @@ interface Crumb {
   href?: string;
 }
 
-/** Header halaman dengan breadcrumb + judul (konsisten di seluruh situs). */
+/** Header halaman dengan breadcrumb + judul (konsisten dengan tema gelap). */
 export function PageHeader({
   title,
   eyebrow,
@@ -19,9 +19,14 @@ export function PageHeader({
   children?: React.ReactNode;
 }) {
   return (
-    <section className="border-b border-neutral-200 bg-gradient-to-b from-primary-800 to-primary-700 text-white">
-      <Container className="py-10">
-        <nav aria-label="Breadcrumb" className="text-xs text-white/75">
+    <section className="relative isolate overflow-hidden bg-mesh text-white">
+      <div aria-hidden="true" className="absolute inset-0 bg-grid-dark opacity-50" />
+      <div
+        aria-hidden="true"
+        className="absolute -right-10 -top-10 h-56 w-56 rounded-full bg-primary-500/25 blur-3xl"
+      />
+      <Container className="relative py-12">
+        <nav aria-label="Breadcrumb" className="text-xs text-neutral-400">
           <ol className="flex flex-wrap items-center gap-1.5">
             <li>
               <Link href="/" className="hover:text-white">
@@ -30,7 +35,9 @@ export function PageHeader({
             </li>
             {crumbs.map((c) => (
               <li key={c.label} className="flex items-center gap-1.5">
-                <span aria-hidden="true">/</span>
+                <span aria-hidden="true" className="text-neutral-600">
+                  /
+                </span>
                 {c.href ? (
                   <Link href={c.href} className="hover:text-white">
                     {c.label}
@@ -43,13 +50,20 @@ export function PageHeader({
           </ol>
         </nav>
         {eyebrow ? (
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary-200">
+          <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-primary-200">
             {eyebrow}
           </p>
         ) : null}
-        <h1 className="mt-2 font-heading text-2xl font-bold sm:text-3xl">{title}</h1>
-        {children ? <div className="mt-3 max-w-3xl text-sm text-white/85">{children}</div> : null}
+        <h1 className="mt-3 font-heading text-3xl font-extrabold tracking-tight sm:text-4xl">
+          {title}
+        </h1>
+        {children ? (
+          <div className="mt-3 max-w-3xl text-sm leading-relaxed text-neutral-300">
+            {children}
+          </div>
+        ) : null}
       </Container>
+      <div aria-hidden="true" className="divider-gradient" />
     </section>
   );
 }

@@ -4,9 +4,10 @@ import { Hero } from "@/components/layout/Hero";
 import { Container } from "@/components/layout/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { Badge } from "@/components/ui/Badge";
-import { NewsCard } from "@/components/news/NewsCard";
 import { SkeletonLoader } from "@/components/news/SkeletonLoader";
 import { ApiErrorFallback } from "@/components/news/ApiErrorFallback";
+import { BentoBerita } from "@/components/news/BentoBerita";
+import { NewsTicker } from "@/components/news/NewsTicker";
 import { SocialFeed } from "@/components/layout/SocialFeed";
 import { ProfilSection } from "@/components/layout/ProfilSection";
 import { LayananBidang } from "@/components/layout/LayananBidang";
@@ -24,34 +25,38 @@ export default function HomePage() {
     <>
       <Hero />
 
-      <StatsBar />
+      <Suspense fallback={null}>
+        <Ticker />
+      </Suspense>
 
-      <ProfilSection />
-
-      {/* Berita Mediacenter */}
+      {/* Bento berita */}
       <Container className="py-16">
-        <SectionHeading
-          action={
-            <Link
-              href="/berita"
-              className="text-sm font-semibold text-primary-700 hover:underline"
-            >
-              Semua berita →
-            </Link>
-          }
-        >
-          Berita Mediacenter
-        </SectionHeading>
-        <p className="mt-1 text-sm text-neutral-600">
-          Berita terbaru Kabupaten Hulu Sungai Tengah — bersumber dari Media
-          Center HST.
-        </p>
-        <div className="mt-6">
-          <Suspense fallback={<SkeletonLoader count={6} />}>
-            <LatestBerita />
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-primary-600">
+              Media Center HST
+            </p>
+            <h2 className="mt-1 font-heading text-2xl font-bold text-neutral-900 sm:text-3xl">
+              Sorotan &amp; Berita Terbaru
+            </h2>
+          </div>
+          <Link
+            href="/berita"
+            className="rounded-full border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-800 transition-colors hover:border-primary-300 hover:text-primary-700"
+          >
+            Semua berita →
+          </Link>
+        </div>
+        <div className="mt-8">
+          <Suspense fallback={<SkeletonLoader count={5} />}>
+            <BeritaBento />
           </Suspense>
         </div>
       </Container>
+
+      <ProfilSection />
+
+      <StatsBar />
 
       <RadioSection />
 
@@ -114,25 +119,27 @@ export default function HomePage() {
   );
 }
 
-async function LatestBerita() {
-  // Fetch (dan error-nya) di dalam try/catch; JSX dirender di luar try/catch
-  // agar tidak melanggar aturan react-hooks/error-boundaries.
+async function Ticker() {
   let data;
   try {
-    ({ data } = await getBerita({ limit: 6 }));
+    ({ data } = await getBerita({ limit: 8 }));
+  } catch {
+    return null;
+  }
+  return <NewsTicker items={data} />;
+}
+
+async function BeritaBento() {
+  let data;
+  try {
+    ({ data } = await getBerita({ limit: 5 }));
   } catch {
     return <ApiErrorFallback />;
   }
   if (data.length === 0) {
     return <EmptyState label="Belum ada berita untuk ditampilkan." />;
   }
-  return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {data.map((b, i) => (
-        <NewsCard key={b.id} berita={b} priority={i < 3} />
-      ))}
-    </div>
-  );
+  return <BentoBerita items={data} />;
 }
 
 async function LatestPengumuman() {
