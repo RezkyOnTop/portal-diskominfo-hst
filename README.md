@@ -10,6 +10,8 @@ Dokumentasi kontrak kerja ada di `~/diskominfosp-hst-docs/` (PRD, ARCHITECTURE, 
   **Tidak ada tabel `News`/`HoaxReport` dan tidak ada CRUD berita.** Hanya `lib/api/media-center.ts` yang boleh memanggil domain tersebut.
 - **Data terbuka** → katalog dataset dari **API publik Open Data HST** (`https://opendata.hstkab.go.id/api/public/datasets`), tanpa API key.
   Hanya `lib/api/opendata.ts` yang boleh memanggil domain tersebut.
+- **Cuaca** → prakiraan resmi dari **API publik BMKG** (`https://api.bmkg.go.id/publik/prakiraan-cuaca`), tanpa API key.
+  Hanya `lib/api/bmkg.ts` yang boleh memanggil domain tersebut.
 - **Data lokal (PostgreSQL)** → hanya `VisitorStat`, `RadioSubscriber`, `SocialMediaCache`, `ServiceSurvey`.
 
 ### Bentuk API Media Center (hasil verifikasi langsung)
@@ -35,6 +37,18 @@ Adapter menormalisasi bentuk mentah ini ke tipe internal (`Berita`, `Pengumuman`
 
 ⚠️ **Sekitar 24% dataset tidak punya `slug`** (null/kosong). Adapter **tidak membuang** dataset tersebut: URL detail memakai `id` sebagai fallback (portal menerima keduanya).
 
+### Bentuk API BMKG (hasil verifikasi langsung)
+
+| Endpoint | Bentuk respons |
+|---|---|
+| `GET /publik/prakiraan-cuaca?adm4={kode}` | `{ lokasi{provinsi,kotkab,kecamatan,desa,lat,lon}, data[0].cuaca[hari][slot] }` |
+| Slot cuaca | `{ local_datetime, t(°C), hu(%), ws(km/j), wd(arah), weather(kode), weather_desc, image(ikon SVG) }` |
+| Halaman sumber | `https://www.bmkg.go.id/cuaca/prakiraan-cuaca/{adm4}` |
+
+**Kode wilayah (adm4) default `63.07.06.1001` = Barabai Darat**, kelurahan terdekat dari kantor (≈1,2 km).
+Kelurahan Benawa Tengah (lokasi kantor) **belum terdaftar di BMKG**, sehingga Barabai Darat dipakai sebagai
+representasi prakiraan wilayah kantor. Ubah lewat env `BMKG_ADM4` bila perlu — tanpa mengubah kode.
+
 ## Fitur
 
 - **Berita / Pengumuman / Hoaks** — bersumber dari Media Center HST (adapter + cache TTL + stale-while-error).
@@ -43,8 +57,9 @@ Adapter menormalisasi bentuk mentah ini ke tipe internal (`Berita`, `Pengumuman`
 - **Data Terbuka** (`/data-terbuka`) — katalog 301 dataset dari Open Data HST; pencarian, filter kategori/tahun, paginasi.
 - **Survei Kepuasan Layanan** (`/survei`) — Indeks Kepuasan Masyarakat (IKM), 9 unsur sesuai **PermenPANRB 14/2017**; nilai IKM & mutu (A/B/C/D) dihitung di server; ringkasan publik.
 - **Peta lokasi** — Google Maps embed di `/kontak` (tanpa API key), koordinat kantor terverifikasi.
+- **Cuaca Barabai** — widget prakiraan resmi **BMKG** (3 hari + kondisi saat ini) di beranda & `/kontak`; sumber data terpisah dari konten lain, gagal upstream → fallback ramah + tautan BMKG.
 - **Radio Swara Murakata** — pemutar persisten lintas halaman + form subscriber.
-- **Dashboard admin** — statistik kunjungan & daftar subscriber (Auth.js).
+- **Dashboard admin** (`/dashboard`, login di `/masuk`) — statistik kunjungan & daftar subscriber (Auth.js); konten berita tetap dikelola di Media Center, bukan di sini.
 
 ## Tech stack
 
@@ -96,9 +111,10 @@ app/(admin)/dashboard/   # statistik + subscriber (Auth.js)
 app/api/                 # visitor, subscriber, cari, survei, auth
 lib/api/media-center.ts  # SATU-SATUNYA pemanggil mediacenter.hstkab.go.id
 lib/api/opendata.ts      # SATU-SATUNYA pemanggil opendata.hstkab.go.id
+lib/api/bmkg.ts          # SATU-SATUNYA pemanggil api.bmkg.go.id (cuaca)
 lib/services/            # subscriber, visitor, social, search, survey (data lokal)
 lib/validations/         # skema Zod (+ rumus IKM)
-components/              # ui/, layout/, news/, search/, survei/
+components/              # ui/, layout/, news/, search/, survei/, cuaca/
 prisma/schema.prisma     # VisitorStat, RadioSubscriber, SocialMediaCache, ServiceSurvey
 ```
 

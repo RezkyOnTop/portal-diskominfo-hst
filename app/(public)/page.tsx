@@ -14,6 +14,7 @@ import { LayananBidang } from "@/components/layout/LayananBidang";
 import { RadioSection } from "@/components/layout/RadioSection";
 import { KontakSection } from "@/components/layout/KontakSection";
 import { StatsBar } from "@/components/layout/StatsBar";
+import { WeatherWidget } from "@/components/cuaca/WeatherWidget";
 import { getBerita, getPengumuman } from "@/lib/api/media-center";
 import { LAYANAN } from "@/lib/config";
 import { formatDate } from "@/lib/utils/format";
@@ -57,6 +58,17 @@ export default function HomePage() {
       <ProfilSection />
 
       <StatsBar />
+
+      {/* Cuaca Barabai (sumber resmi BMKG) */}
+      <Container className="py-16">
+        <Suspense
+          fallback={
+            <div className="h-72 animate-pulse rounded-[var(--radius-card)] border border-neutral-200 bg-neutral-50" />
+          }
+        >
+          <WeatherWidget className="mx-auto max-w-3xl" />
+        </Suspense>
+      </Container>
 
       <RadioSection />
 

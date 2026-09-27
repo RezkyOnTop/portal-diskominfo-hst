@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Container } from "@/components/layout/Container";
+import { WeatherWidget } from "@/components/cuaca/WeatherWidget";
 import { SITE, SOSIAL, googleMapsEmbedUrl } from "@/lib/config";
 
 export const metadata: Metadata = {
@@ -78,6 +79,18 @@ export default function KontakPage() {
               allowFullScreen
             />
           </div>
+        </div>
+
+        {/* Cuaca wilayah kantor — sumber resmi BMKG */}
+        <div className="mt-10">
+          <h2 className="font-heading text-lg font-bold text-neutral-900">
+            Cuaca Sekitar Kantor
+          </h2>
+          <p className="mt-1 text-sm text-neutral-600">
+            Prakiraan resmi BMKG untuk Kecamatan Barabai, Kabupaten Hulu Sungai
+            Tengah.
+          </p>
+          <WeatherWidget className="mt-4" />
         </div>
       </Container>
     </>
