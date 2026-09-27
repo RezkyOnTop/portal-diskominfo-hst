@@ -97,16 +97,26 @@ function tanyaRahasia(teks) {
   });
 }
 
+/**
+ * Escape nilai agar aman di file .env.
+ * Next.js (@next/env) meng-expand `$VAR` / `${VAR}` di dalam nilai, sehingga
+ * hash bcrypt (`$2b$12$...`) akan rusak kalau `$` tidak di-escape jadi `\$`.
+ * Tanpa ini, ADMIN_PASSWORD_HASH terbaca 44 karakter dan login selalu gagal.
+ */
+function escapeEnvValue(nilai) {
+  return String(nilai).replace(/\$/g, "\\$");
+}
+
 /** Set/ubah satu variabel di isi file .env, mempertahankan komentar lain. */
 function setVar(isi, kunci, nilai) {
-  const baris = `${kunci}="${nilai}"`;
+  const baris = `${kunci}="${escapeEnvValue(nilai)}"`;
   const pola = new RegExp(`^\\s*${kunci}\\s*=.*$`, "m");
   return isi.replace(pola, baris); // sudah ada -> ganti di tempat
 }
 
 /** Tambahkan variabel baru di akhir file, di bawah satu header komentar. */
 function tambahVar(isi, kunci, nilai) {
-  const baris = `${kunci}="${nilai}"`;
+  const baris = `${kunci}="${escapeEnvValue(nilai)}"`;
   if (new RegExp(`^\\s*${kunci}\\s*=`, "m").test(isi)) return setVar(isi, kunci, nilai);
   const pemisah = isi === "" || isi.endsWith("\n") ? "" : "\n";
   return `${isi}${pemisah}${baris}\n`;
