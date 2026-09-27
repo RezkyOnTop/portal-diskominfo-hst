@@ -56,10 +56,25 @@ Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Prisma 6 · PostgreS
 cp .env.example .env.local   # isi DATABASE_URL, AUTH_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD_HASH
 npm install
 npx prisma generate
+npx prisma migrate deploy    # buat tabel lokal (VisitorStat, RadioSubscriber, SocialMediaCache, ServiceSurvey)
 npm run dev
 ```
 
 Buat hash password admin: `node -e "console.log(require('bcryptjs').hashSync('PASSWORD_ANDA',10))"`.
+
+### Menyiapkan PostgreSQL (sekali saja)
+
+```bash
+sudo -u postgres psql -c "CREATE ROLE diskominfosp LOGIN PASSWORD 'GANTI_PASSWORD';"
+sudo -u postgres createdb -O diskominfosp diskominfosp_hst
+# lalu set DATABASE_URL di .env.local:
+#   postgresql://diskominfosp:GANTI_PASSWORD@localhost:5432/diskominfosp_hst
+npx prisma migrate deploy
+```
+
+Tanpa PostgreSQL, portal tetap berjalan: berita/pengumuman/data terbuka tetap tampil (sumber API eksternal),
+sedangkan fitur yang butuh database (survei, statistik kunjungan, subscriber radio) menampilkan
+fallback yang ramah — bukan error.
 
 ## Perintah
 
