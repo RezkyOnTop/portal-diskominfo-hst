@@ -101,6 +101,7 @@ export const NAV_MENU: NavItem[] = [
       },
     ],
   },
+  { label: "Galeri", href: "/galeri" },
   { label: "Kontak", href: "/kontak" },
 ];
 /** Layanan digital terkait (dipakai di section & footer). */
