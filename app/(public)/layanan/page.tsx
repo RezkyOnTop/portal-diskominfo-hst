@@ -25,7 +25,7 @@ export default function LayananPage() {
         <h2 className="font-heading text-xl font-bold text-neutral-900">
           Layanan Bidang
         </h2>
-        <div className="mt-6 grid gap-6 md:grid-cols-3">
+        <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {BIDANG.map((b) => (
             <div
               key={b.name}

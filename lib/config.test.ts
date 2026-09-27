@@ -2,11 +2,16 @@ import { describe, it, expect, afterEach } from "vitest";
 import {
   SITE,
   LAYANAN,
+  BIDANG,
   NAV_MENU,
   LINK_TERKAIT,
   SOSIAL,
   RADIO_NAME,
   radioStreamUrl,
+  OFFICE_COORDS,
+  googleMapsEmbedUrl,
+  googleMapsDirectionsUrl,
+  googleMapsPlaceUrl,
 } from "./config";
 
 /** Kumpulkan seluruh href dari struktur menu (termasuk submenu). */
@@ -28,10 +33,51 @@ describe("config", () => {
     expect(SITE.address).toContain("71314");
   });
 
-  it("semua tautan layanan diarahkan ke domain resmi", () => {
+  it("semua tautan layanan diarahkan ke domain resmi hstkab.go.id", () => {
     for (const l of LAYANAN) {
-      expect(l.href).toMatch(/hstkab\.go\.id|lapor\.go\.id/);
+      expect(l.href).toMatch(/hstkab\.go\.id/);
     }
+  });
+
+  it("LAYANAN tidak lagi memuat 'Lapor Bang Rizal'", () => {
+    expect(LAYANAN.some((l) => l.name.includes("Lapor Bang Rizal"))).toBe(false);
+  });
+
+  it("BIDANG memuat Sekretariat + tiga bidang (total 4 unit kerja)", () => {
+    expect(BIDANG).toHaveLength(4);
+    expect(BIDANG[0]!.name).toBe("Sekretariat");
+    const names = BIDANG.map((b) => b.name);
+    expect(names).toContain("Bidang Informatika dan Persandian");
+    expect(names).toContain("Bidang Komunikasi dan Informasi Publik");
+    expect(names).toContain("Bidang Data dan Statistik");
+    // Setiap unit punya deskripsi & ikon.
+    for (const b of BIDANG) {
+      expect(b.description.length).toBeGreaterThan(20);
+      expect(b.icon.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("navigasi Profil tidak lagi memuat Struktur Organisasi / Data Pegawai", () => {
+    const hrefs = allMenuHrefs();
+    expect(hrefs).not.toContain("/profil/struktur-organisasi");
+    expect(hrefs).not.toContain("/profil/data-pegawai");
+  });
+
+  it("helper Google Maps memakai koordinat kantor yang benar", () => {
+    expect(OFFICE_COORDS).toEqual({ lat: -2.5986915, lng: 115.3938058 });
+
+    const embed = googleMapsEmbedUrl();
+    expect(embed).toContain("-2.5986915,115.3938058");
+    expect(embed).toContain("output=embed");
+    expect(embed).not.toContain("key="); // keyless, seperti situs lama
+    expect(googleMapsEmbedUrl(12)).toContain("&z=12");
+
+    expect(googleMapsDirectionsUrl()).toContain(
+      "google.com/maps/dir/?api=1&destination=-2.5986915,115.3938058",
+    );
+    expect(googleMapsPlaceUrl()).toContain(
+      "google.com/maps/search/?api=1&query=-2.5986915,115.3938058",
+    );
   });
 
   it("navigasi memuat rute utama", () => {

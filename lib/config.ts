@@ -71,10 +71,8 @@ export const NAV_MENU: NavItem[] = [
     children: [
       { label: "Visi & Misi", href: "/profil/visi-misi" },
       { label: "Tugas & Fungsi", href: "/profil/tugas-fungsi" },
-      { label: "Struktur Organisasi", href: "/profil/struktur-organisasi" },
       { label: "Maklumat Pelayanan", href: "/profil/maklumat-pelayanan" },
       { label: "Sejarah", href: "/profil/sejarah" },
-      { label: "Data Pegawai", href: "/profil/data-pegawai" },
     ],
   },
   {
@@ -149,19 +147,20 @@ export const LAYANAN = [
     href: "https://opendata.hstkab.go.id/",
   },
   {
-    name: "Lapor Bang Rizal",
-    description: "Aplikasi pengaduan dan aspirasi masyarakat.",
-    href: "https://www.lapor.go.id",
-  },
-  {
     name: "Titik Internet & Metronet",
     description: "Peta titik akses internet publik (SIPETIR).",
     href: "https://sipetir.hstkab.go.id/",
   },
 ] as const;
 
-/** Tiga bidang di Diskominfo SP HST (section Layanan Kami). */
+/** Empat unit kerja di Diskominfo SP HST: Sekretariat + tiga bidang. */
 export const BIDANG = [
+  {
+    name: "Sekretariat",
+    description:
+      "Menyelenggarakan pelayanan administrasi umum, kepegawaian, keuangan, perencanaan, dan ketatausahaan untuk mendukung kelancaran tugas dan fungsi dinas.",
+    icon: "briefcase",
+  },
   {
     name: "Bidang Informatika dan Persandian",
     description:

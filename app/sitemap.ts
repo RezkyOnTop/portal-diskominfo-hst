@@ -19,21 +19,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE.url}/profil/visi-misi`, changeFrequency: "yearly", priority: 0.6 },
     { url: `${SITE.url}/profil/tugas-fungsi`, changeFrequency: "yearly", priority: 0.6 },
     {
-      url: `${SITE.url}/profil/struktur-organisasi`,
-      changeFrequency: "yearly",
-      priority: 0.5,
-    },
-    {
       url: `${SITE.url}/profil/maklumat-pelayanan`,
       changeFrequency: "yearly",
       priority: 0.5,
     },
     { url: `${SITE.url}/profil/sejarah`, changeFrequency: "yearly", priority: 0.5 },
-    {
-      url: `${SITE.url}/profil/data-pegawai`,
-      changeFrequency: "yearly",
-      priority: 0.4,
-    },
   ];
 
   try {

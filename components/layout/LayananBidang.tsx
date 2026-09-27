@@ -2,12 +2,14 @@ import Link from "next/link";
 import { BIDANG } from "@/lib/config";
 
 const ICONS: Record<string, string> = {
+  briefcase:
+    "M3 8h18v11a2 2 0 01-2 2H5a2 2 0 01-2-2V8zM8 8V6a2 2 0 012-2h4a2 2 0 012 2v2M3 13h18",
   code: "M8 6l-5 6 5 6M16 6l5 6-5 6",
   megaphone: "M3 11l14-6v14L3 13v-2zM7 13v4a2 2 0 004 0",
   chart: "M4 20V10M10 20V4M16 20v-7M22 20H2",
 };
 
-/** Section Layanan Kami — tiga bidang Diskominfo SP HST. */
+/** Section Layanan Kami — Sekretariat dan bidang Diskominfo SP HST. */
 export function LayananBidang() {
   return (
     <section className="bg-neutral-50 py-16">
@@ -25,7 +27,7 @@ export function LayananBidang() {
           </p>
         </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {BIDANG.map((b) => (
             <div
               key={b.name}

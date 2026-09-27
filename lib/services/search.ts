@@ -51,10 +51,8 @@ export const HALAMAN_STATIS: {
 }[] = [
   { title: "Visi & Misi", excerpt: "Visi dan misi Diskominfo SP Kabupaten Hulu Sungai Tengah.", href: "/profil/visi-misi" },
   { title: "Tugas & Fungsi", excerpt: "Tugas pokok dan fungsi Dinas Komunikasi, Informatika, Statistik dan Persandian.", href: "/profil/tugas-fungsi" },
-  { title: "Struktur Organisasi", excerpt: "Susunan organisasi dan pejabat Diskominfo SP HST.", href: "/profil/struktur-organisasi" },
   { title: "Maklumat Pelayanan", excerpt: "Komitmen dan standar pelayanan publik Diskominfo SP HST.", href: "/profil/maklumat-pelayanan" },
   { title: "Sejarah", excerpt: "Sejarah berdirinya Diskominfo SP Kabupaten Hulu Sungai Tengah.", href: "/profil/sejarah" },
-  { title: "Data Pegawai", excerpt: "Data pegawai dan ASN Diskominfo SP HST.", href: "/profil/data-pegawai" },
   { title: "Layanan Digital", excerpt: "Daftar layanan digital dan bidang di Diskominfo SP HST.", href: "/layanan" },
   { title: "Radio Swara Murakata", excerpt: "Streaming radio pemerintah daerah Kabupaten Hulu Sungai Tengah.", href: "/radio" },
   { title: "Pengumuman", excerpt: "Pengumuman resmi dari Media Center HST.", href: "/pengumuman" },
