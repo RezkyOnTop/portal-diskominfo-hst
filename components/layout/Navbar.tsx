@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { NAV_MENU, SITE, SOSIAL } from "@/lib/config";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { SocialIcon } from "@/components/ui/SocialIcon";
+import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { NavSearch } from "@/components/layout/NavSearch";
 import { cn } from "@/lib/utils/cn";
 
 /**
@@ -198,7 +200,11 @@ export function Navbar() {
           </ul>
         </nav>
 
-        <MobileNav solid={solid} />
+        <div className="flex items-center gap-2">
+          <NavSearch solid={solid} />
+          <ThemeToggle solid={solid} />
+          <MobileNav solid={solid} />
+        </div>
       </div>
     </header>
   );

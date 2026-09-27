@@ -103,7 +103,6 @@ export const NAV_MENU: NavItem[] = [
   },
   { label: "Kontak", href: "/kontak" },
 ];
-
 /** Layanan digital terkait (dipakai di section & footer). */
 export const LAYANAN = [
   {

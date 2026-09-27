@@ -13,6 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE.url}/radio`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE.url}/layanan`, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE.url}/kontak`, changeFrequency: "yearly", priority: 0.6 },
+    { url: `${SITE.url}/cari`, changeFrequency: "monthly", priority: 0.4 },
     { url: `${SITE.url}/profil/visi-misi`, changeFrequency: "yearly", priority: 0.6 },
     { url: `${SITE.url}/profil/tugas-fungsi`, changeFrequency: "yearly", priority: 0.6 },
     {

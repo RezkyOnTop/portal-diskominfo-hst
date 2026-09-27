@@ -37,6 +37,19 @@ export function MobileNav({ solid = true }: { solid?: boolean }) {
           className="absolute left-0 right-0 top-full max-h-[80vh] overflow-y-auto border-b border-neutral-200 bg-white text-neutral-900 shadow-xl"
         >
           <ul className="mx-auto max-w-7xl px-4 py-2">
+            <li className="border-b border-neutral-100">
+              <Link
+                href="/cari"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2 px-2 py-3 text-sm font-semibold text-neutral-800 hover:text-primary-700"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="M20 20l-3.5-3.5" />
+                </svg>
+                Pencarian
+              </Link>
+            </li>
             {NAV_MENU.map((item) => (
               <li key={item.label} className="border-b border-neutral-100 last:border-0">
                 {item.children ? (

@@ -5,6 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { RadioPlayerProvider } from "@/components/layout/RadioPlayerProvider";
 import { BackToTop } from "@/components/layout/BackToTop";
+import { ThemeProvider, themeInitScript } from "@/components/layout/ThemeProvider";
 import { SITE } from "@/lib/config";
 
 const sora = Sora({
@@ -58,7 +59,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="id"
       data-scroll-behavior="smooth"
       className={`${sora.variable} ${dmSans.variable} h-full`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className="min-h-full flex flex-col bg-neutral-50 text-neutral-900">
         <a
           href="#konten-utama"
@@ -66,14 +71,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Lompat ke konten utama
         </a>
-        <RadioPlayerProvider>
-          <Navbar />
-          <main id="konten-utama" className="flex-1 pb-16">
-            {children}
-          </main>
-          <Footer />
-          <BackToTop />
-        </RadioPlayerProvider>
+        <ThemeProvider>
+          <RadioPlayerProvider>
+            <Navbar />
+            <main id="konten-utama" className="flex-1 pb-16">
+              {children}
+            </main>
+            <Footer />
+            <BackToTop />
+          </RadioPlayerProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

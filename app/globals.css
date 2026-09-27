@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Mode gelap berbasis kelas .dark (bukan prefers-color-scheme), sehingga
+   pengguna bisa memilih dan pilihannya persisten. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
   Design tokens — Diskominfo SP HST
   Arah desain: "Digital Civic" — gelap elegan, gradient mesh, glassmorphism,
@@ -62,6 +66,101 @@
   --background: #ffffff;
   --foreground: var(--color-neutral-900);
   --header-h: 64px;
+  color-scheme: light;
+}
+
+/* ── Mode gelap ──────────────────────────────────────────────────
+   Tailwind v4 mengompilasi utility warna ke var(--color-*), tetapi
+   text-white/bg-white transparan dipakai di atas permukaan gelap (hero,
+   footer, tombol) sehingga TIDAK boleh ikut berubah. Karena itu kita
+   override utility permukaan secara terarah di bawah scope .dark.
+   ───────────────────────────────────────────────────────────────── */
+.dark {
+  --background: #060a17;
+  --foreground: var(--color-neutral-100);
+  color-scheme: dark;
+}
+
+/* Permukaan opak */
+.dark .bg-white {
+  background-color: var(--color-neutral-900);
+}
+.dark .bg-white\/95 {
+  background-color: rgb(2 6 23 / 0.95);
+}
+.dark .bg-neutral-50 {
+  background-color: var(--color-neutral-950);
+}
+.dark .bg-neutral-100 {
+  background-color: var(--color-neutral-800);
+}
+.dark .bg-neutral-200\/70 {
+  background-color: rgb(30 41 59 / 0.7);
+}
+
+/* Teks */
+.dark .text-neutral-900 {
+  color: var(--color-neutral-50);
+}
+.dark .text-neutral-800 {
+  color: var(--color-neutral-100);
+}
+.dark .text-neutral-700 {
+  color: var(--color-neutral-200);
+}
+.dark .text-neutral-600 {
+  color: var(--color-neutral-300);
+}
+.dark .text-neutral-500 {
+  color: var(--color-neutral-400);
+}
+
+/* Garis */
+.dark .border-neutral-200 {
+  border-color: var(--color-neutral-700);
+}
+.dark .border-neutral-100 {
+  border-color: var(--color-neutral-800);
+}
+.dark .border-neutral-300 {
+  border-color: var(--color-neutral-700);
+}
+.dark .divide-neutral-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--color-neutral-700);
+}
+
+/* Hover permukaan terang */
+.dark .hover\:bg-neutral-50:hover {
+  background-color: var(--color-neutral-800);
+}
+.dark .hover\:bg-neutral-100:hover {
+  background-color: var(--color-neutral-800);
+}
+.dark .hover\:bg-white:hover {
+  background-color: var(--color-neutral-800);
+}
+
+/* Tint primary-50 jadi tint gelap halus */
+.dark .bg-primary-50 {
+  background-color: rgb(79 70 229 / 0.16);
+}
+.dark .hover\:bg-primary-50:hover {
+  background-color: rgb(79 70 229 / 0.24);
+}
+
+/* Konten berita */
+.dark .prose-berita {
+  color: var(--color-neutral-300);
+}
+.dark .prose-berita h2,
+.dark .prose-berita h3 {
+  color: var(--color-neutral-50);
+}
+
+/* Kartu kaca terang */
+.dark .glass-light {
+  background: rgb(15 23 42 / 0.75);
+  border-color: rgb(51 65 85 / 0.9);
 }
 
 @media (min-width: 768px) {
