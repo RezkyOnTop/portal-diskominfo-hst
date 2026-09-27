@@ -4,8 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { NAV_MENU, SITE } from "@/lib/config";
+import { NAV_MENU, SITE, SOSIAL } from "@/lib/config";
 import { MobileNav } from "@/components/layout/MobileNav";
+import { SocialIcon } from "@/components/ui/SocialIcon";
 import { cn } from "@/lib/utils/cn";
 
 /**
@@ -60,6 +61,25 @@ export function Navbar() {
               |
             </span>
             <span>Telp. {SITE.phone}</span>
+            <span aria-hidden="true" className="opacity-40">
+              |
+            </span>
+            <ul className="flex items-center gap-1">
+              {SOSIAL.map((s) => (
+                <li key={s.name}>
+                  <a
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={s.name}
+                    title={s.name}
+                    className="grid h-6 w-6 place-items-center rounded-full transition-transform hover:scale-110"
+                  >
+                    <SocialIcon name={s.name} className="h-3.5 w-3.5" brand />
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>

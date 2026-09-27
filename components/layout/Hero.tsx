@@ -1,11 +1,12 @@
 import Link from "next/link";
-import Image from "next/image";
 import { HERO, RADIO_NAME } from "@/lib/config";
+import { HeroSlideshow } from "@/components/layout/HeroSlideshow";
 
 /**
  * Hero "Digital Civic": split asimetris, gradient mesh gelap, kartu kaca
- * mengapung, dan widget radio. Sengaja TIDAK memakai carousel foto penuh
- * layar seperti situs lama — identitas visual baru.
+ * mengapung, dan widget radio. Foto Kabupaten HST kini BERGERAK (slideshow
+ * otomatis), tetapi tetap dalam panel kaca — bukan carousel layar penuh
+ * seperti situs lama.
  */
 export function Hero() {
   return (
@@ -101,27 +102,9 @@ export function Hero() {
           </dl>
         </div>
 
-        {/* Kolom visual: kartu kaca bertumpuk */}
+        {/* Kolom visual: slideshow foto HST yang bergerak */}
         <div className="animate-fade-up delay-2 relative">
-          <div className="glass relative overflow-hidden rounded-[var(--radius-card)] p-2 shadow-2xl">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
-              <Image
-                src="/brand/carousel-1.jpg"
-                alt="Kabupaten Hulu Sungai Tengah"
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 45vw"
-                className="object-cover"
-              />
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 bg-gradient-to-t from-neutral-950/70 to-transparent"
-              />
-              <span className="absolute left-3 top-3 rounded-full bg-black/50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur">
-                Kabupaten HST
-              </span>
-            </div>
-          </div>
+          <HeroSlideshow />
 
           {/* Widget radio mengapung */}
           <div className="glass absolute -bottom-5 left-3 flex items-center gap-3 rounded-2xl p-3 pr-5 shadow-xl sm:-left-6">

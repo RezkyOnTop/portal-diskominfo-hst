@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { LAYANAN, LINK_TERKAIT, NAV_MENU, SITE, SOSIAL } from "@/lib/config";
+import { SocialIcon } from "@/components/ui/SocialIcon";
 
 export function Footer() {
   return (
@@ -19,16 +20,18 @@ export function Footer() {
             {SITE.fullName}. Media center, layanan informasi publik, dan radio
             pemerintah daerah.
           </p>
-          <ul className="flex gap-3 text-sm">
+          <ul className="flex gap-2">
             {SOSIAL.map((s) => (
               <li key={s.name}>
                 <a
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-md bg-white/10 px-3 py-1.5 font-medium text-white hover:bg-white/20"
+                  aria-label={s.name}
+                  title={s.name}
+                  className="grid h-10 w-10 place-items-center rounded-full bg-white/10 transition-colors hover:bg-white/20"
                 >
-                  {s.name}
+                  <SocialIcon name={s.name} brand />
                 </a>
               </li>
             ))}

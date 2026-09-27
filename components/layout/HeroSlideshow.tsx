@@ -1,0 +1,114 @@
+"use client";
+
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+/**
+ * HeroSlideshow — foto Kabupaten HST bergerak otomatis (auto-rotate).
+ * Menghormati prefers-reduced-motion (tidak auto-play bila diminta).
+ * Klik indikator untuk pindah slide; ada tombol jeda.
+ */
+const SLIDES = [
+  { src: "/brand/carousel-1.jpg", alt: "Monumen Kabupaten Hulu Sungai Tengah", label: "Monumen HST" },
+  { src: "/brand/carousel-2.jpg", alt: "Kantor Pemerintah Kabupaten Hulu Sungai Tengah", label: "Pusat Pemerintahan" },
+  { src: "/brand/hst-aktivitas-1.jpg", alt: "Kegiatan masyarakat Hulu Sungai Tengah", label: "Kegiatan Warga" },
+  { src: "/brand/hst-aktivitas-2.jpg", alt: "Pasar murah di Hulu Sungai Tengah", label: "Pasar Murah" },
+  { src: "/brand/hst-aktivitas-3.jpg", alt: "Upacara di Hulu Sungai Tengah", label: "Upacara Resmi" },
+  { src: "/brand/hst-aktivitas-4.jpg", alt: "Aktivitas pemerintahan Hulu Sungai Tengah", label: "Pemerintahan" },
+];
+
+const INTERVAL = 4500;
+
+export function HeroSlideshow() {
+  const [index, setIndex] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const reduced = useRef(false);
+
+  useEffect(() => {
+    reduced.current =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduced.current) setPlaying(false);
+  }, []);
+
+  const next = useCallback(() => {
+    setIndex((i) => (i + 1) % SLIDES.length);
+  }, []);
+
+  useEffect(() => {
+    if (!playing || reduced.current) return;
+    const t = setInterval(next, INTERVAL);
+    return () => clearInterval(t);
+  }, [playing, next]);
+
+  return (
+    <div className="glass relative overflow-hidden rounded-[var(--radius-card)] p-2 shadow-2xl">
+      <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-neutral-900">
+        {SLIDES.map((s, i) => (
+          <div
+            key={s.src}
+            aria-hidden={i !== index}
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              i === index ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <Image
+              src={s.src}
+              alt={s.alt}
+              fill
+              priority={i === 0}
+              sizes="(max-width: 1024px) 100vw, 45vw"
+              className={`object-cover transition-transform duration-[6000ms] ease-out ${
+                i === index ? "scale-105" : "scale-100"
+              }`}
+            />
+          </div>
+        ))}
+
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-t from-neutral-950/75 via-neutral-950/10 to-transparent"
+        />
+
+        {/* Label dinamis */}
+        <span className="absolute left-3 top-3 rounded-full bg-black/50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white backdrop-blur">
+          Kabupaten HST · {SLIDES[index].label}
+        </span>
+
+        {/* Kontrol putar/jeda */}
+        <button
+          type="button"
+          onClick={() => setPlaying((p) => !p)}
+          aria-label={playing ? "Jeda slideshow" : "Putar slideshow"}
+          className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-black/50 text-white backdrop-blur transition-colors hover:bg-black/70"
+        >
+          {playing ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          )}
+        </button>
+
+        {/* Indikator */}
+        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+          {SLIDES.map((s, i) => (
+            <button
+              key={s.src}
+              type="button"
+              onClick={() => setIndex(i)}
+              aria-label={`Tampilkan ${s.label}`}
+              aria-current={i === index}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? "w-6 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

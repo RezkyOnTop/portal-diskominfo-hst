@@ -1,4 +1,5 @@
 import { SITE, SOSIAL } from "@/lib/config";
+import { SocialIcon } from "@/components/ui/SocialIcon";
 
 /** Section Kontak Kami — alamat, email, telepon, dan media sosial. */
 export function KontakSection() {
@@ -36,16 +37,21 @@ export function KontakSection() {
           </div>
           <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
             <h3 className="font-heading text-base font-bold text-neutral-900">Ikuti Kami</h3>
-            <ul className="mt-3 space-y-2 text-sm">
+            <ul className="mt-4 flex flex-wrap gap-3">
               {SOSIAL.map((s) => (
                 <li key={s.name}>
                   <a
                     href={s.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-medium text-primary-700 hover:underline"
+                    aria-label={s.name}
+                    title={s.name}
+                    className="group inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-4 py-2 text-sm font-medium text-neutral-700 transition-colors hover:border-primary-600 hover:bg-primary-600 hover:text-white"
                   >
-                    {s.name} ↗
+                    <span className="transition-transform group-hover:scale-110">
+                      <SocialIcon name={s.name} brand />
+                    </span>
+                    {s.name}
                   </a>
                 </li>
               ))}
