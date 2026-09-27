@@ -1,0 +1,47 @@
+// Prisma schema — Diskominfo SP HST Rebuild
+// HANYA untuk data lokal milik portal baru.
+// JANGAN buat tabel `News` / `HoaxReport`: berita, pengumuman, dan hoaks
+// sepenuhnya berasal dari API Media Center HST (mediacenter.hstkab.go.id).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Statistik kunjungan portal (data lokal).
+model VisitorStat {
+  id        String   @id @default(cuid())
+  path      String
+  referrer  String?
+  userAgent String?
+  country   String?
+  visitedAt DateTime @default(now())
+
+  @@index([path])
+  @@index([visitedAt])
+}
+
+/// Subscriber siaran radio pemerintah daerah (data lokal).
+model RadioSubscriber {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  phone        String?
+  isActive     Boolean  @default(true)
+  subscribedAt DateTime @default(now())
+}
+
+/// Cache feed media sosial (data lokal, sementara).
+model SocialMediaCache {
+  id        String   @id @default(cuid())
+  platform  String
+  payload   Json
+  fetchedAt DateTime @default(now())
+  expiresAt DateTime
+
+  @@index([platform])
+}

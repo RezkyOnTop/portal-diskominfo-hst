@@ -1,26 +1,107 @@
 @import "tailwindcss";
 
+/*
+  Design tokens — Diskominfo SP HST
+  Sumber: DESIGN.md (palet Biru Pemerintah, Hijau/Emas, Neutral).
+  Pendekatan token ala Vercel/Linear/Stripe: kontras tinggi, tipografi tegas.
+*/
+@theme {
+  --color-primary-50: #eaf2fb;
+  --color-primary-100: #d3e3f6;
+  --color-primary-500: #1e63b3;
+  --color-primary-600: #0b4a8f;
+  --color-primary-700: #083a70;
+  --color-primary-800: #062c56;
+
+  --color-secondary-600: #0f7b6c;
+  --color-secondary-700: #0b5e53;
+  --color-accent-500: #c8a44a;
+  --color-accent-600: #a9862f;
+
+  --color-danger-50: #fdecea;
+  --color-danger-600: #c0392b;
+  --color-warning-50: #fdf6e3;
+  --color-warning-600: #b7791f;
+
+  --color-neutral-50: #f9fafb;
+  --color-neutral-100: #f3f4f6;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #374151;
+  --color-neutral-900: #111827;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-jakarta), var(--font-inter), ui-sans-serif, sans-serif;
+
+  --radius-card: 0.875rem;
+  --shadow-card: 0 1px 2px rgb(17 24 39 / 0.06), 0 1px 3px rgb(17 24 39 / 0.1);
+  --shadow-card-hover: 0 10px 24px -8px rgb(11 74 143 / 0.25);
+}
+
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: var(--color-neutral-900);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.01em;
+}
+
+/* Fokus terlihat untuk aksesibilitas keyboard (WCAG 2.1 AA). */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-primary-600);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Konten berita (HTML dari Media Center) — gaya baca. */
+.prose-berita {
+  line-height: 1.75;
+  color: var(--color-neutral-700);
+}
+.prose-berita p {
+  margin-bottom: 1rem;
+}
+.prose-berita img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+}
+.prose-berita a {
+  color: var(--color-primary-600);
+  text-decoration: underline;
+}
+.prose-berita h2,
+.prose-berita h3 {
+  margin: 1.5rem 0 0.75rem;
+  color: var(--color-neutral-900);
 }
