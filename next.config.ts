@@ -15,12 +15,6 @@ const nextConfig: NextConfig = {
         hostname: "mediacenter.hstkab.go.id",
         pathname: "/assets/**",
       },
-      {
-        // Thumbnail video YouTube (kanal Media Center HST).
-        protocol: "https",
-        hostname: "i.ytimg.com",
-        pathname: "/vi/**",
-      },
     ],
   },
   async headers() {
