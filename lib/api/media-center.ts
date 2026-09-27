@@ -28,7 +28,8 @@ import type {
  *         foto(nama file), link, slug, author, kategori_id(nama kategori) }
  *   GET {BASE}/api/pengumuman  -> array polos, item:
  *       { id_pengumuman, tanggal, title, slug, isi(HTML), link }
- *   GET {BASE}/assets/foto_brt/{foto}  -> gambar berita
+ *   Gambar: https://data-mediacenter.hstkab.go.id/assets/foto_brt/{foto}
+ *           (host GAMBAR != host API — lihat imageBaseUrl)
  *   Halaman detail: {BASE}/berita/{slug}
  *
  * CATATAN PENTING (berbeda dari asumsi awal dokumen):
@@ -67,6 +68,19 @@ function baseUrl(): string {
   );
 }
 
+/**
+ * Host GAMBAR berbeda dari host API (terverifikasi langsung).
+ * API:    https://mediacenter.hstkab.go.id
+ * Gambar: https://data-mediacenter.hstkab.go.id/assets/foto_brt/{foto}
+ * (Dibaca dari bundle JS frontend Media Center; memakai host API = 404.)
+ */
+function imageBaseUrl(): string {
+  return (
+    process.env.MEDIA_CENTER_IMAGE_BASE_URL?.replace(/\/+$/, "") ??
+    "https://data-mediacenter.hstkab.go.id"
+  );
+}
+
 function toIso(tanggal: string): string {
   const normalized = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(tanggal)
     ? tanggal.replace(" ", "T")
@@ -78,7 +92,7 @@ function toIso(tanggal: string): string {
 function imageUrl(foto: string): string | null {
   if (!foto || !foto.trim()) return null;
   if (/^https?:\/\//i.test(foto)) return foto;
-  return `${baseUrl()}/assets/foto_brt/${foto.replace(/^\/+/, "")}`;
+  return `${imageBaseUrl()}/assets/foto_brt/${foto.replace(/^\/+/, "")}`;
 }
 
 function normalizeBerita(raw: RawBerita): Berita {

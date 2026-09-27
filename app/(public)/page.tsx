@@ -96,47 +96,51 @@ export default function HomePage() {
 }
 
 async function LatestBerita() {
+  // Fetch (dan error-nya) di dalam try/catch; JSX dirender di luar try/catch
+  // agar tidak melanggar aturan react-hooks/error-boundaries.
+  let data;
   try {
-    const { data } = await getBerita({ limit: 6 });
-    if (data.length === 0) {
-      return <EmptyState label="Belum ada berita untuk ditampilkan." />;
-    }
-    return (
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {data.map((b, i) => (
-          <NewsCard key={b.id} berita={b} priority={i < 3} />
-        ))}
-      </div>
-    );
+    ({ data } = await getBerita({ limit: 6 }));
   } catch {
     return <ApiErrorFallback />;
   }
+  if (data.length === 0) {
+    return <EmptyState label="Belum ada berita untuk ditampilkan." />;
+  }
+  return (
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {data.map((b, i) => (
+        <NewsCard key={b.id} berita={b} priority={i < 3} />
+      ))}
+    </div>
+  );
 }
 
 async function LatestPengumuman() {
+  let data;
   try {
-    const { data } = await getPengumuman({ limit: 4 });
-    if (data.length === 0) return <EmptyState label="Belum ada pengumuman." />;
-    return (
-      <ul className="divide-y divide-neutral-200 rounded-[var(--radius-card)] border border-neutral-200 bg-white">
-        {data.map((p) => (
-          <li key={p.id} className="p-4">
-            <div className="flex items-start justify-between gap-4">
-              <Link
-                href={`/pengumuman#${p.slug}`}
-                className="font-medium text-neutral-900 hover:text-primary-700"
-              >
-                {p.title}
-              </Link>
-              <Badge tone="accent">{formatDate(p.publishedAt)}</Badge>
-            </div>
-          </li>
-        ))}
-      </ul>
-    );
+    ({ data } = await getPengumuman({ limit: 4 }));
   } catch {
     return <ApiErrorFallback />;
   }
+  if (data.length === 0) return <EmptyState label="Belum ada pengumuman." />;
+  return (
+    <ul className="divide-y divide-neutral-200 rounded-[var(--radius-card)] border border-neutral-200 bg-white">
+      {data.map((p) => (
+        <li key={p.id} className="p-4">
+          <div className="flex items-start justify-between gap-4">
+            <Link
+              href={`/pengumuman#${p.slug}`}
+              className="font-medium text-neutral-900 hover:text-primary-700"
+            >
+              {p.title}
+            </Link>
+            <Badge tone="accent">{formatDate(p.publishedAt)}</Badge>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 function EmptyState({ label }: { label: string }) {

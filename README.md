@@ -17,7 +17,7 @@ Dokumentasi kontrak kerja ada di `~/diskominfosp-hst-docs/` (PRD, ARCHITECTURE, 
 | `GET /api/berita` | array polos: `{ id_berita, tanggal, title, isi(HTML), foto, link, slug, author, kategori_id }` |
 | `GET /api/pengumuman` | array polos: `{ id_pengumuman, tanggal, title, slug, isi(HTML), link }` |
 | `GET /api/hoaks` | **404 — belum tersedia** |
-| Gambar | `https://mediacenter.hstkab.go.id/assets/foto_brt/{foto}` |
+| Gambar | `https://data-mediacenter.hstkab.go.id/assets/foto_brt/{foto}` ⚠️ host gambar ≠ host API |
 | Halaman detail | `https://mediacenter.hstkab.go.id/berita/{slug}` |
 
 Adapter menormalisasi bentuk mentah ini ke tipe internal (`Berita`, `Pengumuman`) dan memvalidasi dengan Zod. Bila tim Media Center menambah `/api/hoaks`, cukup ubah `getHoaks()` — UI tidak berubah.

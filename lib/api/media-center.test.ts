@@ -61,6 +61,10 @@ describe("media-center adapter (integrasi, fetch di-mock)", () => {
     expect(res.meta.total).toBe(2);
     expect(res.data[0]!.slug).toBe("berita-baru");
     expect(res.data[0]!.imageUrl).toContain("/assets/foto_brt/a.jpg");
+    // Host gambar BERBEDA dari host API (regresi pernah terjadi: 404).
+    expect(res.data[0]!.imageUrl).toMatch(
+      /^https:\/\/data-mediacenter\.hstkab\.go\.id\/assets\/foto_brt\//,
+    );
     expect(res.data[1]!.imageUrl).toBeNull();
     expect(res.data[0]!.publishedAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });

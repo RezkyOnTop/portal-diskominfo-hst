@@ -2,8 +2,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // Gambar berita berasal dari API Media Center HST (assets/foto_brt).
+    // Gambar berita berasal dari host DATA Media Center HST (assets/foto_brt),
+    // yang BERBEDA dari host API. Lihat lib/api/media-center.ts (imageBaseUrl).
     remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "data-mediacenter.hstkab.go.id",
+        pathname: "/assets/**",
+      },
       {
         protocol: "https",
         hostname: "mediacenter.hstkab.go.id",
