@@ -12,7 +12,8 @@ Dokumentasi kontrak kerja ada di `~/diskominfosp-hst-docs/` (PRD, ARCHITECTURE, 
   Hanya `lib/api/opendata.ts` yang boleh memanggil domain tersebut.
 - **Cuaca** → prakiraan resmi dari **API publik BMKG** (`https://api.bmkg.go.id/publik/prakiraan-cuaca`), tanpa API key.
   Hanya `lib/api/bmkg.ts` yang boleh memanggil domain tersebut.
-- **Data lokal (PostgreSQL)** → hanya `VisitorStat`, `RadioSubscriber`, `SocialMediaCache`, `ServiceSurvey`.
+- **Data lokal (PostgreSQL)** → hanya `VisitorStat`, `RadioSubscriber`, `SocialMediaCache`, `ServiceSurvey`, `ServiceReservation`.
+- **Feed video** → kanal YouTube resmi Media Center HST lewat **RSS keyless** (`youtube.com/feeds/videos.xml`), di-cache ke `SocialMediaCache`. Hanya `lib/api/youtube.ts` yang boleh memanggil domain tersebut.
 
 ### Bentuk API Media Center (hasil verifikasi langsung)
 
@@ -56,10 +57,13 @@ representasi prakiraan wilayah kantor. Ubah lewat env `BMKG_ADM4` bila perlu —
 - **Mode terang/gelap** — berbasis kelas `.dark` (pilihan pengguna persisten, tanpa flicker).
 - **Data Terbuka** (`/data-terbuka`) — katalog 301 dataset dari Open Data HST; pencarian, filter kategori/tahun, paginasi.
 - **Survei Kepuasan Layanan** (`/survei`) — Indeks Kepuasan Masyarakat (IKM), 9 unsur sesuai **PermenPANRB 14/2017**; nilai IKM & mutu (A/B/C/D) dihitung di server; ringkasan publik.
+- **Reservasi Layanan** (`/reservasi`) — permohonan kunjungan/studi tiru, publikasi, penggunaan aula, narasumber, dan peminjaman peralatan multimedia. Setiap permohonan menerima **kode lacak** (`RSV-XXXXXX`) untuk dipantau di `/reservasi/status`.
 - **Peta lokasi** — Google Maps embed di `/kontak` (tanpa API key), koordinat kantor terverifikasi.
 - **Cuaca Barabai** — widget prakiraan resmi **BMKG** (3 hari + kondisi saat ini) di beranda & `/kontak`; sumber data terpisah dari konten lain, gagal upstream → fallback ramah + tautan BMKG.
 - **Radio Swara Murakata** — pemutar persisten lintas halaman + form subscriber.
-- **Dashboard admin** (`/dashboard`, login di `/masuk`) — statistik kunjungan & daftar subscriber (Auth.js); konten berita tetap dikelola di Media Center, bukan di sini.
+- **Media sosial** — feed video kanal YouTube Media Center HST (RSS keyless, di-cache lokal).
+- **Analitik kunjungan** — beacon mencatat kunjungan halaman publik ke `VisitorStat` (sekali per perubahan halaman; area admin dikecualikan).
+- **Dashboard admin** (`/dashboard`, login di `/masuk`) — ringkasan kunjungan, subscriber, reservasi, dan survei IKM (Auth.js); kelola reservasi & subscriber; **ekspor CSV** untuk ketiga data lokal. Konten berita tetap dikelola di Media Center, bukan di sini.
 
 ## Tech stack
 
@@ -71,7 +75,7 @@ Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Prisma 6 · PostgreS
 cp .env.example .env.local   # isi DATABASE_URL, AUTH_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD_HASH
 npm install
 npx prisma generate
-npx prisma migrate deploy    # buat tabel lokal (VisitorStat, RadioSubscriber, SocialMediaCache, ServiceSurvey)
+npx prisma migrate deploy    # buat tabel lokal (VisitorStat, RadioSubscriber, SocialMediaCache, ServiceSurvey, ServiceReservation)
 npm run dev
 ```
 
@@ -123,18 +127,20 @@ npm run test:coverage  # coverage (lib/ & app/api/ >= 80%)
 
 ```
 app/(public)/            # beranda, berita, pengumuman, hoaks, radio, cari,
-                         # data-terbuka, survei, kontak
-app/(admin)/dashboard/   # statistik + subscriber (Auth.js)
+                         # data-terbuka, survei, reservasi, kontak
+app/(admin)/dashboard/   # ringkasan, statistik, subscriber, reservasi, survei (Auth.js)
 app/masuk/               # halaman login administrator
-app/api/                 # visitor, subscriber, cari, survei, auth
+app/api/                 # visitor, subscriber, cari, survei, reservasi, admin/ekspor, auth
 scripts/setup-admin.mjs  # aktifkan akun admin (tulis hash bcrypt ke .env.local)
 lib/api/media-center.ts  # SATU-SATUNYA pemanggil mediacenter.hstkab.go.id
 lib/api/opendata.ts      # SATU-SATUNYA pemanggil opendata.hstkab.go.id
 lib/api/bmkg.ts          # SATU-SATUNYA pemanggil api.bmkg.go.id (cuaca)
-lib/services/            # subscriber, visitor, social, search, survey (data lokal)
-lib/validations/         # skema Zod (+ rumus IKM)
-components/              # ui/, layout/, news/, search/, survei/, cuaca/
-prisma/schema.prisma     # VisitorStat, RadioSubscriber, SocialMediaCache, ServiceSurvey
+lib/api/youtube.ts       # SATU-SATUNYA pemanggil youtube.com/feeds (RSS keyless)
+lib/services/            # subscriber, visitor, social, search, survey, reservation (data lokal)
+lib/validations/         # skema Zod (+ rumus IKM + reservasi)
+lib/utils/csv.ts         # ekspor CSV (BOM UTF-8, delimiter Excel Indonesia)
+components/              # ui/, layout/, news/, search/, survei/, cuaca/, reservasi/, analytics/
+prisma/schema.prisma     # VisitorStat, RadioSubscriber, SocialMediaCache, ServiceSurvey, ServiceReservation
 ```
 
 ## Catatan verifikasi

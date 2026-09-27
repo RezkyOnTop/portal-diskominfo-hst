@@ -15,6 +15,12 @@ const nextConfig: NextConfig = {
         hostname: "mediacenter.hstkab.go.id",
         pathname: "/assets/**",
       },
+      // Thumbnail video feed YouTube (SocialFeed) — i.ytimg.com / iN.ytimg.com.
+      { protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" },
+      { protocol: "https", hostname: "i1.ytimg.com", pathname: "/vi/**" },
+      { protocol: "https", hostname: "i2.ytimg.com", pathname: "/vi/**" },
+      { protocol: "https", hostname: "i3.ytimg.com", pathname: "/vi/**" },
+      { protocol: "https", hostname: "i4.ytimg.com", pathname: "/vi/**" },
     ],
   },
   async headers() {

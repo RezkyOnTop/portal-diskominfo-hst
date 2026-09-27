@@ -65,6 +65,17 @@ export const HALAMAN_STATIS: {
     href: "/survei",
   },
   {
+    title: "Reservasi Layanan",
+    excerpt:
+      "Ajukan permohonan kunjungan/studi tiru, publikasi, penggunaan aula, narasumber, atau peminjaman peralatan multimedia.",
+    href: "/reservasi",
+  },
+  {
+    title: "Cek Status Reservasi",
+    excerpt: "Pantau status permohonan reservasi layanan dengan kode lacak.",
+    href: "/reservasi/status",
+  },
+  {
     title: "Data Terbuka (Open Data)",
     excerpt:
       "Katalog dataset terbuka Kabupaten Hulu Sungai Tengah dari portal Open Data HST.",

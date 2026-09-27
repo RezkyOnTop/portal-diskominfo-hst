@@ -66,10 +66,22 @@ export default function LayananPage() {
           ))}
         </div>
 
-        <div className="mt-10">
+        <div className="mt-10 flex flex-wrap gap-3">
+          <Link
+            href="/reservasi"
+            className="inline-flex rounded-lg bg-primary-600 px-5 py-3 text-sm font-semibold text-white hover:bg-primary-700"
+          >
+            Ajukan Reservasi Layanan
+          </Link>
+          <Link
+            href="/reservasi/status"
+            className="inline-flex rounded-lg border border-neutral-200 px-5 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50"
+          >
+            Cek Status Reservasi
+          </Link>
           <Link
             href="/radio"
-            className="inline-flex rounded-lg bg-primary-600 px-5 py-3 text-sm font-semibold text-white hover:bg-primary-700"
+            className="inline-flex rounded-lg border border-neutral-200 px-5 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50"
           >
             Dengarkan Radio Swara Murakata
           </Link>

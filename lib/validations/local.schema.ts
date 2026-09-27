@@ -135,3 +135,99 @@ export function labelMutu(mutu: string): string {
       return "Tidak Baik";
   }
 }
+
+/**
+ * ============================================================================
+ *  Reservasi Layanan (ServiceReservation)
+ * ============================================================================
+ *  Permohonan kunjungan/studi tiru, publikasi, penggunaan aula, narasumber,
+ *  dan peminjaman peralatan. Setiap permohonan menerima kode lacak singkat.
+ */
+
+/** Jenis layanan yang bisa direservasi. */
+export const LAYANAN_RESERVASI = [
+  "Kunjungan / Studi Tiru",
+  "Permohonan Publikasi & Dokumentasi",
+  "Penggunaan Aula / Ruang Rapat",
+  "Permohonan Narasumber / Pemateri",
+  "Peminjaman Peralatan Multimedia",
+] as const;
+
+/** Status alur permohonan reservasi. */
+export const STATUS_RESERVASI = ["MENUNGGU", "DISETUJUI", "DITOLAK", "SELESAI"] as const;
+export type StatusReservasi = (typeof STATUS_RESERVASI)[number];
+
+/** Label bahasa Indonesia untuk tiap status. */
+export const LABEL_STATUS_RESERVASI: Record<StatusReservasi, string> = {
+  MENUNGGU: "Menunggu Verifikasi",
+  DISETUJUI: "Disetujui",
+  DITOLAK: "Ditolak",
+  SELESAI: "Selesai",
+};
+
+/** Format tanggal & jam. */
+const TANGGAL_RE = /^\d{4}-\d{2}-\d{2}$/;
+const JAM_RE = /^([01]\d|2[0-3]):[0-5]\d$/;
+
+export const ServiceReservationInputSchema = z
+  .object({
+    nama: z.string().trim().min(2, "Nama minimal 2 karakter").max(120),
+    instansi: z.string().trim().max(160).optional().or(z.literal("")),
+    email: z.string().trim().toLowerCase().email("Email tidak valid"),
+    telepon: z
+      .string()
+      .trim()
+      .regex(/^[0-9+\-\s()]{7,20}$/, "Nomor telepon tidak valid"),
+    layanan: z.enum(LAYANAN_RESERVASI, { error: "Pilih jenis layanan" }),
+    /** Tanggal kegiatan dalam format YYYY-MM-DD (waktu lokal). */
+    tanggal: z
+      .string()
+      .trim()
+      .regex(TANGGAL_RE, "Format tanggal harus YYYY-MM-DD")
+      .refine((s) => {
+        const d = new Date(`${s}T00:00:00`);
+        return !Number.isNaN(d.getTime());
+      }, "Tanggal tidak valid"),
+    waktuMulai: z.string().trim().regex(JAM_RE, "Format jam harus HH:MM"),
+    waktuSelesai: z
+      .string()
+      .trim()
+      .regex(JAM_RE, "Format jam harus HH:MM")
+      .optional()
+      .or(z.literal("")),
+    jumlahPeserta: z
+      .number({ error: "Jumlah peserta harus berupa angka" })
+      .int("Jumlah peserta harus bilangan bulat")
+      .min(1, "Minimal 1 peserta")
+      .max(2000, "Maksimal 2000 peserta"),
+    keperluan: z
+      .string()
+      .trim()
+      .min(10, "Uraian keperluan minimal 10 karakter")
+      .max(1000, "Uraian keperluan maksimal 1000 karakter"),
+  })
+  .refine(
+    (d) => !d.waktuSelesai || d.waktuSelesai > d.waktuMulai,
+    { error: "Jam selesai harus setelah jam mulai", path: ["waktuSelesai"] },
+  );
+
+export type ServiceReservationInput = z.infer<typeof ServiceReservationInputSchema>;
+
+/** Kode lacak singkat, tanpa karakter yang mudah tertukar (0/O, 1/I/L). */
+export function buatKodeReservasi(): string {
+  const alfabet = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+  let kode = "";
+  for (let i = 0; i < 6; i += 1) {
+    kode += alfabet[Math.floor(Math.random() * alfabet.length)];
+  }
+  return `RSV-${kode}`;
+}
+
+/** Validasi input admin saat mengubah status permohonan. */
+export const UpdateReservasiStatusSchema = z.object({
+  id: z.string().trim().min(1),
+  status: z.enum(STATUS_RESERVASI, { error: "Status tidak dikenal" }),
+  catatanAdmin: z.string().trim().max(1000).optional().or(z.literal("")),
+});
+
+export type UpdateReservasiStatusInput = z.infer<typeof UpdateReservasiStatusSchema>;

@@ -97,6 +97,8 @@ export const NAV_MENU: NavItem[] = [
     label: "Layanan",
     children: [
       { label: "Daftar Layanan", href: "/layanan" },
+      { label: "Reservasi Layanan", href: "/reservasi" },
+      { label: "Cek Status Reservasi", href: "/reservasi/status" },
       { label: "Radio Swara Murakata", href: "/radio" },
       { label: "Survei Kepuasan Layanan", href: "/survei" },
       {

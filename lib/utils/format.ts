@@ -36,6 +36,25 @@ export function formatDateTime(input: string | Date | null | undefined): string 
   }).format(date);
 }
 
+/**
+ * Format tanggal kegiatan (date-only) dengan acuan UTC.
+ *
+ * Tanggal kegiatan disimpan sebagai tengah malam UTC (lihat
+ * lib/services/reservation.ts). Memformatnya dengan zona waktu server akan
+ * menggeser tanggal saat server ber-offset negatif, jadi paksa timeZone UTC.
+ */
+export function formatDateUtc(input: string | Date | null | undefined): string {
+  if (!input) return "-";
+  const date = input instanceof Date ? input : new Date(input);
+  if (Number.isNaN(date.getTime())) return "-";
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
 /** Perkiraan waktu baca dari konten HTML (menit). */
 export function readingTimeMinutes(html: string | null | undefined): number {
   if (!html) return 1;

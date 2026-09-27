@@ -46,6 +46,43 @@ model SocialMediaCache {
   @@index([platform])
 }
 
+/// Reservasi layanan publik (data lokal).
+/// Permohonan kunjungan/studi tiru, permohonan publikasi, penggunaan aula,
+/// permohonan narasumber, dan peminjaman peralatan.
+model ServiceReservation {
+  id            String    @id @default(cuid())
+  /// Kode lacak singkat yang diberikan ke pemohon (mis. RSV-7K2M9Q).
+  kode          String    @unique
+  /// Nama pemohon / penanggung jawab.
+  nama          String
+  /// Instansi/lembaga asal (boleh kosong untuk perorangan).
+  instansi      String?
+  email         String
+  telepon       String
+  /// Jenis layanan yang diminta (lihat LAYANAN_RESERVASI).
+  layanan       String
+  /// Tanggal kegiatan yang diminta.
+  tanggal       DateTime
+  /// Jam mulai "HH:MM" (waktu lokal WITA).
+  waktuMulai    String
+  /// Jam selesai "HH:MM" (opsional).
+  waktuSelesai  String?
+  /// Perkiraan jumlah peserta.
+  jumlahPeserta Int
+  /// Uraian keperluan/kegiatan.
+  keperluan     String
+  /// MENUNGGU | DISETUJUI | DITOLAK | SELESAI
+  status        String    @default("MENUNGGU")
+  /// Catatan dari admin (alasan penolakan, instruksi, dsb.).
+  catatanAdmin  String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status])
+  @@index([tanggal])
+  @@index([createdAt])
+}
+
 /// Survei kepuasan layanan masyarakat (data lokal).
 /// Mengikuti 9 unsur Indeks Kepuasan Masyarakat (IKM) — PermenPANRB 14/2017.
 /// Setiap unsur dinilai 1–4 (Tidak Baik / Kurang Baik / Baik / Sangat Baik).

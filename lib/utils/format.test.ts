@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { formatDate, formatDateTime, stripHtml, readingTimeMinutes } from "./format";
+import {
+  formatDate,
+  formatDateUtc,
+  formatDateTime,
+  stripHtml,
+  readingTimeMinutes,
+} from "./format";
 
 describe("formatDate", () => {
   it("memformat tanggal Media Center 'YYYY-MM-DD HH:mm:ss'", () => {
@@ -18,6 +24,22 @@ describe("formatDateTime", () => {
   });
   it("mengembalikan '-' untuk input kosong", () => {
     expect(formatDateTime(undefined)).toBe("-");
+  });
+});
+
+describe("formatDateUtc", () => {
+  it("menampilkan tanggal date-only tanpa pergeseran zona waktu", () => {
+    // Tengah malam UTC tanggal 5 tetap tampil sebagai 5, apa pun zona server.
+    expect(formatDateUtc("2026-10-05T00:00:00.000Z")).toBe("5 Oktober 2026");
+  });
+
+  it("menerima objek Date", () => {
+    expect(formatDateUtc(new Date("2026-01-01T00:00:00.000Z"))).toBe("1 Januari 2026");
+  });
+
+  it("mengembalikan '-' untuk input kosong/tidak valid", () => {
+    expect(formatDateUtc(null)).toBe("-");
+    expect(formatDateUtc("bukan-tanggal")).toBe("-");
   });
 });
 
