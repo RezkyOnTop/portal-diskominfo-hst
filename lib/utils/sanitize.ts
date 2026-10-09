@@ -23,3 +23,23 @@ export function sanitizeHtml(html: string | null | undefined): string {
   );
   return out;
 }
+
+/** Batas panjang pesan chat (karakter) — hemat token + tahan penyalahgunaan. */
+export const CHAT_MAX_INPUT = 1000;
+
+/**
+ * Sanitasi pesan chat: buang blok script/style beserta isi, semua tag HTML,
+ * protokol javascript:, lalu runtuhkan whitespace dan batasi panjang.
+ *
+ * Dipakai di DUA sisi (klien sebelum kirim + server sebelum ke AI) sebagai
+ * pertahanan berlapis terhadap XSS dan prompt injection.
+ */
+export function bersihkanPesanChat(raw: string, maks = CHAT_MAX_INPUT): string {
+  let out = String(raw ?? "");
+  out = out.replace(/<(script|style)[\s\S]*?<\/\1>/gi, "");
+  out = out.replace(/<[^>]*>/g, "");
+  out = out.replace(/javascript:/gi, "");
+  out = out.replace(/[\u0000-\u001f\u007f]+/g, " ").replace(/\s+/g, " ").trim();
+  if (out.length > maks) out = out.slice(0, maks);
+  return out;
+}

@@ -5,7 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { RadioPlayerProvider } from "@/components/layout/RadioPlayerProvider";
 import { BackToTop } from "@/components/layout/BackToTop";
-import { CuacaMelayang } from "@/components/cuaca/CuacaMelayang";
+import { ComboMelayang } from "@/components/chat/ComboMelayang";
 import { VisitorBeacon } from "@/components/analytics/VisitorBeacon";
 import { ThemeProvider, themeInitScript } from "@/components/layout/ThemeProvider";
 import { SITE } from "@/lib/config";
@@ -81,7 +81,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </main>
             <Footer />
             <BackToTop />
-            <CuacaMelayang />
+            <ComboMelayang />
             <VisitorBeacon />
           </RadioPlayerProvider>
         </ThemeProvider>
