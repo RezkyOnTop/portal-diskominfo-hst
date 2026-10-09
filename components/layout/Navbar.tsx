@@ -33,7 +33,7 @@ export function Navbar() {
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 transition-[transform,opacity,background-color,border-color] duration-300 ease-out motion-reduce:transition-none",
+        "sticky top-0 z-40 transition-[translate,opacity,background-color,border-color] duration-300 ease-out motion-reduce:transition-none",
         hidden ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
         solid
           ? "border-b border-neutral-200 bg-white/95 text-neutral-900 backdrop-blur"
