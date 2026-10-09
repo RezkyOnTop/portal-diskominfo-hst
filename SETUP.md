@@ -75,6 +75,24 @@ Tempelkan hasilnya ke baris `NEXTAUTH_SECRET` di `.env.local`, contoh:
 NEXTAUTH_SECRET="hasil-salinan-tadi"
 ```
 
+### Kunci chatbot AI (opsional)
+
+Widget combo di pojok kanan bawah punya tab **Asisten AI** (Gemini).
+Tanpa kunci, tab AI menampilkan pesan "belum diaktifkan" tetapi tab
+**Cuaca** tetap jalan normal.
+
+1. Ambil kunci gratis di https://aistudio.google.com/app/apikey
+2. Isi di `.env.local`:
+
+```
+GEMINI_API_KEY="kunci-anda-di-sini"
+GEMINI_MODEL="gemini-2.5-flash-lite"
+```
+
+3. Restart server (`npm run start`).
+4. **Jangan pernah** mengirim kunci lewat chat/email — hanya di file
+   `.env.local` (tidak ikut commit/zip).
+
 > **Penting:** biarkan `NEXTAUTH_URL="http://localhost:3000"` apa adanya selama dijalankan
 > di komputer sendiri. Nilai ini harus sama dengan alamat yang Anda ketik di peramban.
 
