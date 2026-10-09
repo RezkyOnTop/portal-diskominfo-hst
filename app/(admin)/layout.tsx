@@ -54,6 +54,12 @@ export default async function AdminLayout({
               Reservasi Layanan
             </Link>
             <Link
+              href="/dashboard/pegawai"
+              className="block rounded-md px-3 py-2 text-sm text-neutral-700 hover:bg-primary-50"
+            >
+              Data Pegawai
+            </Link>
+            <Link
               href="/dashboard/survei"
               className="block rounded-md px-3 py-2 text-sm text-neutral-700 hover:bg-primary-50"
             >

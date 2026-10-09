@@ -2,20 +2,21 @@ import { auth } from "@/lib/auth";
 import { listSubscribers } from "@/lib/services/subscriber";
 import { listReservations } from "@/lib/services/reservation";
 import { listSurveys } from "@/lib/services/survey";
+import { listStaffAdmin } from "@/lib/services/staff";
 import { csvHeaders, namaBerkasCsv, toCsv } from "@/lib/utils/csv";
 import { IKM_UNSUR } from "@/lib/validations/local.schema";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type JenisEkspor = "subscriber" | "survei" | "reservasi";
+type JenisEkspor = "subscriber" | "survei" | "reservasi" | "pegawai";
 
 function isJenis(v: string): v is JenisEkspor {
-  return v === "subscriber" || v === "survei" || v === "reservasi";
+  return v === "subscriber" || v === "survei" || v === "reservasi" || v === "pegawai";
 }
 
 /**
- * GET /api/admin/ekspor?jenis=subscriber|survei|reservasi
+ * GET /api/admin/ekspor?jenis=subscriber|survei|reservasi|pegawai
  * Unduh data lokal sebagai CSV. HANYA untuk sesi admin (Auth.js).
  */
 export async function GET(request: Request) {
@@ -29,10 +30,27 @@ export async function GET(request: Request) {
 
   const jenis = new URL(request.url).searchParams.get("jenis") ?? "";
   if (!isJenis(jenis)) {
-    return new Response("Parameter `jenis` harus subscriber, survei, atau reservasi.", {
+    return new Response("Parameter `jenis` harus subscriber, survei, reservasi, atau pegawai.", {
       status: 400,
       headers: { "Content-Type": "text/plain; charset=utf-8" },
     });
+  }
+
+  if (jenis === "pegawai") {
+    const rows = await listStaffAdmin();
+    const csv = toCsv(
+      ["Nama", "NIP", "Jabatan", "Unit", "Urutan", "Tampil", "Ada Foto"],
+      rows.map((s) => [
+        s.nama,
+        s.nip ?? "",
+        s.jabatan,
+        s.unit,
+        s.urutan,
+        s.aktif ? "Ya" : "Tidak",
+        s.fotoUrl ? "Ya" : "Tidak",
+      ]),
+    );
+    return new Response(csv, { headers: csvHeaders(namaBerkasCsv("pegawai")) });
   }
 
   if (jenis === "subscriber") {

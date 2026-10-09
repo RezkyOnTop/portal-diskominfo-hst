@@ -4,17 +4,20 @@ vi.mock("@/lib/auth", () => ({ auth: vi.fn() }));
 vi.mock("@/lib/services/subscriber", () => ({ listSubscribers: vi.fn() }));
 vi.mock("@/lib/services/reservation", () => ({ listReservations: vi.fn() }));
 vi.mock("@/lib/services/survey", () => ({ listSurveys: vi.fn() }));
+vi.mock("@/lib/services/staff", () => ({ listStaffAdmin: vi.fn() }));
 
 import { GET } from "./route";
 import { auth } from "@/lib/auth";
 import { listSubscribers } from "@/lib/services/subscriber";
 import { listReservations } from "@/lib/services/reservation";
 import { listSurveys } from "@/lib/services/survey";
+import { listStaffAdmin } from "@/lib/services/staff";
 
 const authMock = auth as unknown as ReturnType<typeof vi.fn>;
 const subsMock = listSubscribers as unknown as ReturnType<typeof vi.fn>;
 const resvMock = listReservations as unknown as ReturnType<typeof vi.fn>;
 const surveiMock = listSurveys as unknown as ReturnType<typeof vi.fn>;
+const staffMock = listStaffAdmin as unknown as ReturnType<typeof vi.fn>;
 
 function makeRequest(jenis: string) {
   return new Request(`http://localhost/api/admin/ekspor?jenis=${jenis}`);
@@ -105,5 +108,28 @@ describe("GET /api/admin/ekspor", () => {
     subsMock.mockResolvedValue([]);
     const res = await GET(makeRequest("subscriber"));
     expect(res.headers.get("Content-Disposition")).toContain("attachment");
+  });
+
+  it("mengekspor pegawai sebagai CSV dengan nama & unit", async () => {
+    staffMock.mockResolvedValue([
+      {
+        id: "s1",
+        nama: "Budi Santoso, S.Kom",
+        nip: "19900101 202001 1 001",
+        jabatan: "Pranata Komputer Ahli Pertama",
+        unit: "Staf PPPK",
+        fotoUrl: null,
+        urutan: 10,
+        aktif: true,
+      },
+    ]);
+    const res = await GET(makeRequest("pegawai"));
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("Content-Type")).toContain("text/csv");
+    const body = await res.text();
+    expect(body).toContain("Budi Santoso");
+    expect(body).toContain("Staf PPPK");
+    expect(body).toContain("NIP");
   });
 });

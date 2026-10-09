@@ -112,3 +112,32 @@ model ServiceSurvey {
   @@index([layanan])
   @@index([createdAt])
 }
+
+/// Data pegawai dinas (data lokal).
+/// Dikelola admin lewat /dashboard/pegawai; ditampilkan publik di
+/// /profil/data-pegawai. Foto diunggah ke berkas terpisah (lihat
+/// lib/storage/foto.ts) dan disajikan lewat /api/pegawai/foto/[id];
+/// bila fotoUrl kosong, UI memakai avatar inisial sebagai gambar default.
+model Staff {
+  id        String   @id @default(cuid())
+  /// Nama lengkap beserta gelar.
+  nama      String
+  /// NIP/NIK — boleh kosong (situs lama belum mengisi kolom ini).
+  nip       String?
+  /// Jabatan atau peran.
+  jabatan   String
+  /// Unit kerja / kelompok (lihat UNIT_PEGAWAI).
+  unit      String
+  /// URL foto; null = pakai gambar default (avatar inisial).
+  fotoUrl   String?
+  /// Urutan tampil dalam satu unit (kecil lebih dulu).
+  urutan    Int      @default(0)
+  /// Sembunyikan dari halaman publik tanpa menghapus data.
+  aktif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([unit])
+  @@index([urutan])
+  @@index([aktif])
+}

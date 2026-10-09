@@ -71,6 +71,7 @@ export const NAV_MENU: NavItem[] = [
     children: [
       { label: "Visi & Misi", href: "/profil/visi-misi" },
       { label: "Tugas & Fungsi", href: "/profil/tugas-fungsi" },
+      { label: "Data Pegawai", href: "/profil/data-pegawai" },
       { label: "Maklumat Pelayanan", href: "/profil/maklumat-pelayanan" },
       { label: "Sejarah", href: "/profil/sejarah" },
     ],

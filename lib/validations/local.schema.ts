@@ -231,3 +231,85 @@ export const UpdateReservasiStatusSchema = z.object({
 });
 
 export type UpdateReservasiStatusInput = z.infer<typeof UpdateReservasiStatusSchema>;
+
+/**
+ * ============================================================================
+ *  Data Pegawai (Staff)
+ * ============================================================================
+ *  Dikelola admin lewat /dashboard/pegawai, tampil publik di /profil/data-pegawai.
+ *  Kolom yang dikelola: nama, NIP (opsional), jabatan, unit, foto, urutan, aktif.
+ *  Unit mengikuti pengelompokan halaman resmi situs lama ("Data Pegawai").
+ */
+
+/** Unit kerja / kelompok pegawai. */
+export const UNIT_PEGAWAI = [
+  "Kepala Dinas",
+  "Sekretaris",
+  "Kepala Bidang & Sub Bagian",
+  "Staf PNS",
+  "Staf PPPK",
+  "Tenaga Outsourcing",
+] as const;
+export type UnitPegawai = (typeof UNIT_PEGAWAI)[number];
+
+/** Label singkat untuk kartu/filter publik. */
+export const LABEL_UNIT_PEGAWAI: Record<UnitPegawai, string> = {
+  "Kepala Dinas": "Pimpinan",
+  Sekretaris: "Sekretariat",
+  "Kepala Bidang & Sub Bagian": "Kabid & Kasubbag",
+  "Staf PNS": "PNS",
+  "Staf PPPK": "PPPK",
+  "Tenaga Outsourcing": "Outsourcing",
+};
+
+const NamaPegawai = z.string().trim().min(2, "Nama minimal 2 karakter").max(160, "Nama maksimal 160 karakter");
+const JabatanPegawai = z.string().trim().min(2, "Jabatan minimal 2 karakter").max(160, "Jabatan maksimal 160 karakter");
+const NipPegawai = z
+  .string()
+  .trim()
+  .max(40, "NIP maksimal 40 karakter")
+  .optional()
+  .or(z.literal(""));
+
+/** Validasi input admin saat menambah pegawai baru. */
+export const CreateStaffInputSchema = z.object({
+  nama: NamaPegawai,
+  nip: NipPegawai,
+  jabatan: JabatanPegawai,
+  unit: z.enum(UNIT_PEGAWAI, { error: "Pilih unit kerja" }),
+  urutan: z
+    .number({ error: "Urutan tampil harus berupa angka" })
+    .int("Urutan tampil harus bilangan bulat")
+    .min(0, "Urutan tampil minimal 0")
+    .max(9999, "Urutan tampil maksimal 9999"),
+});
+
+export type CreateStaffInput = z.infer<typeof CreateStaffInputSchema>;
+
+/** Validasi input admin saat mengubah data pegawai. */
+export const UpdateStaffInputSchema = z.object({
+  id: z.string().trim().min(1),
+  nama: NamaPegawai,
+  nip: NipPegawai,
+  jabatan: JabatanPegawai,
+  unit: z.enum(UNIT_PEGAWAI, { error: "Pilih unit kerja" }),
+  urutan: z
+    .number({ error: "Urutan tampil harus berupa angka" })
+    .int("Urutan tampil harus bilangan bulat")
+    .min(0, "Urutan tampil minimal 0")
+    .max(9999, "Urutan tampil maksimal 9999"),
+  aktif: z.boolean({ error: "Status aktif harus benar/salah" }),
+});
+
+export type UpdateStaffInput = z.infer<typeof UpdateStaffInputSchema>;
+
+/** Validasi input admin saat menghapus pegawai (konfirmasi via id). */
+export const DeleteStaffInputSchema = z.object({
+  id: z.string().trim().min(1),
+});
+
+export type DeleteStaffInput = z.infer<typeof DeleteStaffInputSchema>;
+
+/** Batas ukuran berkas foto pegawai (2 MB) dan tipe yang diizinkan. */
+export const FOTO_PEGAWAI_MAX_BYTES = 2 * 1024 * 1024;
+export const FOTO_PEGAWAI_MIME = ["image/jpeg", "image/png", "image/webp"] as const;

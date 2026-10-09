@@ -43,3 +43,6 @@ next-env.d.ts
 
 # Kredensial admin lingkungan pengembangan (JANGAN commit)
 .admin-kredensial.txt
+
+# Foto pegawai yang diunggah admin (data operasional, JANGAN commit)
+/.uploads/

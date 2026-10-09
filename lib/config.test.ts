@@ -57,10 +57,10 @@ describe("config", () => {
     }
   });
 
-  it("navigasi Profil tidak lagi memuat Struktur Organisasi / Data Pegawai", () => {
+  it("navigasi Profil memuat Data Pegawai, tanpa Struktur Organisasi", () => {
     const hrefs = allMenuHrefs();
     expect(hrefs).not.toContain("/profil/struktur-organisasi");
-    expect(hrefs).not.toContain("/profil/data-pegawai");
+    expect(hrefs).toContain("/profil/data-pegawai");
   });
 
   it("helper Google Maps memakai koordinat kantor yang benar", () => {
