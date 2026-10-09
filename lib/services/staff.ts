@@ -183,11 +183,15 @@ export async function deleteStaff(input: unknown): Promise<StaffResult> {
 
 /**
  * Catat URL foto setelah unggahan berhasil (dipanggil dari route handler foto).
+ * URL kosong berarti "tanpa foto" -> disimpan sebagai null (avatar default).
  * Bila id tidak ada, berkas yang baru ditulis dibuang agar tidak yatim.
  */
 export async function setFotoStaff(id: string, url: string): Promise<boolean> {
   try {
-    await prisma.staff.update({ where: { id }, data: { fotoUrl: url } });
+    await prisma.staff.update({
+      where: { id },
+      data: { fotoUrl: url.trim() ? url : null },
+    });
     return true;
   } catch {
     await hapusSemuaFoto(id);

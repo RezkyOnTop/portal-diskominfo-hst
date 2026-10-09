@@ -174,4 +174,11 @@ describe("setFotoStaff", () => {
     expect(await setFotoStaff("tidak-ada", "/api/pegawai/foto/tidak-ada")).toBe(false);
     expect(hapusSemuaFoto).toHaveBeenCalledWith("tidak-ada");
   });
+
+  it("menyimpan null bila url kosong (kembali ke avatar default)", async () => {
+    staffMock.update!.mockResolvedValue({ id: "s1" });
+    expect(await setFotoStaff("s1", "  ")).toBe(true);
+    const arg = staffMock.update!.mock.calls[0]![0] as { data: { fotoUrl: null } };
+    expect(arg.data.fotoUrl).toBeNull();
+  });
 });

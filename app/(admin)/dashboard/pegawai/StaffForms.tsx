@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
 import { UNIT_PEGAWAI } from "@/lib/validations/local.schema";
@@ -104,94 +105,269 @@ export interface StaffRow {
   aktif: boolean;
 }
 
-/** Form ubah data + hapus + unggah foto untuk satu pegawai. */
-export function StaffRowForm({ row }: { row: StaffRow }) {
-  const [ubahState, ubahAction, ubahPending] = useActionState<StaffActionState | null, FormData>(
+/**
+ * Direktori pegawai (dashboard admin) — pencarian + pengelompokan unit +
+ * dialog ubah per baris.
+ *
+ * Form ubah/foto/hapus HANYA dirender saat dialog dibuka untuk satu pegawai,
+ * sehingga daftar awal tinggal baris teks ringan (bukan ratusan input) dan
+ * halaman tetap cepat walau pegawai bertambah banyak.
+ */
+export function StaffDirectory({ rows }: { rows: StaffRow[] }) {
+  const [cari, setCari] = useState("");
+  const [terbuka, setTerbuka] = useState<StaffRow | null>(null);
+
+  const q = cari.trim().toLowerCase();
+  const tersaring = q
+    ? rows.filter(
+        (r) =>
+          r.nama.toLowerCase().includes(q) ||
+          r.jabatan.toLowerCase().includes(q) ||
+          (r.nip ?? "").toLowerCase().includes(q),
+      )
+    : rows;
+
+  // Kunci scroll badan saat dialog terbuka; Esc menutup.
+  useEffect(() => {
+    if (!terbuka) return;
+    const asal = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setTerbuka(null);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = asal;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [terbuka]);
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center gap-3">
+        <label htmlFor="cari-pegawai" className="sr-only">
+          Cari pegawai
+        </label>
+        <input
+          id="cari-pegawai"
+          type="search"
+          value={cari}
+          onChange={(e) => setCari(e.target.value)}
+          placeholder="Cari nama, jabatan, atau NIP…"
+          className={`${inputCls} max-w-sm`}
+        />
+        <span className="text-xs text-neutral-500 dark:text-slate-400" role="status" aria-live="polite">
+          {tersaring.length} dari {rows.length} pegawai
+        </span>
+      </div>
+
+      {tersaring.length === 0 ? (
+        <p className="rounded-[var(--radius-card)] border border-dashed border-neutral-200 bg-white p-6 text-sm text-neutral-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+          Tidak ada pegawai yang cocok dengan “{cari}”.
+        </p>
+      ) : (
+        UNIT_PEGAWAI.map((unit) => {
+          const anggota = tersaring.filter((r) => r.unit === unit);
+          if (anggota.length === 0) return null;
+          return (
+            <div key={unit}>
+              <h2 className="mb-2 font-heading text-sm font-bold text-neutral-900 dark:text-slate-50">
+                {unit}{" "}
+                <span className="font-semibold text-neutral-500 dark:text-slate-400">
+                  ({anggota.length})
+                </span>
+              </h2>
+              <ul className="divide-y divide-neutral-100 overflow-hidden rounded-[var(--radius-card)] border border-neutral-200 bg-white shadow-[var(--shadow-card)] dark:divide-slate-800 dark:border-slate-700 dark:bg-slate-900">
+                {anggota.map((r) => (
+                  <li
+                    key={r.id}
+                    className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-neutral-50 dark:hover:bg-slate-800/60"
+                  >
+                    {/* Thumb foto / inisial — <img> kecil agar ringan */}
+                    <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-primary-100 text-xs font-bold text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">
+                      {r.fotoUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={r.fotoUrl} alt="" aria-hidden="true" className="h-full w-full object-cover" loading="lazy" />
+                      ) : (
+                        <span aria-hidden="true">{inisial(r.nama)}</span>
+                      )}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-medium text-neutral-900 dark:text-slate-100">
+                        {r.nama}
+                      </span>
+                      <span className="block truncate text-xs text-neutral-500 dark:text-slate-400">
+                        {r.jabatan}
+                      </span>
+                    </span>
+                    <span
+                      className={`hidden shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold sm:inline ${
+                        r.aktif
+                          ? "bg-secondary-600/10 text-secondary-700 dark:text-secondary-300"
+                          : "bg-neutral-200 text-neutral-700 dark:bg-slate-700 dark:text-slate-300"
+                      }`}
+                    >
+                      {r.aktif ? "Tampil" : "Sembunyi"}
+                    </span>
+                    <Button type="button" size="sm" variant="secondary" onClick={() => setTerbuka(r)}>
+                      Ubah
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })
+      )}
+
+      {terbuka ? <StaffDialog row={terbuka} onTutup={() => setTerbuka(null)} /> : null}
+    </div>
+  );
+}
+
+/** Inisial nama untuk thumb default (maks 2 huruf). */
+function inisial(nama: string): string {
+  const kata = nama.trim().split(/\s+/).filter(Boolean);
+  if (kata.length === 0) return "?";
+  if (kata.length === 1) return (kata[0]![0] ?? "?").toUpperCase();
+  return `${kata[0]![0] ?? ""}${kata[kata.length - 1]![0] ?? ""}`.toUpperCase();
+}
+
+/** Dialog ubah data + foto + hapus untuk satu pegawai. */
+function StaffDialog({ row, onTutup }: { row: StaffRow; onTutup: () => void }) {
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+
+  // Fokus ke judul saat dibuka (aksesibilitas).
+  useEffect(() => {
+    dialogRef.current?.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+  }, []);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-4 sm:items-center"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) onTutup();
+      }}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Ubah data ${row.nama}`}
+        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+      >
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="font-heading text-base font-bold text-neutral-900 dark:text-slate-50" tabIndex={-1} data-autofocus>
+            Ubah: {row.nama}
+          </h3>
+          <button
+            type="button"
+            onClick={onTutup}
+            aria-label="Tutup dialog"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100 dark:hover:bg-slate-800"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div className="mt-4 space-y-4">
+          <StaffUbahForm row={row} />
+          <FotoForm id={row.id} adaFoto={Boolean(row.fotoUrl)} />
+          <StaffHapusForm row={row} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Form ubah data satu pegawai (di dalam dialog). */
+function StaffUbahForm({ row }: { row: StaffRow }) {
+  const [state, formAction, pending] = useActionState<StaffActionState | null, FormData>(
     updateStaffAction,
     null,
   );
-  const [hapusState, hapusAction, hapusPending] = useActionState<StaffActionState | null, FormData>(
+
+  return (
+    <form action={formAction} className="space-y-2">
+      <input type="hidden" name="id" value={row.id} />
+      <div className="grid gap-2 sm:grid-cols-2">
+        <div>
+          <label htmlFor={`nama-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+            Nama
+          </label>
+          <input id={`nama-${row.id}`} name="nama" required maxLength={160} defaultValue={row.nama} className={inputCls} />
+        </div>
+        <div>
+          <label htmlFor={`nip-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+            NIP / NIK
+          </label>
+          <input id={`nip-${row.id}`} name="nip" maxLength={40} defaultValue={row.nip ?? ""} className={inputCls} />
+        </div>
+        <div>
+          <label htmlFor={`jabatan-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+            Jabatan
+          </label>
+          <input id={`jabatan-${row.id}`} name="jabatan" required maxLength={160} defaultValue={row.jabatan} className={inputCls} />
+        </div>
+        <div>
+          <label htmlFor={`unit-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+            Unit
+          </label>
+          <select id={`unit-${row.id}`} name="unit" defaultValue={row.unit} className={inputCls}>
+            {UNIT_PEGAWAI.map((u) => (
+              <option key={u} value={u}>
+                {u}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label htmlFor={`urutan-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+            Urutan
+          </label>
+          <input id={`urutan-${row.id}`} name="urutan" type="number" min={0} max={9999} defaultValue={row.urutan} className={inputCls} />
+        </div>
+        <div>
+          <label htmlFor={`aktif-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+            Tampil di publik
+          </label>
+          <select id={`aktif-${row.id}`} name="aktif" defaultValue={row.aktif ? "true" : "false"} className={inputCls}>
+            <option value="true">Ya, tampilkan</option>
+            <option value="false">Sembunyikan</option>
+          </select>
+        </div>
+      </div>
+      <Button type="submit" size="sm" disabled={pending}>
+        {pending ? "Menyimpan…" : "Simpan Perubahan"}
+      </Button>
+      <PesanHasil state={state} />
+    </form>
+  );
+}
+
+/** Form hapus satu pegawai (di dalam dialog). */
+function StaffHapusForm({ row }: { row: StaffRow }) {
+  const [state, formAction, pending] = useActionState<StaffActionState | null, FormData>(
     deleteStaffAction,
     null,
   );
 
   return (
-    <div className="space-y-3">
-      <form action={ubahAction} className="space-y-2">
-        <input type="hidden" name="id" value={row.id} />
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          <div>
-            <label htmlFor={`nama-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
-              Nama
-            </label>
-            <input id={`nama-${row.id}`} name="nama" required maxLength={160} defaultValue={row.nama} className={inputCls} />
-          </div>
-          <div>
-            <label htmlFor={`nip-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
-              NIP / NIK
-            </label>
-            <input id={`nip-${row.id}`} name="nip" maxLength={40} defaultValue={row.nip ?? ""} className={inputCls} />
-          </div>
-          <div>
-            <label htmlFor={`jabatan-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
-              Jabatan
-            </label>
-            <input id={`jabatan-${row.id}`} name="jabatan" required maxLength={160} defaultValue={row.jabatan} className={inputCls} />
-          </div>
-          <div>
-            <label htmlFor={`unit-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
-              Unit
-            </label>
-            <select id={`unit-${row.id}`} name="unit" defaultValue={row.unit} className={inputCls}>
-              {UNIT_PEGAWAI.map((u) => (
-                <option key={u} value={u}>
-                  {u}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor={`urutan-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
-              Urutan
-            </label>
-            <input id={`urutan-${row.id}`} name="urutan" type="number" min={0} max={9999} defaultValue={row.urutan} className={inputCls} />
-          </div>
-          <div>
-            <label htmlFor={`aktif-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
-              Tampil di publik
-            </label>
-            <select id={`aktif-${row.id}`} name="aktif" defaultValue={row.aktif ? "true" : "false"} className={inputCls}>
-              <option value="true">Ya, tampilkan</option>
-              <option value="false">Sembunyikan</option>
-            </select>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button type="submit" size="sm" disabled={ubahPending}>
-            {ubahPending ? "Menyimpan…" : "Simpan Perubahan"}
-          </Button>
-        </div>
-        <PesanHasil state={ubahState} />
-      </form>
-
-      <FotoForm id={row.id} adaFoto={Boolean(row.fotoUrl)} />
-
-      <form
-        action={hapusAction}
-        className="border-t border-neutral-100 pt-2 dark:border-slate-800"
-        onSubmit={(e) => {
-          if (!window.confirm(`Hapus ${row.nama} dari data pegawai? Foto ikut terhapus.`)) {
-            e.preventDefault();
-          }
-        }}
-      >
-        <input type="hidden" name="id" value={row.id} />
-        <Button type="submit" size="sm" variant="danger" disabled={hapusPending}>
-          {hapusPending ? "Menghapus…" : "Hapus Pegawai"}
-        </Button>
-        <PesanHasil state={hapusState} />
-      </form>
-    </div>
+    <form
+      action={formAction}
+      className="border-t border-neutral-100 pt-3 dark:border-slate-800"
+      onSubmit={(e) => {
+        if (!window.confirm(`Hapus ${row.nama} dari data pegawai? Foto ikut terhapus.`)) {
+          e.preventDefault();
+        }
+      }}
+    >
+      <input type="hidden" name="id" value={row.id} />
+      <Button type="submit" size="sm" variant="danger" disabled={pending}>
+        {pending ? "Menghapus…" : "Hapus Pegawai"}
+      </Button>
+      <PesanHasil state={state} />
+    </form>
   );
 }
 

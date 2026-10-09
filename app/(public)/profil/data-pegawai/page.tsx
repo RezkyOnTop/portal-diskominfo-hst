@@ -140,7 +140,7 @@ export default async function DataPegawaiPage({
                     className="overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-[var(--shadow-card)] dark:border-neutral-800 dark:bg-neutral-900"
                   >
                     <div className="relative aspect-square w-full bg-gradient-to-br from-primary-100 via-primary-50 to-secondary-100 dark:from-primary-900/40 dark:via-neutral-800 dark:to-secondary-900/40">
-                      {p.fotoUrl ? (
+                      {p.fotoUrl && p.fotoUrl.trim() ? (
                         <Image
                           src={p.fotoUrl}
                           alt={`Foto ${p.nama}`}

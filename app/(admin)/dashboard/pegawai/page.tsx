@@ -1,7 +1,7 @@
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { countStaff, listStaffAdmin } from "@/lib/services/staff";
 import { UNIT_PEGAWAI } from "@/lib/validations/local.schema";
-import { StaffCreateForm, StaffRowForm } from "./StaffForms";
+import { StaffCreateForm, StaffDirectory } from "./StaffForms";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Data Pegawai" };
@@ -41,55 +41,18 @@ export default async function PegawaiAdminPage() {
 
       <StaffCreateForm />
 
-      {UNIT_PEGAWAI.map((unit) => {
-        const anggota = rows.filter((r) => r.unit === unit);
-        if (anggota.length === 0) return null;
-        return (
-          <section key={unit} aria-label={unit}>
-            <h2 className="font-heading text-lg font-bold text-neutral-900 dark:text-slate-50">
-              {unit}{" "}
-              <span className="text-sm font-semibold text-neutral-500 dark:text-slate-400">
-                ({anggota.length})
-              </span>
-            </h2>
-            <ul className="mt-3 space-y-4">
-              {anggota.map((r) => (
-                <li
-                  key={r.id}
-                  className="rounded-[var(--radius-card)] border border-neutral-200 bg-white p-5 shadow-[var(--shadow-card)] dark:border-slate-700 dark:bg-slate-900"
-                >
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="font-medium text-neutral-900 dark:text-slate-100">
-                      {r.nama}
-                      <span className="text-xs text-neutral-500 dark:text-slate-400">
-                        {" "}· {r.jabatan}
-                      </span>
-                    </p>
-                    <span
-                      className={`rounded-full px-2.5 py-1 text-xs font-bold ${
-                        r.aktif
-                          ? "bg-secondary-600/10 text-secondary-700 dark:text-secondary-300"
-                          : "bg-neutral-200 text-neutral-700 dark:text-slate-300"
-                      }`}
-                    >
-                      {r.aktif ? "Tampil" : "Sembunyi"}
-                    </span>
-                  </div>
-                  <div className="mt-3">
-                    <StaffRowForm row={r} />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
-        );
-      })}
-
+      {/* Direktori: pencarian + daftar ringkas + dialog ubah per baris.
+          Satu form per pegawai hanya dirender saat dialog dibuka, jadi
+          halaman tetap ringan walau jumlah pegawai bertambah banyak. */}
       {rows.length === 0 ? (
         <p className="rounded-[var(--radius-card)] border border-dashed border-neutral-200 bg-white p-6 text-sm text-neutral-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
           Belum ada data pegawai. Tambahkan lewat formulir di atas.
         </p>
-      ) : null}
+      ) : (
+        <section aria-label="Daftar pegawai">
+          <StaffDirectory rows={rows} />
+        </section>
+      )}
     </div>
   );
 }
