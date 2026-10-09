@@ -18,7 +18,10 @@ import { getBerita, getPengumuman } from "@/lib/api/media-center";
 import { LAYANAN } from "@/lib/config";
 import { formatDate } from "@/lib/utils/format";
 
-export const dynamic = "force-dynamic";
+// Beranda: data berita/pengumuman sudah di-cache 1 jam di adapter, jadi aman
+// memakai ISR. Halaman disajikan dari cache statis (TTFB rendah) dan
+// diperbarui di latar tiap 5 menit. Sesi/tema tetap ditangani di klien.
+export const revalidate = 300;
 
 export default function HomePage() {
   return (

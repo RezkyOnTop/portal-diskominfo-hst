@@ -46,3 +46,6 @@ next-env.d.ts
 
 # Foto pegawai yang diunggah admin (data operasional, JANGAN commit)
 /.uploads/
+
+# Cache gambar hasil olahan proxy /api/gambar (dibangun ulang otomatis)
+/.cache/

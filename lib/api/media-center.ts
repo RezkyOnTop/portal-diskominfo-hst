@@ -122,7 +122,7 @@ function normalizePengumuman(raw: RawPengumuman): Pengumuman {
 }
 
 /** Ambil array MENTAH dari Media Center (timeout + error normalisasi). */
-async function fetchArray(path: string): Promise<unknown[]> {
+async function fetchArray(path: string, ttlSeconds: number): Promise<unknown[]> {
   const url = `${baseUrl()}${path}`;
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -130,9 +130,11 @@ async function fetchArray(path: string): Promise<unknown[]> {
     const res = await fetch(url, {
       signal: controller.signal,
       headers: { Accept: "application/json" },
-      // Respons > 2 MB tidak dapat disimpan cache bawaan Next.js; cache
-      // ditangani sendiri (lihat fetchArrayCached). Karena itu no-store.
-      cache: "no-store",
+      // Respons > 2 MB tidak dapat disimpan cache bawaan Next.js, jadi cache
+      // ditangani sendiri (lihat fetchArrayCached). `next.revalidate` memberi
+      // tahu Next bahwa fetch ini BOLEH di-cache saat prerender/ISR — tanpa
+      // ini beranda tidak bisa statis dan selalu render dinamis (TTFB tinggi).
+      next: { revalidate: ttlSeconds },
     });
     if (!res.ok) throw new MediaCenterError(`HTTP_${res.status}`);
     let json: unknown;
@@ -169,7 +171,7 @@ async function fetchArrayCached(path: string, ttlSeconds: number): Promise<unkno
   const cached = memoryCache.get(path);
   if (cached && cached.expires > now) return cached.data;
   try {
-    const data = await fetchArray(path);
+    const data = await fetchArray(path, ttlSeconds);
     memoryCache.set(path, { data, expires: now + ttlSeconds * 1000 });
     return data;
   } catch (err) {

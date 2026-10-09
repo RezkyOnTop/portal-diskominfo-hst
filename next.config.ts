@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Sembunyikan "X-Powered-By: Next.js" (kurangi info disclosure).
+  poweredByHeader: false,
+  // `sharp` dipakai untuk memproses gambar berita di /api/gambar.
+  // `undici` dipakai untuk koneksi TLS khusus ke host gambar Media Center.
+  serverExternalPackages: ["sharp", "undici"],
   images: {
     // Gambar berita berasal dari host DATA Media Center HST (assets/foto_brt),
     // yang BERBEDA dari host API. Lihat lib/api/media-center.ts (imageBaseUrl).

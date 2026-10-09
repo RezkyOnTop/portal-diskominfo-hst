@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils/format";
+import { gambarBerita } from "@/lib/utils/gambar";
 import type { Berita } from "@/types/media-center";
 
 /**
@@ -18,7 +19,7 @@ export function NewsCard({ berita, priority = false }: { berita: Berita; priorit
       >
         {berita.imageUrl ? (
           <Image
-            src={berita.imageUrl}
+            src={gambarBerita(berita.imageUrl, 800)!}
             alt={berita.title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils/format";
+import { gambarBerita } from "@/lib/utils/gambar";
 import type { Berita } from "@/types/media-center";
 
 function excerpt(b: Berita): string {
@@ -27,7 +28,7 @@ export function BentoBerita({ items }: { items: Berita[] }) {
           <div className="relative h-full min-h-[320px] w-full">
             {lead!.imageUrl ? (
               <Image
-                src={lead!.imageUrl}
+                src={gambarBerita(lead!.imageUrl, 1200)!}
                 alt={lead!.title}
                 fill
                 sizes="(max-width: 1024px) 100vw, 66vw"
@@ -75,7 +76,7 @@ export function BentoBerita({ items }: { items: Berita[] }) {
           >
             {b.imageUrl ? (
               <Image
-                src={b.imageUrl}
+                src={gambarBerita(b.imageUrl, 240)!}
                 alt={b.title}
                 fill
                 sizes="96px"

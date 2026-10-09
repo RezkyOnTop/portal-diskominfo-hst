@@ -6,6 +6,7 @@ import { Container } from "@/components/layout/Container";
 import { Badge } from "@/components/ui/Badge";
 import { getBeritaBySlug } from "@/lib/api/media-center";
 import { formatDateTime, readingTimeMinutes } from "@/lib/utils/format";
+import { gambarBerita } from "@/lib/utils/gambar";
 import { sanitizeHtml } from "@/lib/utils/sanitize";
 
 export const dynamic = "force-dynamic";
@@ -69,7 +70,7 @@ export default async function BeritaDetailPage({ params }: PageProps<"/berita/[s
         {berita.imageUrl ? (
           <figure className="mt-6 overflow-hidden rounded-[var(--radius-card)] border border-neutral-200">
             <Image
-              src={berita.imageUrl}
+              src={gambarBerita(berita.imageUrl, 1200)!}
               alt={berita.title}
               width={1200}
               height={675}
