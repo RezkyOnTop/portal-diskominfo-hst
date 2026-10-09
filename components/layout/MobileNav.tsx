@@ -6,9 +6,27 @@ import { NAV_MENU, SITE } from "@/lib/config";
 import { cn } from "@/lib/utils/cn";
 
 /** Menu navigasi mobile dengan submenu akordeon yang aksesibel. */
-export function MobileNav({ solid = true }: { solid?: boolean }) {
+export function MobileNav({
+  solid = true,
+  onOpenChange,
+}: {
+  solid?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
   const [open, setOpen] = useState(false);
   const [sub, setSub] = useState<string | null>(null);
+
+  function toggle() {
+    setOpen((v) => {
+      onOpenChange?.(!v);
+      return !v;
+    });
+  }
+
+  function tutup() {
+    setOpen(false);
+    onOpenChange?.(false);
+  }
 
   return (
     <div className="lg:hidden">
@@ -17,7 +35,7 @@ export function MobileNav({ solid = true }: { solid?: boolean }) {
         aria-expanded={open}
         aria-controls="menu-mobile"
         aria-label={open ? "Tutup menu" : "Buka menu"}
-        onClick={() => setOpen((v) => !v)}
+        onClick={toggle}
         className={cn(
           "rounded-lg border p-2",
           solid
@@ -40,7 +58,7 @@ export function MobileNav({ solid = true }: { solid?: boolean }) {
             <li className="border-b border-neutral-100">
               <Link
                 href="/cari"
-                onClick={() => setOpen(false)}
+                onClick={tutup}
                 className="flex items-center gap-2 px-2 py-3 text-sm font-semibold text-neutral-800 hover:text-primary-700"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
@@ -77,7 +95,7 @@ export function MobileNav({ solid = true }: { solid?: boolean }) {
                                 href={child.href}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                onClick={() => setOpen(false)}
+                                onClick={tutup}
                                 className="block rounded-md px-3 py-2.5 text-sm text-neutral-600 hover:bg-primary-50 hover:text-primary-700"
                               >
                                 {child.label} ↗
@@ -85,7 +103,7 @@ export function MobileNav({ solid = true }: { solid?: boolean }) {
                             ) : (
                               <Link
                                 href={child.href ?? "#"}
-                                onClick={() => setOpen(false)}
+                                onClick={tutup}
                                 className="block rounded-md px-3 py-2.5 text-sm text-neutral-600 hover:bg-primary-50 hover:text-primary-700"
                               >
                                 {child.label}
@@ -99,7 +117,7 @@ export function MobileNav({ solid = true }: { solid?: boolean }) {
                 ) : (
                   <Link
                     href={item.href ?? "/"}
-                    onClick={() => setOpen(false)}
+                    onClick={tutup}
                     className="block px-2 py-3 text-sm font-semibold text-neutral-800 hover:text-primary-700"
                   >
                     {item.label}

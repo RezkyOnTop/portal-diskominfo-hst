@@ -3,40 +3,38 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NAV_MENU, SITE, SOSIAL } from "@/lib/config";
 import { MobileNav } from "@/components/layout/MobileNav";
 import { SocialIcon } from "@/components/ui/SocialIcon";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { NavSearch } from "@/components/layout/NavSearch";
+import { useNavbarHide } from "@/components/layout/useNavbarHide";
 import { cn } from "@/lib/utils/cn";
 
 /**
  * Navbar dengan mega-menu. Transparan di atas hero pada beranda, lalu
  * berubah solid saat halaman di-scroll. Dropdown dapat diakses keyboard.
+ *
+ * Scroll ke bawah -> navbar menyembur naik (slide up + fade); scroll ke atas
+ * -> muncul lagi. Di <=80px dari atas selalu terlihat (lihat useNavbarHide).
  */
 export function Navbar() {
   const pathname = usePathname();
-  const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
+  const [menuMobileTerbuka, setMenuMobileTerbuka] = useState(false);
 
   const isHome = pathname === "/";
-
-  useEffect(() => {
-    function onScroll() {
-      setScrolled(window.scrollY > 24);
-    }
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  // Saat menu mobile terbuka, jangan pernah sembunyikan navbar.
+  const { hidden, scrolled } = useNavbarHide(menuMobileTerbuka);
 
   const solid = scrolled || !isHome;
 
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 transition-colors duration-300",
+        "sticky top-0 z-40 transition-[transform,opacity,background-color,border-color] duration-300 ease-out motion-reduce:transition-none",
+        hidden ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
         solid
           ? "border-b border-neutral-200 bg-white/95 text-neutral-900 backdrop-blur"
           : "bg-transparent text-white",
@@ -203,7 +201,7 @@ export function Navbar() {
         <div className="flex items-center gap-2">
           <NavSearch solid={solid} />
           <ThemeToggle solid={solid} />
-          <MobileNav solid={solid} />
+          <MobileNav solid={solid} onOpenChange={setMenuMobileTerbuka} />
         </div>
       </div>
     </header>
