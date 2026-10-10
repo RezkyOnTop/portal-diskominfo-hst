@@ -259,6 +259,87 @@ h4 {
   background-size: 56px 56px;
 }
 
+/* ── Hero adaptif ("Digital Civic" siang & malam) ───────────────────
+   Hero beranda kini MENGIKUTI tema: mesh pastel di atas putih saat terang,
+   mesh gelap saat .dark. Warna brand sama (indigo/sky/emerald), hanya
+   kecerahannya berubah — identitas tetap. Kelas khusus hero agar
+   PageHeader halaman dalam (yang sengaja tetap gelap) tidak terpengaruh. */
+.hero-mesh {
+  background-color: #eef2ff;
+  background-image:
+    radial-gradient(at 12% 18%, rgb(79 70 229 / 0.18) 0px, transparent 50%),
+    radial-gradient(at 82% 12%, rgb(14 165 233 / 0.15) 0px, transparent 45%),
+    radial-gradient(at 70% 82%, rgb(16 185 129 / 0.13) 0px, transparent 50%),
+    radial-gradient(at 25% 88%, rgb(99 102 241 / 0.15) 0px, transparent 45%);
+}
+.dark .hero-mesh {
+  background-color: #0b1020;
+  background-image:
+    radial-gradient(at 12% 18%, rgb(79 70 229 / 0.45) 0px, transparent 50%),
+    radial-gradient(at 82% 12%, rgb(14 165 233 / 0.35) 0px, transparent 45%),
+    radial-gradient(at 70% 82%, rgb(16 185 129 / 0.28) 0px, transparent 50%),
+    radial-gradient(at 25% 88%, rgb(99 102 241 / 0.35) 0px, transparent 45%);
+}
+
+.hero-grid {
+  background-image: linear-gradient(
+      to right,
+      rgb(30 27 75 / 0.06) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgb(30 27 75 / 0.06) 1px, transparent 1px);
+  background-size: 56px 56px;
+}
+.dark .hero-grid {
+  background-image: linear-gradient(
+      to right,
+      rgb(255 255 255 / 0.045) 1px,
+      transparent 1px
+    ),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.045) 1px, transparent 1px);
+}
+
+/* Kaca hero: putih susu saat terang, kaca gelap saat malam. */
+.hero-glass {
+  background: rgb(255 255 255 / 0.7);
+  border: 1px solid rgb(15 23 42 / 0.08);
+  backdrop-filter: blur(14px);
+}
+.dark .hero-glass {
+  background: rgb(255 255 255 / 0.06);
+  border: 1px solid rgb(255 255 255 / 0.12);
+}
+
+/* Judul gradient hero: shade pekat saat terang, pastel saat malam. */
+.hero-text-gradient {
+  background: linear-gradient(100deg, #4338ca 0%, #0369a1 45%, #047857 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.dark .hero-text-gradient {
+  background: linear-gradient(100deg, #a5b4fc 0%, #7dd3fc 45%, #6ee7b7 100%);
+}
+
+/* Garis pembatas hero. */
+.hero-divider {
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgb(79 70 229 / 0.35),
+    transparent
+  );
+}
+.dark .hero-divider {
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgb(129 140 248 / 0.5),
+    transparent
+  );
+}
+
 /* Kaca (glassmorphism). */
 .glass {
   background: rgb(255 255 255 / 0.06);

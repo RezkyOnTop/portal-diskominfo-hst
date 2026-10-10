@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { describe, it, expect, vi, afterEach } from "vitest";
+import { render, screen, cleanup } from "@testing-library/react";
 import { Navbar } from "./Navbar";
 
 // Stub navigasi: beranda transparan, path lain solid.
@@ -17,27 +17,31 @@ vi.mock("./ThemeProvider", () => ({
   useTheme: () => ({ toggle: () => undefined, theme: "light" as const, setTheme: () => undefined }),
 }));
 
-describe("Navbar logo mengikuti tema", () => {
-  it("mode transparan (atas beranda): hanya logo PUTIH yang terlihat", () => {
+describe("Navbar mengikuti tema", () => {
+  afterEach(() => cleanup());
+
+  it("logo selalu ikut tema (hitam di terang, putih di gelap, tukar via CSS)", () => {
     pathnameMock.mockReturnValue("/");
     const { container } = render(<Navbar />);
     const putih = container.querySelector('img[src*="logo-putih"]');
     const hitam = container.querySelector('img[src*="logo-hitam"]');
     expect(putih).not.toBeNull();
     expect(hitam).not.toBeNull();
-    // Logo putih tanpa 'hidden' saat transparan; logo hitam disembunyikan.
-    expect(putih?.className).not.toMatch(/(^|\s)hidden(\s|$)/);
-    expect(hitam?.className).toMatch(/(^|\s)hidden(\s|$)/);
-  });
-
-  it("mode solid (halaman lain): logo hitam di terang, putih di gelap (tukar via CSS)", () => {
-    pathnameMock.mockReturnValue("/berita");
-    const { container } = render(<Navbar />);
-    const putih = container.querySelector('img[src*="logo-putih"]');
-    const hitam = container.querySelector('img[src*="logo-hitam"]');
     // Keduanya dirender; visibilitas diatur kelas dark: — mencegah flash.
     expect(hitam?.className).toContain("dark:hidden");
     expect(putih?.className).toContain("dark:block");
+  });
+
+  it("header transparan memakai warna adaptif tema", () => {
+    pathnameMock.mockReturnValue("/");
+    const { container } = render(<Navbar />);
+    const header = container.querySelector("header");
+    const cls = header?.className ?? "";
+    // Adaptif: teks gelap di terang, putih di gelap — tanpa kelas text-white mandiri.
+    expect(cls).toContain("dark:text-white");
+    expect(cls.split(/\s+/)).toContain("text-neutral-900");
+    expect(cls.split(/\s+/).some((c) => c === "text-white")).toBe(false);
+    expect(screen.getByRole("navigation", { name: /Navigasi utama/i })).toBeInTheDocument();
   });
 
   it("header solid memakai kelas dark: (ikut tema gelap)", () => {

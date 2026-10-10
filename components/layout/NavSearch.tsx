@@ -52,7 +52,7 @@ export function NavSearch({ solid = true }: { solid?: boolean }) {
           "grid h-9 w-9 place-items-center rounded-lg border transition-colors",
           solid
             ? "border-neutral-200 text-neutral-700 hover:bg-neutral-100"
-            : "border-white/30 text-white hover:bg-white/15",
+            : "border-neutral-900/15 text-neutral-700 hover:bg-neutral-900/10 dark:border-white/30 dark:text-white dark:hover:bg-white/15",
         )}
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
@@ -82,7 +82,7 @@ export function NavSearch({ solid = true }: { solid?: boolean }) {
           "h-9 w-40 rounded-lg border px-3 text-sm sm:w-56",
           solid
             ? "border-neutral-200 bg-white text-neutral-900 placeholder:text-neutral-400"
-            : "border-white/30 bg-white/10 text-white placeholder:text-white/60",
+            : "border-neutral-900/15 bg-white/70 text-neutral-900 placeholder:text-neutral-500 dark:border-white/30 dark:bg-white/10 dark:text-white dark:placeholder:text-white/60",
         )}
       />
     </form>

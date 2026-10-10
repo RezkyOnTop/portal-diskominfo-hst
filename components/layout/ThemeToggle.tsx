@@ -22,7 +22,7 @@ export function ThemeToggle({ solid = true }: { solid?: boolean }) {
         "grid h-9 w-9 place-items-center rounded-lg border transition-colors",
         solid
           ? "border-neutral-200 text-neutral-700 hover:bg-neutral-100"
-          : "border-white/30 text-white hover:bg-white/15",
+          : "border-neutral-900/15 text-neutral-700 hover:bg-neutral-900/10 dark:border-white/30 dark:text-white dark:hover:bg-white/15",
       )}
     >
       {/* Mode terang → tampilkan ikon bulan (aksi: ke gelap) */}

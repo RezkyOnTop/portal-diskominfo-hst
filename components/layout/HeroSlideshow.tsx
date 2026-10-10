@@ -42,7 +42,7 @@ export function HeroSlideshow() {
   }, [playing, next]);
 
   return (
-    <div className="glass relative overflow-hidden rounded-[var(--radius-card)] p-2 shadow-2xl">
+    <div className="hero-glass relative overflow-hidden rounded-[var(--radius-card)] p-2 shadow-2xl">
       <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-neutral-900">
         {SLIDES.map((s, i) => (
           <div

@@ -37,7 +37,7 @@ export function Navbar() {
         hidden ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
         solid
           ? "border-b border-neutral-200 bg-white/95 text-neutral-900 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95 dark:text-neutral-100"
-          : "bg-transparent text-white [text-shadow:0_1px_12px_rgb(0_0_0/0.55)]",
+          : "bg-transparent text-neutral-900 dark:text-white dark:[text-shadow:0_1px_12px_rgb(0_0_0/0.55)]",
       )}
     >
       {/* Top bar */}
@@ -46,7 +46,7 @@ export function Navbar() {
           "hidden border-b text-xs transition-colors md:block",
           solid
             ? "border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
-            : "border-white/15 bg-black/20 text-white/85",
+            : "border-neutral-900/10 bg-white/40 text-neutral-700 dark:border-white/15 dark:bg-black/20 dark:text-white/85",
         )}
       >
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-1.5">
@@ -91,19 +91,16 @@ export function Navbar() {
           className="flex items-center gap-3"
           aria-label={`${SITE.shortName} — Beranda`}
         >
-          {/* Logo terang: saat transparan SELALU pakai putih; saat solid
-              pakai hitam di tema terang, putih di tema gelap (tukar via CSS
-              agar tanpa jeda render). */}
+          {/* Logo ikut tema: hitam di mode terang, putih di mode gelap.
+              Tukar via CSS (bukan state React) agar tanpa jeda render dan
+              tetap terbaca di hero terang maupun gelap. */}
           <Image
             src="/brand/logo-hitam.png"
             alt={`Logo ${SITE.shortName}`}
             width={185}
             height={54}
             priority
-            className={cn(
-              "h-9 w-auto sm:h-11",
-              solid ? "block dark:hidden" : "hidden",
-            )}
+            className="block h-9 w-auto dark:hidden sm:h-11"
           />
           <Image
             src="/brand/logo-putih.png"
@@ -111,10 +108,7 @@ export function Navbar() {
             width={185}
             height={54}
             priority
-            className={cn(
-              "h-9 w-auto sm:h-11",
-              solid ? "hidden dark:block" : "block",
-            )}
+            className="hidden h-9 w-auto dark:block sm:h-11"
           />
         </Link>
 
@@ -137,8 +131,8 @@ export function Navbar() {
                             ? "bg-primary-50 text-primary-700"
                             : "text-neutral-700 hover:bg-primary-50 hover:text-primary-700"
                           : active
-                            ? "bg-white/20 text-white"
-                            : "text-white/90 hover:bg-white/15 hover:text-white",
+                            ? "bg-primary-600/15 text-primary-700 dark:bg-white/20 dark:text-white"
+                            : "text-neutral-700 hover:bg-primary-600/10 hover:text-primary-700 dark:text-white/90 dark:hover:bg-white/15 dark:hover:text-white",
                       )}
                     >
                       {item.label}
@@ -164,7 +158,7 @@ export function Navbar() {
                       "flex items-center gap-1 rounded-lg px-3 py-2 text-sm font-semibold transition-colors",
                       solid
                         ? "text-neutral-700 hover:bg-primary-50 hover:text-primary-700"
-                        : "text-white/90 hover:bg-white/15 hover:text-white",
+                        : "text-neutral-700 hover:bg-primary-600/10 hover:text-primary-700 dark:text-white/90 dark:hover:bg-white/15 dark:hover:text-white",
                     )}
                   >
                     {item.label}

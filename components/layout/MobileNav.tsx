@@ -40,7 +40,7 @@ export function MobileNav({
           "rounded-lg border p-2",
           solid
             ? "border-neutral-200 text-neutral-700"
-            : "border-white/30 text-white",
+            : "border-neutral-900/15 text-neutral-700 dark:border-white/30 dark:text-white",
         )}
       >
         <span aria-hidden="true" className="block text-lg leading-none">

@@ -3,15 +3,15 @@ import { HERO, RADIO_NAME } from "@/lib/config";
 import { HeroSlideshow } from "@/components/layout/HeroSlideshow";
 
 /**
- * Hero "Digital Civic": split asimetris, gradient mesh gelap, kartu kaca
- * mengapung, dan widget radio. Foto Kabupaten HST kini BERGERAK (slideshow
- * otomatis), tetapi tetap dalam panel kaca — bukan carousel layar penuh
- * seperti situs lama.
+ * Hero "Digital Civic": split asimetris, gradient mesh adaptif (terang di
+ * mode terang, gelap di mode gelap), kartu kaca mengapung, dan widget
+ * radio. Foto Kabupaten HST BERGERAK (slideshow otomatis), tetapi tetap
+ * dalam panel kaca — bukan carousel layar penuh seperti situs lama.
  */
 export function Hero() {
   return (
-    <section className="relative isolate -mt-[var(--header-h)] overflow-hidden bg-mesh pt-[calc(var(--header-h)+2rem)] text-white">
-      <div aria-hidden="true" className="absolute inset-0 bg-grid-dark opacity-60" />
+    <section className="hero-mesh relative isolate -mt-[var(--header-h)] overflow-hidden pt-[calc(var(--header-h)+2rem)] text-neutral-900 dark:text-white">
+      <div aria-hidden="true" className="hero-grid absolute inset-0 opacity-60" />
       {/* Orb dekoratif */}
       <div
         aria-hidden="true"
@@ -25,10 +25,10 @@ export function Hero() {
       <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-4 pb-20 pt-10 lg:grid-cols-[1.15fr_1fr] lg:pb-28 lg:pt-16">
         {/* Kolom teks */}
         <div>
-          <p className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary-200">
+          <p className="animate-fade-up inline-flex items-center gap-2 rounded-full border border-primary-600/20 bg-white/60 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary-700 dark:border-white/15 dark:bg-white/5 dark:text-primary-200">
             <span
               aria-hidden="true"
-              className="animate-pulse-ring h-1.5 w-1.5 rounded-full bg-secondary-400"
+              className="animate-pulse-ring h-1.5 w-1.5 rounded-full bg-secondary-500"
             />
             {HERO.region}
           </p>
@@ -36,12 +36,12 @@ export function Hero() {
           <h1 className="animate-fade-up delay-1 mt-6 font-heading text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl">
             Satu Portal untuk
             <br />
-            <span className="text-gradient">Informasi &amp; Layanan</span>
+            <span className="hero-text-gradient">Informasi &amp; Layanan</span>
             <br />
             Hulu Sungai Tengah
           </h1>
 
-          <p className="animate-fade-up delay-2 mt-6 max-w-xl text-base leading-relaxed text-neutral-300">
+          <p className="animate-fade-up delay-2 mt-6 max-w-xl text-base leading-relaxed text-neutral-600 dark:text-neutral-300">
             {HERO.subtitle}. Berita resmi, pengumuman, klarifikasi hoaks, data
             terbuka, dan radio daerah — dalam satu pengalaman digital yang cepat
             dan mudah diakses.
@@ -62,14 +62,14 @@ export function Hero() {
             </Link>
             <Link
               href="/layanan"
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/10"
+              className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white/60 px-6 py-3 text-sm font-semibold text-neutral-800 backdrop-blur transition-colors hover:bg-white dark:border-white/20 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
             >
               Layanan Digital
             </Link>
           </div>
 
           {/* Pilar ringkas */}
-          <dl className="animate-fade-up delay-4 mt-10 grid max-w-lg grid-cols-3 gap-3 border-t border-white/10 pt-6">
+          <dl className="animate-fade-up delay-4 mt-10 grid max-w-lg grid-cols-3 gap-3 border-t border-neutral-900/10 pt-6 dark:border-white/10">
             {[
               { k: "Media Center", v: "Berita resmi", icon: "M4 6h16v12H4zM8 10h8M8 14h5" },
               { k: "Open Data", v: "Data terbuka", icon: "M12 3v18M3 12h18" },
@@ -77,7 +77,7 @@ export function Hero() {
             ].map((s) => (
               <div
                 key={s.k}
-                className="rounded-xl border border-white/10 bg-white/5 p-3 transition-colors hover:bg-white/10"
+                className="rounded-xl border border-neutral-900/10 bg-white/60 p-3 transition-colors hover:bg-white dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
               >
                 <svg
                   width="18"
@@ -89,14 +89,14 @@ export function Hero() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   aria-hidden="true"
-                  className="text-accent-400"
+                  className="text-accent-600 dark:text-accent-400"
                 >
                   <path d={s.icon} />
                 </svg>
-                <dt className="mt-2 text-[11px] font-semibold uppercase tracking-wide text-primary-200">
+                <dt className="mt-2 text-[11px] font-semibold uppercase tracking-wide text-primary-700 dark:text-primary-200">
                   {s.k}
                 </dt>
-                <dd className="mt-0.5 text-xs text-neutral-300">{s.v}</dd>
+                <dd className="mt-0.5 text-xs text-neutral-600 dark:text-neutral-300">{s.v}</dd>
               </div>
             ))}
           </dl>
@@ -107,29 +107,29 @@ export function Hero() {
           <HeroSlideshow />
 
           {/* Widget radio mengapung */}
-          <div className="glass absolute -bottom-5 left-3 flex items-center gap-3 rounded-2xl p-3 pr-5 shadow-xl sm:-left-6">
+          <div className="hero-glass absolute -bottom-5 left-3 flex items-center gap-3 rounded-2xl p-3 pr-5 shadow-xl sm:-left-6">
             <span className="animate-pulse-ring grid h-10 w-10 place-items-center rounded-full bg-secondary-500 text-white">
               <span aria-hidden="true">▶</span>
             </span>
             <div>
-              <p className="text-[11px] uppercase tracking-wide text-primary-200">
+              <p className="text-[11px] uppercase tracking-wide text-primary-700 dark:text-primary-200">
                 Sedang Siaran
               </p>
-              <p className="text-sm font-semibold text-white">{RADIO_NAME}</p>
+              <p className="text-sm font-semibold text-neutral-900 dark:text-white">{RADIO_NAME}</p>
             </div>
           </div>
 
           {/* Badge layanan mengapung */}
-          <div className="glass absolute -right-3 -top-5 rounded-2xl px-4 py-3 text-center shadow-xl">
-            <p className="font-heading text-xl font-extrabold text-white">24/7</p>
-            <p className="text-[10px] uppercase tracking-wide text-primary-200">
+          <div className="hero-glass absolute -right-3 -top-5 rounded-2xl px-4 py-3 text-center shadow-xl">
+            <p className="font-heading text-xl font-extrabold text-neutral-900 dark:text-white">24/7</p>
+            <p className="text-[10px] uppercase tracking-wide text-primary-700 dark:text-primary-200">
               Layanan
             </p>
           </div>
         </div>
       </div>
 
-      <div aria-hidden="true" className="divider-gradient" />
+      <div aria-hidden="true" className="hero-divider" />
     </section>
   );
 }
