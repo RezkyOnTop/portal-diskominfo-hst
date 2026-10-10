@@ -5,6 +5,12 @@
  * terbatas (bold, italic, kode inline, tautan http/https, daftar). Karena
  * HTML sudah di-escape, tidak ada tag mentah dari AI yang bisa dieksekusi —
  * mencegah XSS. Hasilnya string HTML aman untuk dangerouslySetInnerHTML.
+ *
+ * PENTING (atribut href): setelah escape, karakter `"` menjadi `&quot;`.
+ * Bila URL semacam itu dimasukkan ke `href="..."`, browser akan MEN-DECODE
+ * entity tersebut menjadi `"` dan dapat keluar dari atribut (XSS). Karena itu
+ * URL yang memuat entity kutip/tanda-kurung sudut DITOLAK (tidak dijadikan
+ * tautan) — lihat HREF_BERBAHAYA.
  */
 
 /** Escape karakter HTML agar tidak bisa menjadi tag. */
@@ -17,11 +23,29 @@ export function escapeHtml(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
+/**
+ * Entity hasil escape yang berbahaya bila masuk ke nilai atribut.
+ * `&quot;`/`&#39;` bisa menutup atribut; `&lt;`/`&gt;` bisa memecah tag.
+ */
+const HREF_BERBAHAYA = /&quot;|&#39;|&lt;|&gt;/;
+
+const KELAS_TAUTAN =
+  "font-medium text-primary-700 underline dark:text-primary-400";
+
+/** Buat tag <a> hanya bila URL lolos pemeriksaan entity berbahaya. */
+function tautan(url: string, teks: string): string {
+  if (HREF_BERBAHAYA.test(url)) return teks;
+  return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="${KELAS_TAUTAN}">${teks}</a>`;
+}
+
 /** Format inline: kode, bold, italic, tautan. Input SUDAH ter-escape. */
 function inline(teks: string): string {
   let out = teks;
   // Kode inline `...`
-  out = out.replace(/`([^`]+)`/g, '<code class="rounded bg-neutral-100 px-1 py-0.5 text-[0.85em] dark:bg-neutral-800">$1</code>');
+  out = out.replace(
+    /`([^`]+)`/g,
+    '<code class="rounded bg-neutral-100 px-1 py-0.5 text-[0.85em] dark:bg-neutral-800">$1</code>',
+  );
   // Bold **...** / __...__
   out = out.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   out = out.replace(/__([^_]+)__/g, "<strong>$1</strong>");
@@ -30,17 +54,18 @@ function inline(teks: string): string {
   // Tautan markdown [teks](url) — hanya http/https.
   out = out.replace(
     /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
-    '<a href="$2" target="_blank" rel="noopener noreferrer" class="font-medium text-primary-700 underline dark:text-primary-400">$1</a>',
+    (_m, teks2: string, url: string) => tautan(url, teks2),
   );
   // Tautan polos http(s) (yang belum menjadi href).
   out = out.replace(
     /(^|[\s(])(https?:\/\/[^\s<)]+)/g,
-    '$1<a href="$2" target="_blank" rel="noopener noreferrer" class="font-medium text-primary-700 underline dark:text-primary-400">$2</a>',
+    (_m, pre: string, url: string) => `${pre}${tautan(url, url)}`,
   );
   // Rute internal portal (/reservasi dsb.) dijadikan tautan bila berdiri sendiri.
   out = out.replace(
     /(^|\s)(\/(?:reservasi|reservasi\/status|layanan|berita|pengumuman|hoaks|survei|data-terbuka|kontak|radio|cari|profil(?:\/[\w-]+)?))(?=[\s.,)]|$)/g,
-    '$1<a href="$2" class="font-medium text-primary-700 underline dark:text-primary-400">$2</a>',
+    (_m, pre: string, rute: string) =>
+      `${pre}<a href="${rute}" class="${KELAS_TAUTAN}">${rute}</a>`,
   );
   return out;
 }

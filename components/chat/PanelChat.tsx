@@ -13,14 +13,14 @@ interface Pesan {
 const SAPAAN: Pesan = {
   role: "assistant",
   content:
-    "Halo! Saya asisten Diskominfo SP HST. Tanyakan soal layanan, reservasi, profil, kontak, atau cuaca Barabai. 🙂",
+    "Halo! Saya **Asisten AI Diskominfo SP HST** — tanya apa pun soal layanan kami: reservasi, profil, berita, data terbuka, kontak. Psst, saya juga tahu **cuaca Barabai** terkini. 🙂",
 };
 
 const SARAN = [
   "Bagaimana cara reservasi layanan?",
   "Apa saja layanan Diskominfo SP HST?",
-  "Cuaca Barabai hari ini?",
   "Alamat dan kontak kantor?",
+  "Cuaca Barabai hari ini?",
 ];
 
 /**
@@ -35,6 +35,7 @@ export function PanelChat() {
   const [teks, setTeks] = useState("");
   const [memuat, setMemuat] = useState(false);
   const daftarRef = useRef<HTMLDivElement | null>(null);
+  const kunciRef = useRef(false);
 
   useEffect(() => {
     const el = daftarRef.current;
@@ -43,14 +44,16 @@ export function PanelChat() {
 
   async function kirim(isi: string) {
     const bersih = bersihkanPesanChat(isi);
-    if (bersih.length < 2 || memuat) return;
+    // Kunci ref: cegah kirim ganda walau klik terjadi sebelum re-render.
+    if (bersih.length < 2 || kunciRef.current) return;
+    kunciRef.current = true;
+    setMemuat(true);
     const riwayat = pesan
       .filter((p) => !p.gagal)
       .slice(-6)
       .map((p) => ({ role: p.role, content: p.content }));
     setPesan((v) => [...v, { role: "user", content: bersih }]);
     setTeks("");
-    setMemuat(true);
     try {
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -69,6 +72,7 @@ export function PanelChat() {
         { role: "assistant", content: m, gagal: true },
       ]);
     } finally {
+      kunciRef.current = false;
       setMemuat(false);
     }
   }

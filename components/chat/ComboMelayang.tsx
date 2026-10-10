@@ -9,11 +9,11 @@ import { useCuaca, ambilCuaca } from "@/components/cuaca/useCuaca";
 type Tab = "cuaca" | "chat";
 
 /**
- * ComboMelayang — widget combo AI + Cuaca di pojok kanan bawah.
+ * ComboMelayang — widget AI + Cuaca di pojok kanan bawah, AI DITONJOLKAN.
  *
- * Gelembung mini berisi ringkasan cuaca (integrasi widget lama). Diklik:
- * mekar panel dengan dua tab: "Asisten AI" (default) dan "Cuaca".
- * Esc / klik luar menutup. Data cuaca di-cache 1 jam di browser.
+ * Gelembung mini: identitas AI ("Tanya AI") dengan cuplikan cuaca kecil di
+ * sampingnya. Diklik: mekar panel, tab "Asisten AI" default. Tab "Cuaca"
+ * sekunder berisi prakiraan BMKG. Esc / klik luar menutup.
  */
 export function ComboMelayang() {
   const [buka, setBuka] = useState(false);
@@ -137,30 +137,36 @@ export function ComboMelayang() {
         </div>
       )}
 
-      {/* Gelembung mini (ringkasan cuaca) */}
+      {/* Gelembung mini — identitas AI utama, cuaca cuplikan kecil */}
       <button
         type="button"
         onClick={togglePanel}
         aria-expanded={buka}
         aria-label={
           sekarang
-            ? `Asisten AI & cuaca Barabai: ${sekarang.deskripsi}, ${sekarang.suhu} derajat. ${buka ? "Tutup panel" : "Buka panel"}`
-            : "Asisten AI & cuaca Barabai. Buka panel"
+            ? `Tanya AI Diskominfo. Cuaca Barabai ${sekarang.deskripsi}, ${sekarang.suhu} derajat. ${buka ? "Tutup panel" : "Buka panel"}`
+            : "Tanya AI Diskominfo. Buka panel"
         }
-        className="flex items-center gap-2 rounded-full border border-neutral-200 bg-white/95 py-2 pl-3 pr-4 shadow-lg backdrop-blur transition-transform hover:scale-105 dark:border-neutral-700 dark:bg-neutral-900/95"
+        className="group flex items-center gap-2.5 rounded-full bg-primary-600 py-2 pl-2.5 pr-4 text-white shadow-xl transition-transform hover:scale-105 dark:bg-primary-500"
       >
-        {sekarang ? (
-          <>
-            <CuacaIcon kode={sekarang.kode} className="h-6 w-6 text-primary-600 dark:text-primary-400" />
-            <span className="text-sm font-bold text-neutral-900 dark:text-white">{sekarang.suhu}°C</span>
-            <span className="max-w-24 truncate text-xs text-neutral-500">· Tanya AI</span>
-          </>
-        ) : (
-          <>
-            <span aria-hidden="true" className="text-lg">✨</span>
-            <span className="text-xs font-semibold text-neutral-500">Asisten</span>
-          </>
-        )}
+        <span className="grid h-9 w-9 place-items-center rounded-full bg-white/20 text-lg" aria-hidden="true">
+          ✨
+        </span>
+        <span className="flex flex-col items-start leading-tight">
+          <span className="text-sm font-bold">Tanya AI</span>
+          <span className="flex max-w-32 items-center gap-1 text-[11px] text-white/85">
+            {sekarang ? (
+              <>
+                <CuacaIcon kode={sekarang.kode} className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">
+                  {sekarang.suhu}°C · {sekarang.deskripsi}
+                </span>
+              </>
+            ) : (
+              "Diskominfo HST"
+            )}
+          </span>
+        </span>
       </button>
     </div>
   );

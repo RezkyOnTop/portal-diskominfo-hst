@@ -66,12 +66,12 @@ describe("ComboMelayang", () => {
     localStorage.clear();
   });
 
-  it("gelembung mini menampilkan suhu + label Tanya AI", async () => {
+  it("gelembung AI-utama dengan cuplikan cuaca", async () => {
     mockFetch(() => ({ ok: true, json: async () => CUACA }));
     render(<ComboMelayang />);
     await waitFor(() => {
       expect(
-        screen.getByRole("button", { name: /Asisten AI & cuaca Barabai: Cerah, 36 derajat/i }),
+        screen.getByRole("button", { name: /Tanya AI Diskominfo. Cuaca Barabai Cerah, 36 derajat/i }),
       ).toBeInTheDocument();
     });
   });
@@ -80,7 +80,7 @@ describe("ComboMelayang", () => {
     mockFetch(() => ({ ok: true, json: async () => CUACA }));
     const user = userEvent.setup();
     render(<ComboMelayang />);
-    const gelembung = await screen.findByRole("button", { name: /Asisten AI & cuaca/i });
+    const gelembung = await screen.findByRole("button", { name: /Tanya AI Diskominfo/i });
     await user.click(gelembung);
 
     expect(screen.getByRole("dialog")).toBeInTheDocument();
@@ -97,15 +97,17 @@ describe("ComboMelayang", () => {
     });
     const user = userEvent.setup();
     render(<ComboMelayang />);
-    await user.click(await screen.findByRole("button", { name: /Asisten AI & cuaca/i }));
+    await user.click(await screen.findByRole("button", { name: /Tanya AI Diskominfo/i }));
 
     await user.type(screen.getByLabelText(/Pesan untuk asisten/i), "cara reservasi?");
     await user.click(screen.getByRole("button", { name: /Kirim pesan/i }));
 
     expect(await screen.findByText(/Buka/)).toBeInTheDocument();
     // Markdown di-escape lalu di-render aman: <strong> muncul, bukan tag mentah.
+    // (ambil yang TERAKHIR — yang pertama milik sapaan pembuka.)
     await waitFor(() => {
-      const el = document.querySelector(".space-y-1 strong");
+      const semua = document.querySelectorAll(".space-y-1 strong");
+      const el = semua[semua.length - 1];
       expect(el?.textContent).toBe("/reservasi");
     });
   });
@@ -114,7 +116,7 @@ describe("ComboMelayang", () => {
     mockFetch(() => ({ ok: true, json: async () => CUACA }));
     const user = userEvent.setup();
     render(<ComboMelayang />);
-    await user.click(await screen.findByRole("button", { name: /Asisten AI & cuaca/i }));
+    await user.click(await screen.findByRole("button", { name: /Tanya AI Diskominfo/i }));
     await user.click(screen.getByRole("tab", { name: /Cuaca/i }));
     expect(await screen.findByText(/Sumber: BMKG/i)).toBeInTheDocument();
   });
@@ -128,7 +130,7 @@ describe("ComboMelayang", () => {
     });
     const user = userEvent.setup();
     render(<ComboMelayang />);
-    await user.click(await screen.findByRole("button", { name: /Asisten AI & cuaca/i }));
+    await user.click(await screen.findByRole("button", { name: /Tanya AI Diskominfo/i }));
     await user.type(screen.getByLabelText(/Pesan untuk asisten/i), "halo");
     await user.click(screen.getByRole("button", { name: /Kirim pesan/i }));
     expect(await screen.findByText(/Asisten sedang sibuk/i)).toBeInTheDocument();

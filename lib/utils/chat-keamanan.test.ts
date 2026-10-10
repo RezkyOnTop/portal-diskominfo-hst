@@ -31,6 +31,21 @@ describe("markdownAman", () => {
     const html = markdownAman("Cek /reservasi/status ya");
     expect(html).toContain('href="/reservasi/status"');
   });
+
+  it("menolak URL dgn entity kutip (cegah lolos dari atribut href)", () => {
+    // Penyerang menaruh tanda kutip pada URL markdown. URL ditolak jadi
+    // tautan (hanya teks), jadi tak ada atribut href yang bisa dibobol.
+    const html = markdownAman('[klik](https://jahat.example.com/x"onmouseover="alert(1))');
+    expect(html).not.toContain("<a ");
+    expect(html).not.toContain("onmouseover=\"");
+  });
+
+  it("menolak URL dgn tanda kurung sudut (cegah pecah tag)", () => {
+    const html = markdownAman("[x](https://jahat.example.com/<img src=x onerror=alert(1)>)");
+    // Tidak ada tag <img> hidup; karakter sudut tetap ter-escape sebagai teks.
+    expect(html).not.toContain("<img");
+    expect(html).toContain("&lt;img");
+  });
 });
 
 describe("bersihkanPesanChat (server = klien)", () => {
