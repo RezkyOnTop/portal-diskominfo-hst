@@ -121,6 +121,27 @@ describe("ComboMelayang", () => {
     expect(await screen.findByText(/Sumber: BMKG/i)).toBeInTheDocument();
   });
 
+  it("tab Cuaca menampilkan nama daerah (desa · kecamatan)", async () => {
+    mockFetch(() => ({ ok: true, json: async () => CUACA }));
+    const user = userEvent.setup();
+    render(<ComboMelayang />);
+    await user.click(await screen.findByRole("button", { name: /Tanya AI Diskominfo/i }));
+    await user.click(screen.getByRole("tab", { name: /Cuaca/i }));
+    expect(await screen.findByText(/Barabai Darat · Kec\. Barabai/i)).toBeInTheDocument();
+  });
+
+  it("sumber BMKG hanya muncul SEKALI (tidak dobel)", async () => {
+    mockFetch(() => ({ ok: true, json: async () => CUACA }));
+    const user = userEvent.setup();
+    render(<ComboMelayang />);
+    await user.click(await screen.findByRole("button", { name: /Tanya AI Diskominfo/i }));
+    await user.click(screen.getByRole("tab", { name: /Cuaca/i }));
+    await screen.findByText(/Barabai Darat/i);
+    // Teks sumber hanya satu; footer lama "Sumber cuaca: BMKG" sudah dibuang.
+    expect(screen.getAllByText(/Sumber: BMKG/i)).toHaveLength(1);
+    expect(screen.queryByText(/Sumber cuaca/i)).not.toBeInTheDocument();
+  });
+
   it("menampilkan galat ramah saat /api/chat gagal (tanpa detail mentah)", async () => {
     mockFetch((url) => {
       if (url.includes("/api/chat")) {

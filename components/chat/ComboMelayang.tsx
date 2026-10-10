@@ -128,12 +128,12 @@ export function ComboMelayang() {
             <PanelCuaca payload={payload} memuat={memuat} muatUlang={() => void muat(true)} />
           )}
 
-          {/* Kaki */}
-          <p className="border-t border-neutral-200 bg-neutral-50 px-4 py-1.5 text-[11px] text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800/50">
-            {tab === "chat"
-              ? "AI dapat keliru — verifikasi ke kontak resmi bila penting."
-              : "Sumber cuaca: BMKG."}
-          </p>
+          {/* Kaki: hanya di tab chat (tab cuaca punya baris sumber sendiri) */}
+          {tab === "chat" && (
+            <p className="border-t border-neutral-200 bg-neutral-50 px-4 py-1.5 text-[11px] text-neutral-500 dark:border-neutral-700 dark:bg-neutral-800/50">
+              AI dapat keliru — verifikasi ke kontak resmi bila penting.
+            </p>
+          )}
         </div>
       )}
 
@@ -147,19 +147,19 @@ export function ComboMelayang() {
             ? `Tanya AI Diskominfo. Cuaca Barabai ${sekarang.deskripsi}, ${sekarang.suhu} derajat. ${buka ? "Tutup panel" : "Buka panel"}`
             : "Tanya AI Diskominfo. Buka panel"
         }
-        className="group flex items-center gap-2.5 rounded-full bg-primary-600 py-2 pl-2.5 pr-4 text-white shadow-xl transition-transform hover:scale-105 dark:bg-primary-500"
+        className="group flex items-center gap-2 rounded-full bg-primary-600 py-1.5 pl-2 pr-3.5 text-white shadow-lg ring-1 ring-black/5 transition-colors hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600"
       >
-        <span className="grid h-9 w-9 place-items-center rounded-full bg-white/20 text-lg" aria-hidden="true">
+        <span className="grid h-7 w-7 place-items-center rounded-full bg-white/20 text-sm" aria-hidden="true">
           ✨
         </span>
         <span className="flex flex-col items-start leading-tight">
-          <span className="text-sm font-bold">Tanya AI</span>
-          <span className="flex max-w-32 items-center gap-1 text-[11px] text-white/85">
+          <span className="text-[13px] font-bold">Tanya AI</span>
+          <span className="flex max-w-28 items-center gap-1 text-[10px] text-white/80">
             {sekarang ? (
               <>
-                <CuacaIcon kode={sekarang.kode} className="h-3.5 w-3.5 shrink-0" />
+                <CuacaIcon kode={sekarang.kode} className="h-3 w-3 shrink-0" />
                 <span className="truncate">
-                  {sekarang.suhu}°C · {sekarang.deskripsi}
+                  {sekarang.suhu}° · {sekarang.deskripsi}
                 </span>
               </>
             ) : (
