@@ -36,8 +36,8 @@ export function Navbar() {
         "sticky top-0 z-40 transition-[translate,opacity,background-color,border-color] duration-300 ease-out motion-reduce:transition-none",
         hidden ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
         solid
-          ? "border-b border-neutral-200 bg-white/95 text-neutral-900 backdrop-blur"
-          : "bg-transparent text-white",
+          ? "border-b border-neutral-200 bg-white/95 text-neutral-900 backdrop-blur dark:border-neutral-800 dark:bg-neutral-950/95 dark:text-neutral-100"
+          : "bg-transparent text-white [text-shadow:0_1px_12px_rgb(0_0_0/0.55)]",
       )}
     >
       {/* Top bar */}
@@ -45,7 +45,7 @@ export function Navbar() {
         className={cn(
           "hidden border-b text-xs transition-colors md:block",
           solid
-            ? "border-neutral-200 bg-neutral-50 text-neutral-600"
+            ? "border-neutral-200 bg-neutral-50 text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
             : "border-white/15 bg-black/20 text-white/85",
         )}
       >
@@ -91,13 +91,30 @@ export function Navbar() {
           className="flex items-center gap-3"
           aria-label={`${SITE.shortName} — Beranda`}
         >
+          {/* Logo terang: saat transparan SELALU pakai putih; saat solid
+              pakai hitam di tema terang, putih di tema gelap (tukar via CSS
+              agar tanpa jeda render). */}
           <Image
-            src={solid ? "/brand/logo-hitam.png" : "/brand/logo-putih.png"}
+            src="/brand/logo-hitam.png"
             alt={`Logo ${SITE.shortName}`}
             width={185}
             height={54}
             priority
-            className="h-9 w-auto sm:h-11"
+            className={cn(
+              "h-9 w-auto sm:h-11",
+              solid ? "block dark:hidden" : "hidden",
+            )}
+          />
+          <Image
+            src="/brand/logo-putih.png"
+            alt={`Logo ${SITE.shortName}`}
+            width={185}
+            height={54}
+            priority
+            className={cn(
+              "h-9 w-auto sm:h-11",
+              solid ? "hidden dark:block" : "block",
+            )}
           />
         </Link>
 
