@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { PanelCuaca } from "@/components/cuaca/PanelCuaca";
-import { CuacaIcon } from "@/components/cuaca/CuacaIcon";
 import { PanelChat } from "@/components/chat/PanelChat";
 import { useCuaca, ambilCuaca } from "@/components/cuaca/useCuaca";
 
@@ -137,7 +136,7 @@ export function ComboMelayang() {
         </div>
       )}
 
-      {/* Gelembung mini — identitas AI utama, cuaca cuplikan kecil */}
+      {/* Gelembung mini — pil satu baris: logo AI + suhu cuaca */}
       <button
         type="button"
         onClick={togglePanel}
@@ -147,25 +146,16 @@ export function ComboMelayang() {
             ? `Tanya AI Diskominfo. Cuaca Barabai ${sekarang.deskripsi}, ${sekarang.suhu} derajat. ${buka ? "Tutup panel" : "Buka panel"}`
             : "Tanya AI Diskominfo. Buka panel"
         }
-        className="group flex items-center gap-2 rounded-full bg-primary-600 py-1.5 pl-2 pr-3.5 text-white shadow-lg ring-1 ring-black/5 transition-colors hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600"
+        className="group flex max-w-[13rem] items-center gap-1.5 rounded-full bg-primary-600 py-1.5 pl-1.5 pr-3 text-white shadow-lg ring-1 ring-black/5 transition-colors hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600"
       >
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-white/20 text-sm" aria-hidden="true">
+        <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-white/20 text-xs" aria-hidden="true">
           ✨
         </span>
-        <span className="flex flex-col items-start leading-tight">
-          <span className="text-[13px] font-bold">Tanya AI</span>
-          <span className="flex max-w-28 items-center gap-1 text-[10px] text-white/80">
-            {sekarang ? (
-              <>
-                <CuacaIcon kode={sekarang.kode} className="h-3 w-3 shrink-0" />
-                <span className="truncate">
-                  {sekarang.suhu}° · {sekarang.deskripsi}
-                </span>
-              </>
-            ) : (
-              "Diskominfo HST"
-            )}
-          </span>
+        <span className="truncate text-xs font-bold">
+          Tanya AI
+          {sekarang ? (
+            <span className="font-medium text-white/80"> · {sekarang.suhu}°</span>
+          ) : null}
         </span>
       </button>
     </div>
