@@ -135,4 +135,32 @@ describe("ComboMelayang", () => {
     await user.click(screen.getByRole("button", { name: /Kirim pesan/i }));
     expect(await screen.findByText(/Asisten sedang sibuk/i)).toBeInTheDocument();
   });
+
+  it("kirim ganda cepat hanya menghasilkan SATU request (kunci ref)", async () => {
+    let chatCalls = 0;
+    let lepas!: (v: unknown) => void;
+    const tertahan = new Promise((res) => {
+      lepas = res as (v: unknown) => void;
+    });
+    mockFetch((url) => {
+      if (url.includes("/api/chat")) {
+        chatCalls++;
+        return tertahan.then(() => ({
+          ok: true,
+          json: async () => ({ ok: true, balasan: "ok", ditolak: false }),
+        }));
+      }
+      return { ok: true, json: async () => CUACA };
+    });
+    const user = userEvent.setup();
+    render(<ComboMelayang />);
+    await user.click(await screen.findByRole("button", { name: /Tanya AI Diskominfo/i }));
+    await user.type(screen.getByLabelText(/Pesan untuk asisten/i), "halo layanan");
+    const kirim = screen.getByRole("button", { name: /Kirim pesan/i });
+    // Dua klik sebelum fetch selesai — tanpa kunci ref ini jadi 2 pesan.
+    await user.click(kirim);
+    await user.click(kirim);
+    lepas(null);
+    await waitFor(() => expect(chatCalls).toBe(1));
+  });
 });
