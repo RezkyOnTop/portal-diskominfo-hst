@@ -310,15 +310,20 @@ h4 {
   border: 1px solid rgb(255 255 255 / 0.12);
 }
 
-/* Judul gradient hero: shade pekat saat terang, pastel saat malam. */
+/* Judul gradient hero: shade pekat saat terang, pastel saat malam.
+   PENTING: pakai background-image (bukan shorthand background) agar tidak
+   me-reset background-clip:text menjadi border-box (teks jadi transparan
+   tak terlihat di mode gelap). */
 .hero-text-gradient {
-  background: linear-gradient(100deg, #4338ca 0%, #0369a1 45%, #047857 100%);
+  background-image: linear-gradient(100deg, #4338ca 0%, #0369a1 45%, #047857 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 .dark .hero-text-gradient {
-  background: linear-gradient(100deg, #a5b4fc 0%, #7dd3fc 45%, #6ee7b7 100%);
+  background-image: linear-gradient(100deg, #a5b4fc 0%, #7dd3fc 45%, #6ee7b7 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
 }
 
 /* Garis pembatas hero. */
