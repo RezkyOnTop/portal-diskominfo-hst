@@ -7,8 +7,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
  * HeroSlideshow — foto Kabupaten HST bergerak otomatis (auto-rotate).
  * Menghormati prefers-reduced-motion (tidak auto-play bila diminta).
  * Klik indikator untuk pindah slide; ada tombol jeda.
+ *
+ * Daftar slide datang dari prop (dikelola admin lewat /dashboard/hero).
+ * Bila prop kosong, dipakai foto bawaan di public/brand sebagai cadangan.
  */
-const SLIDES = [
+export interface SlideHero {
+  src: string;
+  label: string;
+}
+
+const SLIDES_BAWAAN: SlideHero[] = [
   { src: "/brand/carousel-1.jpg", label: "Monumen Kabupaten Hulu Sungai Tengah" },
   { src: "/brand/carousel-2.jpg", label: "Kantor Pemerintah Kabupaten Hulu Sungai Tengah" },
   { src: "/brand/hst-aktivitas-1.jpg", label: "Kegiatan masyarakat Hulu Sungai Tengah" },
@@ -19,7 +27,8 @@ const SLIDES = [
 
 const INTERVAL = 4500;
 
-export function HeroSlideshow() {
+export function HeroSlideshow({ slides }: { slides?: SlideHero[] }) {
+  const daftar = slides && slides.length > 0 ? slides : SLIDES_BAWAAN;
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(true);
   const reduced = useRef(false);
@@ -31,9 +40,12 @@ export function HeroSlideshow() {
     if (reduced.current) setPlaying(false);
   }, []);
 
+  // Indeks selalu di-clamp saat render (lihat `aktif`), jadi tidak perlu
+  // menyelaraskan state lewat efek saat jumlah slide berubah.
+
   const next = useCallback(() => {
-    setIndex((i) => (i + 1) % SLIDES.length);
-  }, []);
+    setIndex((i) => (i + 1) % daftar.length);
+  }, [daftar.length]);
 
   useEffect(() => {
     if (!playing || reduced.current) return;
@@ -41,15 +53,17 @@ export function HeroSlideshow() {
     return () => clearInterval(t);
   }, [playing, next]);
 
+  const aktif = index < daftar.length ? index : 0;
+
   return (
     <div className="hero-glass relative overflow-hidden rounded-[var(--radius-card)] p-2 shadow-2xl">
       <div className="relative aspect-[4/3] overflow-hidden rounded-xl bg-neutral-900">
-        {SLIDES.map((s, i) => (
+        {daftar.map((s, i) => (
           <div
             key={s.src}
-            aria-hidden={i !== index}
+            aria-hidden={i !== aktif}
             className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              i === index ? "opacity-100" : "opacity-0"
+              i === aktif ? "opacity-100" : "opacity-0"
             }`}
           >
             <Image
@@ -59,7 +73,7 @@ export function HeroSlideshow() {
               priority={i === 0}
               sizes="(max-width: 1024px) 100vw, 45vw"
               className={`object-cover transition-transform duration-[6000ms] ease-out ${
-                i === index ? "scale-105" : "scale-100"
+                i === aktif ? "scale-105" : "scale-100"
               }`}
             />
           </div>
@@ -90,15 +104,15 @@ export function HeroSlideshow() {
 
         {/* Indikator */}
         <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-          {SLIDES.map((s, i) => (
+          {daftar.map((s, i) => (
             <button
               key={s.src}
               type="button"
               onClick={() => setIndex(i)}
               aria-label={`Tampilkan ${s.label}`}
-              aria-current={i === index}
+              aria-current={i === aktif}
               className={`h-1.5 rounded-full transition-all ${
-                i === index ? "w-6 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
+                i === aktif ? "w-6 bg-white" : "w-1.5 bg-white/50 hover:bg-white/80"
               }`}
             />
           ))}

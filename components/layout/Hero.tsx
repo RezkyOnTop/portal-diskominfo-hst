@@ -1,14 +1,28 @@
 import Link from "next/link";
 import { HERO, JAM_LAYANAN, RADIO_NAME } from "@/lib/config";
-import { HeroSlideshow } from "@/components/layout/HeroSlideshow";
+import { HeroSlideshow, type SlideHero } from "@/components/layout/HeroSlideshow";
+import { listHeroSlidePublik } from "@/lib/services/hero";
 
 /**
  * Hero "Digital Civic": split asimetris, gradient mesh adaptif (terang di
  * mode terang, gelap di mode gelap), kartu kaca mengapung, dan widget
  * radio. Foto Kabupaten HST BERGERAK (slideshow otomatis), tetapi tetap
  * dalam panel kaca — bukan carousel layar penuh seperti situs lama.
+ *
+ * Slide foto dikelola admin lewat /dashboard/hero. Bila DB tidak bisa
+ * diakses, slideshow memakai foto bawaan (slideshow tetap tampil).
  */
-export function Hero() {
+export async function Hero() {
+  let slides: SlideHero[] = [];
+  try {
+    const rows = await listHeroSlidePublik();
+    slides = rows
+      .filter((r) => r.fotoUrl)
+      .map((r) => ({ src: r.fotoUrl!, label: r.label }));
+  } catch (err) {
+    console.error("[hero] gagal memuat slide, memakai foto bawaan", err);
+  }
+
   return (
     <section className="hero-mesh relative isolate -mt-[var(--header-h)] overflow-hidden pt-[calc(var(--header-h)+2rem)] text-neutral-900 dark:text-white">
       <div aria-hidden="true" className="hero-grid absolute inset-0 opacity-60" />
@@ -104,7 +118,7 @@ export function Hero() {
 
         {/* Kolom visual: slideshow foto HST yang bergerak */}
         <div className="animate-fade-up delay-2 relative">
-          <HeroSlideshow />
+          <HeroSlideshow slides={slides} />
 
           {/* Widget radio mengapung */}
           <div className="hero-glass absolute -bottom-5 left-3 flex items-center gap-3 rounded-2xl p-3 pr-5 shadow-xl sm:-left-6">

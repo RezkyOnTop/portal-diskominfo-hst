@@ -377,3 +377,47 @@ export type DeleteStaffInput = z.infer<typeof DeleteStaffInputSchema>;
 /** Batas ukuran berkas foto pegawai (2 MB) dan tipe yang diizinkan. */
 export const FOTO_PEGAWAI_MAX_BYTES = 2 * 1024 * 1024;
 export const FOTO_PEGAWAI_MIME = ["image/jpeg", "image/png", "image/webp"] as const;
+
+/**
+ * ============================================================================
+ *  Slide Hero Beranda (HeroSlide)
+ * ============================================================================
+ *  Dikelola admin lewat /dashboard/hero, tampil publik di slideshow Hero.
+ *  Foto slide umumnya lanskap — batas 4 MB (lebih longgar dari foto pegawai).
+ */
+
+/** Batas ukuran berkas foto slide hero (4 MB) dan tipe yang diizinkan. */
+export const FOTO_HERO_MAX_BYTES = 4 * 1024 * 1024;
+export const FOTO_HERO_MIME = ["image/jpeg", "image/png", "image/webp"] as const;
+
+const LabelSlideHero = z.string().trim().min(3, "Keterangan minimal 3 karakter").max(160, "Keterangan maksimal 160 karakter");
+const UrutanSlideHero = z
+  .number({ error: "Urutan tampil harus berupa angka" })
+  .int("Urutan tampil harus bilangan bulat")
+  .min(0, "Urutan tampil minimal 0")
+  .max(9999, "Urutan tampil maksimal 9999");
+
+/** Validasi input admin saat menambah slide hero baru. */
+export const CreateHeroSlideInputSchema = z.object({
+  label: LabelSlideHero,
+  urutan: UrutanSlideHero,
+});
+
+export type CreateHeroSlideInput = z.infer<typeof CreateHeroSlideInputSchema>;
+
+/** Validasi input admin saat mengubah slide hero. */
+export const UpdateHeroSlideInputSchema = z.object({
+  id: z.string().trim().min(1),
+  label: LabelSlideHero,
+  urutan: UrutanSlideHero,
+  aktif: z.boolean({ error: "Status aktif harus benar/salah" }),
+});
+
+export type UpdateHeroSlideInput = z.infer<typeof UpdateHeroSlideInputSchema>;
+
+/** Validasi input admin saat menghapus slide hero (konfirmasi via id). */
+export const DeleteHeroSlideInputSchema = z.object({
+  id: z.string().trim().min(1),
+});
+
+export type DeleteHeroSlideInput = z.infer<typeof DeleteHeroSlideInputSchema>;

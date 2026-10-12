@@ -166,3 +166,25 @@ model Staff {
   @@index([urutan])
   @@index([aktif])
 }
+
+/// Slide foto slideshow hero beranda (data lokal).
+/// Dikelola admin lewat /dashboard/hero; ditampilkan publik di Hero.
+/// Foto diunggah ke berkas terpisah (lihat lib/storage/foto-hero.ts) dan
+/// disajikan lewat /api/hero/foto/[id]. Bila belum ada slide sama sekali,
+/// komponen memakai 6 foto bawaan di public/brand sebagai gambar default.
+model HeroSlide {
+  id        String   @id @default(cuid())
+  /// Keterangan foto (untuk label aksesibilitas + aria slideshow).
+  label     String
+  /// URL foto; null = belum diunggah (slide dilewati di slideshow publik).
+  fotoUrl   String?
+  /// Urutan tampil di slideshow (kecil lebih dulu).
+  urutan    Int      @default(0)
+  /// Sembunyikan dari halaman publik tanpa menghapus foto.
+  aktif     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([urutan])
+  @@index([aktif])
+}
