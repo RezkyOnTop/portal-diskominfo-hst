@@ -8,6 +8,8 @@ import { BackToTop } from "@/components/layout/BackToTop";
 import { ComboMelayang } from "@/components/chat/ComboMelayang";
 import { VisitorBeacon } from "@/components/analytics/VisitorBeacon";
 import { ThemeProvider, themeInitScript } from "@/components/layout/ThemeProvider";
+import { Preloader } from "@/components/layout/Preloader";
+import { NavProgress } from "@/components/layout/NavProgress";
 import { SITE } from "@/lib/config";
 
 const sora = Sora({
@@ -75,6 +77,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </a>
         <ThemeProvider>
           <RadioPlayerProvider>
+            <Preloader />
+            <NavProgress />
             <Navbar />
             <main id="konten-utama" className="flex-1 pb-16">
               {children}

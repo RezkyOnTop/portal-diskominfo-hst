@@ -482,3 +482,203 @@ h4 {
   color: var(--color-neutral-900);
   font-family: var(--font-heading);
 }
+
+/* ── Preloader pembuka + bilah progres navigasi ──────────────────
+   Situs lama memakai tirai fullscreen dengan huruf "DISKOMINFOSP" yang
+   berputar 3D. Versi ini mempertahankan nuansa itu tetapi lebih halus:
+   huruf masuk satu per satu (flip + kilau gradien), lalu tirai memudar.
+   Perpindahan antar halaman TIDAK memicu tirai — cukup bilah tipis di atas,
+   supaya navigasi tetap terasa cepat.
+   ───────────────────────────────────────────────────────────────── */
+
+@keyframes preloader-letter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) rotateX(-90deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+  }
+}
+
+@keyframes preloader-shine {
+  from {
+    background-position: 200% center;
+  }
+  to {
+    background-position: -200% center;
+  }
+}
+
+@keyframes preloader-bar {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes nav-progress-shine {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(400%);
+  }
+}
+
+.preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(60% 50% at 50% 35%, rgb(99 102 241 / 0.18), transparent 70%),
+    var(--background);
+  /* Tirai otomatis memudar setelah ~1,5 dtk TANPA butuh state React:
+     tampil dulu (huruf beranimasi), lalu pudar saat konten sudah siap. */
+  animation: preloader-auto-hide 0.55s ease 1.55s forwards;
+}
+
+html[data-preloader="lewat"] .preloader {
+  display: none;
+}
+
+@keyframes preloader-auto-hide {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.preloader__inner {
+  display: grid;
+  justify-items: center;
+  gap: 1.1rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.preloader__word {
+  display: flex;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: clamp(1.6rem, 7vw, 3.1rem);
+  letter-spacing: 0.1em;
+  perspective: 700px;
+}
+
+.preloader__letter {
+  display: inline-block;
+  opacity: 0;
+  animation: preloader-letter 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.preloader__letter-inner {
+  display: inline-block;
+  background-image: linear-gradient(
+    100deg,
+    #818cf8 0%,
+    #7dd3fc 35%,
+    #6ee7b7 55%,
+    #818cf8 80%
+  );
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: preloader-shine 3s linear infinite;
+}
+
+.preloader__tagline {
+  max-width: 24rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-neutral-500);
+}
+
+.dark .preloader__tagline {
+  color: var(--color-neutral-400);
+}
+
+.preloader__track {
+  width: min(18rem, 60vw);
+  height: 3px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgb(148 163 184 / 0.25);
+}
+
+.preloader__bar {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6366f1, #38bdf8, #34d399);
+  animation: preloader-bar 1.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Bilah progres di atas layar saat berpindah halaman (navigasi klien). */
+.nav-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.nav-progress--tampil {
+  opacity: 1;
+}
+
+.nav-progress__bar {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 0 999px 999px 0;
+  background: linear-gradient(90deg, #6366f1, #38bdf8, #34d399);
+  box-shadow:
+    0 0 10px rgb(99 102 241 / 0.7),
+    0 0 6px rgb(56 189 248 / 0.6);
+  transition: width 0.22s ease-out;
+}
+
+.nav-progress__bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.75),
+    transparent
+  );
+  animation: nav-progress-shine 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-progress,
+  .nav-progress__bar::after,
+  .preloader__letter,
+  .preloader__letter-inner,
+  .preloader__bar {
+    animation: none !important;
+    transition: none !important;
+  }
+  /* Animasi auto-hide dimatikan di atas, jadi tirai harus disembunyikan
+     langsung — kalau tidak, ia menutupi seluruh layar selamanya. */
+  .preloader {
+    display: none;
+  }
+  .preloader__letter {
+    opacity: 1;
+  }
+}
