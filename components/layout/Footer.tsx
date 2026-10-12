@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { LAYANAN, LINK_TERKAIT, NAV_MENU, SITE, SOSIAL } from "@/lib/config";
+import { LAYANAN, LINK_TERKAIT, NAV_MENU, SITE, SOSIAL, whatsappUrl } from "@/lib/config";
 import { SocialIcon } from "@/components/ui/SocialIcon";
 
 export function Footer() {
@@ -89,7 +89,17 @@ export function Footer() {
                 {SITE.email}
               </a>
             </p>
-            <p>Telp. {SITE.phone}</p>
+            <p>
+              Telp.{" "}
+              <a
+                href={whatsappUrl()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-white"
+              >
+                {SITE.phone}
+              </a>
+            </p>
           </address>
           <h2 className="pt-2 font-heading text-sm font-bold text-white">
             Link Terkait
