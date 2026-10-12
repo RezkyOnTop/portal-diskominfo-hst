@@ -16,6 +16,9 @@ vi.mock("@/lib/services/visitor", () => ({
   })),
 }));
 vi.mock("@/lib/services/subscriber", () => ({ countSubscribers: vi.fn(async () => 42) }));
+vi.mock("@/lib/services/pengaduan", () => ({
+  countPengaduan: vi.fn(async () => ({ total: 3, baru: 1, diproses: 1, selesai: 1 })),
+}));
 vi.mock("@/lib/services/survey", () => ({
   countSurveys: vi.fn(async () => 7),
   listSurveys: vi.fn(async () => [

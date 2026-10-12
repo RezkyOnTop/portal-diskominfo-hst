@@ -64,6 +64,7 @@ describe("ComboMelayang", () => {
   beforeEach(() => {
     vi.unstubAllGlobals();
     localStorage.clear();
+    sessionStorage.clear();
   });
 
   it("gelembung AI-utama dengan cuplikan cuaca", async () => {
@@ -102,13 +103,12 @@ describe("ComboMelayang", () => {
     await user.type(screen.getByLabelText(/Pesan untuk asisten/i), "cara reservasi?");
     await user.click(screen.getByRole("button", { name: /Kirim pesan/i }));
 
-    expect(await screen.findByText(/Buka/)).toBeInTheDocument();
     // Markdown di-escape lalu di-render aman: <strong> muncul, bukan tag mentah.
-    // (ambil yang TERAKHIR — yang pertama milik sapaan pembuka.)
+    // Cari di dalam area percakapan agar tidak bentrok dengan tautan "Buka BMKG".
     await waitFor(() => {
-      const semua = document.querySelectorAll(".space-y-1 strong");
-      const el = semua[semua.length - 1];
-      expect(el?.textContent).toBe("/reservasi");
+      const area = screen.getByLabelText(/Percakapan dengan asisten/i);
+      const el = area.querySelectorAll("strong");
+      expect(el[el.length - 1]?.textContent).toBe("/reservasi");
     });
   });
 
@@ -183,5 +183,68 @@ describe("ComboMelayang", () => {
     await user.click(kirim);
     lepas(null);
     await waitFor(() => expect(chatCalls).toBe(1));
+  });
+
+  it("riwayat chat TIDAK hilang saat pindah ke tab Cuaca lalu kembali", async () => {
+    mockFetch((url) => {
+      if (url.includes("/api/chat")) {
+        return { ok: true, json: async () => ({ ok: true, balasan: "Baik, siap.", ditolak: false }) };
+      }
+      return { ok: true, json: async () => CUACA };
+    });
+    const user = userEvent.setup();
+    render(<ComboMelayang />);
+    await user.click(await screen.findByRole("button", { name: /Tanya AI Diskominfo/i }));
+    await user.type(screen.getByLabelText(/Pesan untuk asisten/i), "halo apa kabar");
+    await user.click(screen.getByRole("button", { name: /Kirim pesan/i }));
+    await screen.findByText(/Baik, siap/i);
+
+    // Pindah ke Cuaca, lalu kembali ke Asisten AI.
+    await user.click(screen.getByRole("tab", { name: /Cuaca/i }));
+    await user.click(screen.getByRole("tab", { name: /Asisten AI/i }));
+
+    // Pertanyaan user + balasan harus masih ada.
+    const area = screen.getByLabelText(/Percakapan dengan asisten/i);
+    expect(area.textContent).toContain("halo apa kabar");
+    expect(area.textContent).toContain("Baik, siap");
+  });
+
+  it("riwayat chat dipulihkan dari sessionStorage (simulasi refresh)", async () => {
+    mockFetch(() => ({ ok: true, json: async () => CUACA }));
+    sessionStorage.setItem(
+      "diskominfosp:riwayat-chat",
+      JSON.stringify([
+        { role: "assistant", content: "Halo! Saya **Asisten AI Diskominfo SP HST** — tanya apa pun soal layanan kami: reservasi, profil, berita, data terbuka, kontak. Psst, saya juga tahu **cuaca Barabai** terkini. 🙂" },
+        { role: "user", content: "pesan tersimpan sebelumnya" },
+        { role: "assistant", content: "jawaban tersimpan sebelumnya" },
+      ]),
+    );
+    const user = userEvent.setup();
+    render(<ComboMelayang />);
+    await user.click(await screen.findByRole("button", { name: /Tanya AI Diskominfo/i }));
+
+    const area = await screen.findByLabelText(/Percakapan dengan asisten/i);
+    await waitFor(() => expect(area.textContent).toContain("pesan tersimpan sebelumnya"));
+    expect(area.textContent).toContain("jawaban tersimpan sebelumnya");
+  });
+
+  it("tombol Bersihkan mengosongkan riwayat kembali ke sapaan", async () => {
+    mockFetch((url) => {
+      if (url.includes("/api/chat")) {
+        return { ok: true, json: async () => ({ ok: true, balasan: "Baik.", ditolak: false }) };
+      }
+      return { ok: true, json: async () => CUACA };
+    });
+    const user = userEvent.setup();
+    render(<ComboMelayang />);
+    await user.click(await screen.findByRole("button", { name: /Tanya AI Diskominfo/i }));
+    await user.type(screen.getByLabelText(/Pesan untuk asisten/i), "halo halo");
+    await user.click(screen.getByRole("button", { name: /Kirim pesan/i }));
+    await screen.findByText(/Baik\./);
+
+    await user.click(screen.getByRole("button", { name: /Bersihkan/i }));
+    const area = screen.getByLabelText(/Percakapan dengan asisten/i);
+    await waitFor(() => expect(area.textContent).not.toContain("halo halo"));
+    expect(sessionStorage.getItem("diskominfosp:riwayat-chat")).toBeNull();
   });
 });

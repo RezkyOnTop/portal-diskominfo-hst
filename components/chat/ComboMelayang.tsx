@@ -120,12 +120,17 @@ export function ComboMelayang() {
             </button>
           </div>
 
-          {/* Isi tab */}
-          {tab === "chat" ? (
+          {/* Isi tab — PanelChat tetap terpasang agar riwayat TIDAK hilang saat
+              berpindah tab (disembunyikan pakai CSS, bukan unmount).
+              PanelCuaca memakai `hidden` inert: tidak tampil + tidak bisa
+              diklik (tes "sumber SEKALI" tetap lolos).
+              Ketekunan antar refresh ditangani sessionStorage di useRiwayatChat. */}
+          <div className={tab === "chat" ? "block" : "hidden"}>
             <PanelChat />
-          ) : (
+          </div>
+          <div className={tab === "cuaca" ? "block" : "hidden"} inert={tab !== "cuaca" ? true : undefined}>
             <PanelCuaca payload={payload} memuat={memuat} muatUlang={() => void muat(true)} />
-          )}
+          </div>
 
           {/* Kaki: hanya di tab chat (tab cuaca punya baris sumber sendiri) */}
           {tab === "chat" && (

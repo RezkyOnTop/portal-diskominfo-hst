@@ -3,18 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { markdownAman } from "@/lib/utils/markdown";
 import { bersihkanPesanChat } from "@/lib/utils/sanitize";
-
-interface Pesan {
-  role: "user" | "assistant";
-  content: string;
-  gagal?: boolean;
-}
-
-const SAPAAN: Pesan = {
-  role: "assistant",
-  content:
-    "Halo! Saya **Asisten AI Diskominfo SP HST** — tanya apa pun soal layanan kami: reservasi, profil, berita, data terbuka, kontak. Psst, saya juga tahu **cuaca Barabai** terkini. 🙂",
-};
+import { useRiwayatChat } from "./useRiwayatChat";
 
 const SARAN = [
   "Bagaimana cara reservasi layanan?",
@@ -26,12 +15,15 @@ const SARAN = [
 /**
  * PanelChat — kotak chat AI di dalam widget combo.
  *
+ * Riwayat percakapan disimpan per-tab (sessionStorage) sehingga tidak hilang
+ * saat berpindah tab widget atau me-refresh halaman; hilang saat tab ditutup.
+ *
  * Keamanan: input disanitasi sebelum kirim; balasan dirender sebagai teks/
  * markdown yang sudah di-escape (bukan HTML mentah) untuk mencegah XSS.
  * Disclaimer privasi selalu tampil.
  */
 export function PanelChat() {
-  const [pesan, setPesan] = useState<Pesan[]>([SAPAAN]);
+  const { pesan, tambahPesan, hapusRiwayat } = useRiwayatChat();
   const [teks, setTeks] = useState("");
   const [memuat, setMemuat] = useState(false);
   const daftarRef = useRef<HTMLDivElement | null>(null);
@@ -52,7 +44,7 @@ export function PanelChat() {
       .filter((p) => !p.gagal)
       .slice(-6)
       .map((p) => ({ role: p.role, content: p.content }));
-    setPesan((v) => [...v, { role: "user", content: bersih }]);
+    tambahPesan({ role: "user", content: bersih });
     setTeks("");
     try {
       const res = await fetch("/api/chat", {
@@ -64,13 +56,10 @@ export function PanelChat() {
       if (!res.ok || !data.ok || !data.balasan) {
         throw new Error(data.message ?? "Gagal menghubungi asisten.");
       }
-      setPesan((v) => [...v, { role: "assistant", content: data.balasan! }]);
+      tambahPesan({ role: "assistant", content: data.balasan! });
     } catch (e) {
       const m = e instanceof Error ? e.message : "Gagal menghubungi asisten.";
-      setPesan((v) => [
-        ...v,
-        { role: "assistant", content: m, gagal: true },
-      ]);
+      tambahPesan({ role: "assistant", content: m, gagal: true });
     } finally {
       kunciRef.current = false;
       setMemuat(false);
@@ -79,14 +68,23 @@ export function PanelChat() {
 
   return (
     <div className="flex h-[min(26rem,60vh)] flex-col">
-      {/* Disclaimer privasi */}
-      <p className="flex items-start gap-1.5 border-b border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
+      {/* Disclaimer privasi + tombol bersihkan riwayat */}
+      <div className="flex items-start gap-1.5 border-b border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-snug text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
         <span aria-hidden="true">⚠️</span>
-        <span>
+        <span className="flex-1">
           Jangan kirim data pribadi sensitif (NIK, nomor KK, password, OTP). Percakapan
           dapat diproses pihak ketiga (penyedia AI).
         </span>
-      </p>
+        {pesan.filter((p) => p.role === "user").length > 0 ? (
+          <button
+            type="button"
+            onClick={hapusRiwayat}
+            className="shrink-0 rounded-md border border-amber-300 px-1.5 py-0.5 text-[10px] font-semibold hover:bg-amber-100 dark:border-amber-800 dark:hover:bg-amber-900/40"
+          >
+            Bersihkan
+          </button>
+        ) : null}
+      </div>
 
       {/* Daftar pesan */}
       <div
