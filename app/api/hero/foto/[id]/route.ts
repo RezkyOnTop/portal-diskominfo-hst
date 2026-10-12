@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { bacaFotoHero, hapusSemuaFotoHero, simpanFotoHero } from "@/lib/storage/foto-hero";
 import { getHeroSlideById, setFotoHeroSlide } from "@/lib/services/hero";
@@ -74,6 +75,7 @@ export async function POST(
     return NextResponse.json({ ok: false, message: "Slide tidak ditemukan." }, { status: 404 });
   }
 
+  revalidatePath("/");
   return NextResponse.json({ ok: true, url: simpan.url }, { status: 201 });
 }
 
@@ -100,5 +102,6 @@ export async function DELETE(
 
   await hapusSemuaFotoHero(id);
   await setFotoHeroSlide(id, "");
+  revalidatePath("/");
   return NextResponse.json({ ok: true });
 }
