@@ -10,6 +10,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
  *
  * Daftar slide datang dari prop (dikelola admin lewat /dashboard/hero).
  * Bila prop kosong, dipakai foto bawaan di public/brand sebagai cadangan.
+ *
+ * Performa: hanya slide aktif (+1 tetangga berikutnya, prefetch halus) yang
+ * me-render <Image>, sehingga browser tidak mengunduh semua foto sekaligus.
+ * Tanpa ini, 6 foto (~300 KB di HP – ~1,3 MB di layar besar) diunduh di awal
+ * dan beranda terasa lelet.
  */
 export interface SlideHero {
   src: string;
@@ -54,6 +59,9 @@ export function HeroSlideshow({ slides }: { slides?: SlideHero[] }) {
   }, [playing, next]);
 
   const aktif = index < daftar.length ? index : 0;
+  // Prefetch halus: slide berikutnya ikut dimuat agar transisi tidak kedip,
+  // tetapi tidak semua slide sekaligus.
+  const perluMuat = new Set([aktif, (aktif + 1) % daftar.length]);
 
   return (
     <div className="hero-glass relative overflow-hidden rounded-[var(--radius-card)] p-2 shadow-2xl">
@@ -66,16 +74,18 @@ export function HeroSlideshow({ slides }: { slides?: SlideHero[] }) {
               i === aktif ? "opacity-100" : "opacity-0"
             }`}
           >
-            <Image
-              src={s.src}
-              alt=""
-              fill
-              priority={i === 0}
-              sizes="(max-width: 1024px) 100vw, 45vw"
-              className={`object-cover transition-transform duration-[6000ms] ease-out ${
-                i === aktif ? "scale-105" : "scale-100"
-              }`}
-            />
+            {perluMuat.has(i) ? (
+              <Image
+                src={s.src}
+                alt=""
+                fill
+                priority={i === 0}
+                sizes="(max-width: 1024px) 100vw, 45vw"
+                className={`object-cover transition-transform duration-[6000ms] ease-out ${
+                  i === aktif ? "scale-105" : "scale-100"
+                }`}
+              />
+            ) : null}
           </div>
         ))}
 

@@ -17,6 +17,9 @@ type Tab = "cuaca" | "chat";
 export function ComboMelayang() {
   const [buka, setBuka] = useState(false);
   const [tab, setTab] = useState<Tab>("chat");
+  // PanelChat HANYA di-mount setelah panel dibuka pertama kali: bundle chat
+  // (~puluhan KB) tidak membebani render awal tiap halaman.
+  const [chatAktif, setChatAktif] = useState(false);
   const { payload, memuat, muat, setPayload } = useCuaca();
   const panelRef = useRef<HTMLDivElement | null>(null);
 
@@ -35,7 +38,10 @@ export function ComboMelayang() {
   const togglePanel = useCallback(() => {
     const next = !buka;
     setBuka(next);
-    if (next) void muat(false);
+    if (next) {
+      setChatAktif(true);
+      void muat(false);
+    }
   }, [buka, muat]);
 
   // Esc menutup.
@@ -126,7 +132,7 @@ export function ComboMelayang() {
               diklik (tes "sumber SEKALI" tetap lolos).
               Ketekunan antar refresh ditangani sessionStorage di useRiwayatChat. */}
           <div className={tab === "chat" ? "block" : "hidden"}>
-            <PanelChat />
+            {chatAktif ? <PanelChat /> : null}
           </div>
           <div className={tab === "cuaca" ? "block" : "hidden"} inert={tab !== "cuaca" ? true : undefined}>
             <PanelCuaca payload={payload} memuat={memuat} muatUlang={() => void muat(true)} />
