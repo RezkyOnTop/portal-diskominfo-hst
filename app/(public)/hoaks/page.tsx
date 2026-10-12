@@ -1,11 +1,6 @@
 import Link from "next/link";
 import { Container } from "@/components/layout/Container";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { HoaxBadge } from "@/components/news/HoaxBadge";
-import { ApiErrorFallback } from "@/components/news/ApiErrorFallback";
-import { getHoaks } from "@/lib/api/media-center";
-import { formatDate, stripHtml } from "@/lib/utils/format";
-import type { Hoaks, PaginatedResponse } from "@/types/media-center";
 
 export const metadata = {
   title: "Klarifikasi Hoaks",
@@ -13,16 +8,12 @@ export const metadata = {
     "Klarifikasi dan verifikasi informasi hoaks di Kabupaten Hulu Sungai Tengah.",
 };
 
-export const dynamic = "force-dynamic";
-
-export default async function HoaksPage() {
-  let result: PaginatedResponse<Hoaks> | null = null;
-  try {
-    result = await getHoaks({ limit: 12 });
-  } catch {
-    result = null;
-  }
-
+// Halaman ini TIDAK mengambil data dari API: kanal khusus hoaks belum ada
+// (endpoint `/api/hoaks` tidak tersedia — lihat getHoaks). Mengambil feed
+// berita penuh (~3,5 MB, ~4 detik) hanya untuk menampilkan "belum ada" adalah
+// pemborosan yang membuat navigasi terasa macet. Begitu kanal tersedia,
+// cukup panggil getHoaks() lagi — UI daftar di bawah sudah siap.
+export default function HoaksPage() {
   return (
     <>
       <PageHeader
@@ -34,11 +25,6 @@ export default async function HoaksPage() {
         Sumber: Media Center HST.
       </PageHeader>
       <Container className="py-10">
-      {result === null ? (
-        <div className="mt-8">
-          <ApiErrorFallback />
-        </div>
-      ) : result.data.length === 0 ? (
         <div className="mt-8 rounded-[var(--radius-card)] border border-dashed border-neutral-200 bg-white p-10 text-center">
           <p className="font-medium text-neutral-900">
             Belum ada klarifikasi hoaks yang dipublikasikan.
@@ -55,36 +41,6 @@ export default async function HoaksPage() {
             Lihat berita resmi →
           </Link>
         </div>
-      ) : (
-        <ul className="mt-8 space-y-4">
-          {result.data.map((h) => (
-            <li
-              key={h.id}
-              className="rounded-[var(--radius-card)] border border-neutral-200 bg-white p-5 shadow-[var(--shadow-card)]"
-            >
-              <div className="flex items-center gap-3">
-                <HoaxBadge status={h.status} />
-                <time dateTime={h.publishedAt} className="text-xs text-neutral-600">
-                  {formatDate(h.publishedAt)}
-                </time>
-              </div>
-              <h2 className="mt-3 font-heading text-lg font-semibold text-neutral-900">
-                <Link href={`/berita/${h.slug}`} className="hover:text-primary-700">
-                  {h.title}
-                </Link>
-              </h2>
-              <p className="mt-2 text-sm text-neutral-600">
-                {stripHtml(h.clarification, 220)}
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
-      {result ? (
-        <p className="mt-8 text-center text-xs text-neutral-600">
-          {result.meta.total} entri klarifikasi.
-        </p>
-      ) : null}
       </Container>
     </>
   );

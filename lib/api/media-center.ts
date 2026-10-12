@@ -159,27 +159,79 @@ async function fetchArray(path: string, ttlSeconds: number): Promise<unknown[]> 
   }
 }
 
-// --- Cache in-memory ber-TTL dengan stale-while-error ---
+// --- Cache in-memory ber-TTL dengan stale-while-revalidate ---
+//
+// Kenapa begini (diukur langsung):
+//   - API Media Center mengirim SELURUH feed dalam satu respons (~3,5 MB,
+//     ~4 detik). Tidak ada paginasi server-side, jadi feed ini wajib di-cache.
+//   - Respons > 2 MB sehingga cache `fetch` bawaan Next.js TIDAK menyimpannya;
+//     satu-satunya cache adalah Map di bawah.
+//   - Dua masalah nyata yang membuat navigasi terasa macet:
+//       1. THUNDERING HERD: satu halaman sering meminta dua hal sekaligus
+//          (mis. `Promise.all([getBerita(), getKategori()])`). Tanpa dedup,
+//          keduanya melihat cache kosong lalu masing-masing mengunduh 3,5 MB
+//          — total ~8 detik, bukan ~4.
+//       2. BLOKIR SAAT BASI: begitu TTL habis, permintaan berikutnya menunggu
+//          unduhan penuh sebelum halaman dirender.
+//     Perbaikan: `inFlight` membuat pemanggil bersamaan berbagi SATU unduhan,
+//     dan data basi disajikan SEKARANG sambil disegarkan di latar belakang.
 interface CacheEntry {
-  data: unknown[];
+  data: unknown[] | null;
   expires: number;
+  inFlight: Promise<unknown[]> | null;
 }
 const memoryCache = new Map<string, CacheEntry>();
 
+function refresh(path: string, ttlSeconds: number): Promise<unknown[]> {
+  return fetchArray(path, ttlSeconds)
+    .then((data) => {
+      memoryCache.set(path, {
+        data,
+        expires: Date.now() + ttlSeconds * 1000,
+        inFlight: null,
+      });
+      return data;
+    })
+    .catch((err) => {
+      const prev = memoryCache.get(path);
+      if (prev) prev.inFlight = null; // biarkan percobaan berikutnya mencoba lagi
+      throw err;
+    });
+}
+
 async function fetchArrayCached(path: string, ttlSeconds: number): Promise<unknown[]> {
   const now = Date.now();
-  const cached = memoryCache.get(path);
-  if (cached && cached.expires > now) return cached.data;
-  try {
-    const data = await fetchArray(path, ttlSeconds);
-    memoryCache.set(path, { data, expires: now + ttlSeconds * 1000 });
-    return data;
-  } catch (err) {
-    if (cached) {
-      // Stale-while-error: sajikan data lama daripada gagal total.
-      console.error(`[media-center] ${path} gagal; memakai cache lama`);
-      return cached.data;
+  const entry = memoryCache.get(path);
+
+  // 1. Masih segar -> langsung sajikan.
+  if (entry?.data && entry.expires > now) return entry.data;
+
+  // 2. Ada data tapi sudah basi -> sajikan stale SEKARANG, segarkan di latar.
+  if (entry?.data) {
+    if (!entry.inFlight) {
+      entry.inFlight = refresh(path, ttlSeconds).catch((err) => {
+        // Gagal menyegarkan -> tetap pakai data lama (stale-while-error).
+        console.error(
+          `[media-center] ${path} gagal disegarkan: ${
+            err instanceof Error ? err.message : String(err)
+          }`,
+        );
+        return entry.data as unknown[];
+      });
     }
+    return entry.data;
+  }
+
+  // 3. Belum ada data sama sekali (cold start) -> unduh; pemanggil bersamaan
+  //    berbagi satu unduhan yang sama, bukan dua.
+  if (entry?.inFlight) return entry.inFlight;
+
+  const p = refresh(path, ttlSeconds);
+  memoryCache.set(path, { data: null, expires: 0, inFlight: p });
+  try {
+    return await p;
+  } catch (err) {
+    if (memoryCache.get(path)?.inFlight === p) memoryCache.delete(path);
     throw err;
   }
 }
