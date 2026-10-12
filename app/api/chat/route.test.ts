@@ -68,7 +68,7 @@ describe("POST /api/chat", () => {
     const res = await POST(req({ pesan: "halo" }));
     const body = await res.json();
     expect(res.status).toBe(503);
-    expect(body.message).toContain("GEMINI_API_KEY");
+    expect(body.message).toContain("GROQ_API_KEY");
   });
 
   it("membatasi 10 pesan/menit per IP (429 setelah batas)", async () => {

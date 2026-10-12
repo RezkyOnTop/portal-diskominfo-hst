@@ -77,18 +77,18 @@ NEXTAUTH_SECRET="hasil-salinan-tadi"
 
 ### Kunci chatbot AI (opsional)
 
-Widget combo di pojok kanan bawah punya tab **Asisten AI** (Gemini).
+Widget combo di pojok kanan bawah punya tab **Asisten AI** (Groq,
+OpenAI-compatible — dulu Gemini, diganti karena Gemini memblokir IP
+datacenter server ini: "User location is not supported").
 Tanpa kunci, tab AI menampilkan pesan "belum diaktifkan" tetapi tab
 **Cuaca** tetap jalan normal.
 
-1. Ambil kunci gratis di https://aistudio.google.com/app/apikey
+1. Ambil kunci gratis di https://console.groq.com/keys
 2. Isi di `.env.local`:
 
 ```
-GEMINI_API_KEY="kunci-anda-di-sini"
-# AI Studio kini menerbitkan Auth key ("AQ.…"); kode otomatis memakai
-# endpoint NATIVE untuk AQ. (Standard key "AIza…" tetap jalan).
-GEMINI_MODEL="gemini-3.5-flash-lite"
+GROQ_API_KEY="kunci-anda-di-sini"
+GROQ_MODEL="llama-3.3-70b-versatile"
 ```
 
 3. Restart server (`npm run start`).

@@ -22,7 +22,7 @@ const BodySchema = z.object({
 });
 
 /**
- * POST /api/chat — proxy chatbot AI (Gemini).
+ * POST /api/chat — proxy chatbot AI (Groq).
  *
  * Keamanan (semua di server, key TIDAK pernah ke browser):
  *  - rate limit 10 permintaan / menit / IP;
@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       {
         ok: false,
         message: belumAktif
-          ? "Asisten AI belum diaktifkan. Hubungi admin untuk mengisi GEMINI_API_KEY."
+          ? "Asisten AI belum diaktifkan. Hubungi admin untuk mengisi GROQ_API_KEY."
           : "Maaf, asisten sedang sibuk. Coba lagi sebentar lagi.",
       },
       { status: 503 },

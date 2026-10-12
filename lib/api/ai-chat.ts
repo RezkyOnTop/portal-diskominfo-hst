@@ -6,14 +6,18 @@ import { CHAT_MAX_INPUT, bersihkanPesanChat } from "@/lib/utils/sanitize";
 
 /**
  * ============================================================================
- *  lib/api/ai-chat.ts — SATU-SATUNYA pemanggil API AI (Gemini).
+ *  lib/api/ai-chat.ts — SATU-SATUNYA pemanggil API AI (Groq).
  *  UI tidak pernah memanggil AI langsung; semua lewat /api/chat.
  *  API key dibaca dari process.env (server) — TIDAK pernah ke browser.
  * ============================================================================
  */
 
-/** Endpoint Gemini yang kompatibel protokol OpenAI (chat/completions). */
-const GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai";
+/**
+ * Groq memakai protokol OpenAI-compatible. Dipilih karena tidak memblokir
+ * IP datacenter server ini (Gemini menolak dengan "User location is not
+ * supported" walau Indonesia resmi didukung).
+ */
+const GROQ_BASE = process.env.GROQ_BASE_URL ?? "https://api.groq.com/openai/v1";
 const TIMEOUT_MS = 25_000;
 const MAX_OUTPUT_TOKENS = 512;
 
@@ -128,7 +132,7 @@ const PENOLAKAN =
   "Maaf, saya hanya membantu seputar layanan Diskominfo SP HST. Silakan tanyakan tentang reservasi, layanan, profil, atau kontak kami.";
 
 /**
- * Kirim percakapan ke Gemini (protokol OpenAI-compatible).
+ * Kirim percakapan ke Groq (protokol OpenAI-compatible).
  * Hanya dipanggil dari route /api/chat. Melempar Error generik bila gagal
  * (tanpa membocorkan detail upstream ke klien).
  */
@@ -141,14 +145,17 @@ export async function tanyaAI(
   if (pesan.length < 2) throw new Error("Pesan tidak valid.");
   if (perluTolak(pesan)) return { balasan: PENOLAKAN, ditolak: true };
 
-  const apiKey = process.env.GEMINI_API_KEY ?? "";
-  const model = process.env.GEMINI_MODEL ?? "gemini-3.5-flash-lite";
+  // Key HANYA dari GROQ_API_KEY (tanpa fallback ke Gemini — key Gemini
+  // tidak valid di Groq; bila kosong, route menampilkan "belum diaktifkan").
+  const apiKey = process.env.GROQ_API_KEY ?? "";
+  // Model HANYA dari GROQ_MODEL — jangan fallback ke GEMINI_MODEL, karena
+  // nilainya (mis. "gemini-3.1-flash-lite") tidak dikenal Groq dan akan
+  // membuat setiap permintaan gagal 404 model.
+  const model = process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
   if (!apiKey) throw new Error("AI belum dikonfigurasi.");
 
-  // Egress opsional: sebagian IP datacenter diklasifikasi Google sebagai
-  // wilayah tak didukung ("User location is not supported"). Bila
-  // GEMINI_PROXY_URL diisi, permintaan keluar lewat proxy tersebut.
-  const proxyUrl = process.env.GEMINI_PROXY_URL ?? "";
+  // Egress opsional: bila GROQ_PROXY_URL diisi, permintaan keluar lewat proxy.
+  const proxyUrl = process.env.GROQ_PROXY_URL ?? process.env.GEMINI_PROXY_URL ?? "";
 
   const riwayatBersih = riwayat
     .filter(
@@ -165,44 +172,21 @@ export async function tanyaAI(
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
-  // Key format baru AI Studio (Auth key "AQ.") hanya didukung di endpoint
-  // native; endpoint OpenAI-compatible butuh Standard key ("AIza"). Pilih
-  // otomatis dari format key agar dua-duanya jalan tanpa ganti kode.
-  const memakaiAuthKey = apiKey.startsWith("AQ.");
-  const url = memakaiAuthKey
-    ? `${GEMINI_BASE.replace("/openai", "")}/models/${model}:generateContent`
-    : `${GEMINI_BASE}/chat/completions`;
-  const headers: Record<string, string> = memakaiAuthKey
-    ? { "x-goog-api-key": apiKey, "Content-Type": "application/json" }
-    : { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" };
-  const payloadKirim: unknown = memakaiAuthKey
-    ? {
-        contents: [
-          {
-            parts: [
-              { text: systemPrompt(cuaca) },
-              ...riwayatBersih.map((t) => ({
-                text: `${t.role === "assistant" ? "Asisten" : "Pengguna"}: ${t.content}`,
-              })),
-              { text: `Pengguna: ${pesan}` },
-            ],
-          },
-        ],
-        generationConfig: {
-          maxOutputTokens: MAX_OUTPUT_TOKENS,
-          temperature: 0.3,
-        },
-      }
-    : {
-        model,
-        messages: [
-          { role: "system", content: systemPrompt(cuaca) },
-          ...riwayatBersih,
-          { role: "user", content: pesan },
-        ],
-        max_tokens: MAX_OUTPUT_TOKENS,
-        temperature: 0.3,
-      };
+  const url = `${GROQ_BASE}/chat/completions`;
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${apiKey}`,
+    "Content-Type": "application/json",
+  };
+  const payloadKirim: unknown = {
+    model,
+    messages: [
+      { role: "system", content: systemPrompt(cuaca) },
+      ...riwayatBersih,
+      { role: "user", content: pesan },
+    ],
+    max_tokens: MAX_OUTPUT_TOKENS,
+    temperature: 0.3,
+  };
   // Dispatcher fetch: langsung, atau lewat undici ProxyAgent bila diisi.
   let dispatcher: unknown;
   if (proxyUrl) {
@@ -236,10 +220,8 @@ export async function tanyaAI(
     } catch {
       throw new Error("Layanan AI sedang sibuk.");
     }
-    const teks = memakaiAuthKey
-      ? (json as { candidates?: { content?: { parts?: { text?: string }[] } }[] })
-          ?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? null
-      : typeof json === "object" && json !== null
+    const teks =
+      typeof json === "object" && json !== null
         ? (json as { choices?: { message?: { content?: unknown } }[] }).choices?.[0]
             ?.message?.content
         : null;

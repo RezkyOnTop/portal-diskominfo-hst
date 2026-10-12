@@ -121,8 +121,10 @@ describe("konteksCuaca", () => {
 describe("tanyaAI", () => {
   beforeEach(() => {
     vi.unstubAllGlobals();
-    process.env.GEMINI_API_KEY = "kunci-uji";
-    process.env.GEMINI_MODEL = "model-uji";
+    process.env.GROQ_API_KEY = "kunci-uji";
+    process.env.GROQ_MODEL = "model-uji";
+    delete process.env.GEMINI_API_KEY;
+    delete process.env.GEMINI_MODEL;
   });
 
   function mockFetch(body: unknown, ok = true, status = 200) {
@@ -149,11 +151,13 @@ describe("tanyaAI", () => {
     const hasil = await tanyaAI("cara <b>reservasi</b>?", []);
     expect(hasil.balasan).toBe("Jawab layanan.");
     const { url, init } = calls[0]!;
-    expect(url).toContain("generativelanguage.googleapis.com");
+    expect(url).toContain("api.groq.com");
+    const h = init.headers as Record<string, string>;
+    expect(h.Authorization).toBe("Bearer kunci-uji");
     const body = JSON.parse(String(init.body));
+    expect(body.model).toBe("model-uji");
     expect(body.messages[0].role).toBe("system");
     expect(body.messages.at(-1).content).toBe("cara reservasi?");
-    expect(String(init.headers)).not.toContain("kunci-uji");
     expect(JSON.stringify(body)).not.toContain("kunci-uji");
   });
 
@@ -170,7 +174,8 @@ describe("tanyaAI", () => {
   });
 
   it("melempar error konfigurasi bila key kosong", async () => {
-    process.env.GEMINI_API_KEY = "";
+    process.env.GROQ_API_KEY = "";
+    delete process.env.GEMINI_API_KEY;
     await expect(tanyaAI("halo", [])).rejects.toThrow("AI belum dikonfigurasi.");
   });
 
@@ -179,30 +184,24 @@ describe("tanyaAI", () => {
     await expect(tanyaAI("halo", [])).rejects.toThrow("Layanan AI sedang sibuk.");
   });
 
-  it("key format baru (AQ.) pakai endpoint NATIVE + x-goog-api-key", async () => {
-    process.env.GEMINI_API_KEY = "AQ.Ab8RContohKeyBaru";
-    const calls = mockFetch({
-      candidates: [{ content: { parts: [{ text: "Jawab layanan." }] } }],
-    });
-    const hasil = await tanyaAI("cara reservasi?", []);
-    expect(hasil.balasan).toBe("Jawab layanan.");
-    const { url, init } = calls[0]!;
-    // Endpoint native, bukan /openai/chat/completions.
-    expect(url).toContain(":generateContent");
-    expect(url).not.toContain("/openai/");
-    const h = init.headers as Record<string, string>;
-    expect(h["x-goog-api-key"]).toBe("AQ.Ab8RContohKeyBaru");
-    expect(h.Authorization).toBeUndefined();
-    // Payload native: contents[].parts[].
-    const body = JSON.parse(String(init.body));
-    expect(Array.isArray(body.contents[0].parts)).toBe(true);
-    expect(body.contents[0].parts.at(-1).text).toContain("cara reservasi?");
+  it("mengabaikan GEMINI_API_KEY lama (key Gemini tak valid di Groq)", async () => {
+    delete process.env.GROQ_API_KEY;
+    process.env.GEMINI_API_KEY = "AQ.ContohKeyGeminiLama";
+    await expect(tanyaAI("halo layanan", [])).rejects.toThrow("AI belum dikonfigurasi.");
   });
 
-  it("key lama (AIza) tetap pakai endpoint OpenAI-compatible", async () => {
-    process.env.GEMINI_API_KEY = "AIzaSyContohKeyLama";
+  it("memakai model default Groq bila GROQ_MODEL kosong", async () => {
+    delete process.env.GROQ_MODEL;
     const calls = mockFetch({ choices: [{ message: { content: "ok" } }] });
     await tanyaAI("halo layanan", []);
-    expect(calls[0]!.url).toContain("/openai/chat/completions");
+    expect(JSON.parse(String(calls[0]!.init.body)).model).toBe("llama-3.3-70b-versatile");
+  });
+
+  it("mengabaikan GEMINI_MODEL lama (tak pernah dikirim ke Groq)", async () => {
+    delete process.env.GROQ_MODEL;
+    process.env.GEMINI_MODEL = "gemini-3.1-flash-lite";
+    const calls = mockFetch({ choices: [{ message: { content: "ok" } }] });
+    await tanyaAI("halo layanan", []);
+    expect(JSON.parse(String(calls[0]!.init.body)).model).toBe("llama-3.3-70b-versatile");
   });
 });
