@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { Preloader } from "@/components/layout/Preloader";
 import { NavProgress } from "@/components/layout/NavProgress";
 
@@ -10,6 +10,11 @@ vi.mock("next/navigation", () => ({
 }));
 
 describe("Preloader", () => {
+  beforeEach(() => {
+    sessionStorage.clear();
+    document.documentElement.removeAttribute("data-preloader");
+  });
+
   it("menampilkan huruf DISKOMINFOSP berurutan dengan jeda animasi", () => {
     render(<Preloader />);
     const kata = screen.getByRole("status", {
