@@ -4,7 +4,7 @@ import { Container } from "@/components/layout/Container";
 import { WeatherWidget } from "@/components/cuaca/WeatherWidget";
 import { PengaduanForm } from "@/components/pengaduan/PengaduanForm";
 import { CekStatusPengaduan } from "@/components/pengaduan/CekStatusPengaduan";
-import { SITE, SOSIAL, googleMapsEmbedUrl, whatsappUrl } from "@/lib/config";
+import { SITE, SOSIAL, googleMapsEmbedUrl, whatsappUrl, JAM_LAYANAN } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Kontak",
@@ -125,7 +125,7 @@ export default function KontakPage() {
               </h3>
               <p className="mt-2 text-xs text-neutral-700 dark:text-slate-300">
                 Hubungi petugas langsung lewat WhatsApp atau telepon pada jam
-                kerja (Senin–Jumat, 08.00–16.00 WITA).
+                kerja ({JAM_LAYANAN.lengkap}).
               </p>
               <a
                 href={whatsappUrl()}

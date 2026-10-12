@@ -210,6 +210,18 @@ export function radioStreamUrl(): string {
 export const RADIO_NAME = "Radio Swara Murakata";
 
 /**
+ * Jam operasional layanan tatap muka (satu sumber kebenaran).
+ * Dipakai di badge hero, bar statistik, halaman kontak, dan reservasi —
+ * supaya tidak ada lagi klaim "24/7" yang keliru (layanan hanya jam kerja).
+ */
+export const JAM_LAYANAN = {
+  /** Ringkasan untuk badge/label pendek. */
+  singkat: "Sen–Jum · 08.00–16.00",
+  /** Kalimat lengkap untuk teks bantuan. */
+  lengkap: "Senin–Jumat, 08.00–16.00 WITA",
+} as const;
+
+/**
  * URL chat WhatsApp resmi — dari nomor telepon utama.
  * Nomor dinormalisasi ke format internasional (62...) agar bisa dibuka
  * lewat wa.me di ponsel maupun desktop.

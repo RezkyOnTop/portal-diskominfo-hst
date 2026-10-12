@@ -1,4 +1,5 @@
 import { getStatistikRingkas } from "@/lib/services/visitor";
+import { JAM_LAYANAN } from "@/lib/config";
 
 /**
  * Bar statistik kunjungan (data lokal). Gagal DB → tampilkan tanda "—",
@@ -35,11 +36,11 @@ export async function StatsBar() {
           </div>
         ))}
         <div className="text-center">
-          <dd className="font-heading text-2xl font-extrabold text-primary-700 sm:text-3xl">
-            24/7
+          <dd className="font-heading text-xl font-extrabold text-primary-700 sm:text-2xl">
+            {JAM_LAYANAN.singkat}
           </dd>
           <dt className="mt-1 text-xs font-medium uppercase tracking-wide text-neutral-500">
-            Layanan Informasi
+            Jam Layanan
           </dt>
         </div>
         <div className="text-center">

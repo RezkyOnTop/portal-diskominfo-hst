@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Container } from "@/components/layout/Container";
 import { ReservasiForm } from "@/components/reservasi/ReservasiForm";
-import { SITE } from "@/lib/config";
+import { SITE, JAM_LAYANAN } from "@/lib/config";
 import { LAYANAN_RESERVASI } from "@/lib/validations/local.schema";
 
 export const metadata: Metadata = {
@@ -95,7 +95,7 @@ export default function ReservasiPage() {
               <ul className="mt-3 space-y-1.5 text-xs text-neutral-600 dark:text-slate-300">
                 <li>Telepon: {SITE.phone}</li>
                 <li>Email: {SITE.email}</li>
-                <li>Jam layanan: Senin–Jumat, 08.00–16.00 WITA</li>
+                <li>Jam layanan: {JAM_LAYANAN.lengkap}</li>
               </ul>
             </div>
           </aside>

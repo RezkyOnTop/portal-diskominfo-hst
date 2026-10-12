@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { HERO, RADIO_NAME } from "@/lib/config";
+import { HERO, JAM_LAYANAN, RADIO_NAME } from "@/lib/config";
 import { HeroSlideshow } from "@/components/layout/HeroSlideshow";
 
 /**
@@ -119,11 +119,13 @@ export function Hero() {
             </div>
           </div>
 
-          {/* Badge layanan mengapung */}
+          {/* Badge jam layanan mengapung */}
           <div className="hero-glass absolute -right-3 -top-5 rounded-2xl px-4 py-3 text-center shadow-xl">
-            <p className="font-heading text-xl font-extrabold text-neutral-900 dark:text-white">24/7</p>
+            <p className="font-heading text-sm font-extrabold leading-tight text-neutral-900 dark:text-white">
+              {JAM_LAYANAN.singkat}
+            </p>
             <p className="text-[10px] uppercase tracking-wide text-primary-700 dark:text-primary-200">
-              Layanan
+              Jam Layanan
             </p>
           </div>
         </div>
