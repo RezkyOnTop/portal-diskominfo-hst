@@ -142,8 +142,13 @@ export async function tanyaAI(
   if (perluTolak(pesan)) return { balasan: PENOLAKAN, ditolak: true };
 
   const apiKey = process.env.GEMINI_API_KEY ?? "";
-  const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash-lite";
+  const model = process.env.GEMINI_MODEL ?? "gemini-3.5-flash-lite";
   if (!apiKey) throw new Error("AI belum dikonfigurasi.");
+
+  // Egress opsional: sebagian IP datacenter diklasifikasi Google sebagai
+  // wilayah tak didukung ("User location is not supported"). Bila
+  // GEMINI_PROXY_URL diisi, permintaan keluar lewat proxy tersebut.
+  const proxyUrl = process.env.GEMINI_PROXY_URL ?? "";
 
   const riwayatBersih = riwayat
     .filter(
@@ -158,32 +163,71 @@ export async function tanyaAI(
 
   const cuaca = await konteksCuaca();
 
-  const body = {
-    model,
-    messages: [
-      { role: "system", content: systemPrompt(cuaca) },
-      ...riwayatBersih,
-      { role: "user", content: pesan },
-    ],
-    max_tokens: MAX_OUTPUT_TOKENS,
-    temperature: 0.3,
-  };
-
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  // Key format baru AI Studio (Auth key "AQ.") hanya didukung di endpoint
+  // native; endpoint OpenAI-compatible butuh Standard key ("AIza"). Pilih
+  // otomatis dari format key agar dua-duanya jalan tanpa ganti kode.
+  const memakaiAuthKey = apiKey.startsWith("AQ.");
+  const url = memakaiAuthKey
+    ? `${GEMINI_BASE.replace("/openai", "")}/models/${model}:generateContent`
+    : `${GEMINI_BASE}/chat/completions`;
+  const headers: Record<string, string> = memakaiAuthKey
+    ? { "x-goog-api-key": apiKey, "Content-Type": "application/json" }
+    : { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" };
+  const payloadKirim: unknown = memakaiAuthKey
+    ? {
+        contents: [
+          {
+            parts: [
+              { text: systemPrompt(cuaca) },
+              ...riwayatBersih.map((t) => ({
+                text: `${t.role === "assistant" ? "Asisten" : "Pengguna"}: ${t.content}`,
+              })),
+              { text: `Pengguna: ${pesan}` },
+            ],
+          },
+        ],
+        generationConfig: {
+          maxOutputTokens: MAX_OUTPUT_TOKENS,
+          temperature: 0.3,
+        },
+      }
+    : {
+        model,
+        messages: [
+          { role: "system", content: systemPrompt(cuaca) },
+          ...riwayatBersih,
+          { role: "user", content: pesan },
+        ],
+        max_tokens: MAX_OUTPUT_TOKENS,
+        temperature: 0.3,
+      };
+  // Dispatcher fetch: langsung, atau lewat undici ProxyAgent bila diisi.
+  let dispatcher: unknown;
+  if (proxyUrl) {
+    const { ProxyAgent } = await import("undici");
+    dispatcher = new ProxyAgent(proxyUrl);
+  }
   try {
-    const res = await fetch(`${GEMINI_BASE}/chat/completions`, {
+    const res = await fetch(url, {
       method: "POST",
       signal: controller.signal,
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
+      headers,
+      body: JSON.stringify(payloadKirim),
       cache: "no-store",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ...(dispatcher ? { dispatcher: dispatcher as any } : {}),
     });
     if (!res.ok) {
-      console.error("[ai-chat] upstream gagal");
+      let kode = "";
+      try {
+        const errJson = (await res.json()) as { error?: { message?: string } };
+        kode = errJson?.error?.message ?? "";
+      } catch {
+        /* abaikan — pakai status saja */
+      }
+      console.error(`[ai-chat] upstream ${res.status} ${kode}`.slice(0, 200));
       throw new Error("Layanan AI sedang sibuk.");
     }
     let json: unknown;
@@ -192,8 +236,10 @@ export async function tanyaAI(
     } catch {
       throw new Error("Layanan AI sedang sibuk.");
     }
-    const teks =
-      typeof json === "object" && json !== null
+    const teks = memakaiAuthKey
+      ? (json as { candidates?: { content?: { parts?: { text?: string }[] } }[] })
+          ?.candidates?.[0]?.content?.parts?.map((p) => p.text ?? "").join("") ?? null
+      : typeof json === "object" && json !== null
         ? (json as { choices?: { message?: { content?: unknown } }[] }).choices?.[0]
             ?.message?.content
         : null;

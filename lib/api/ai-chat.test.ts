@@ -178,4 +178,31 @@ describe("tanyaAI", () => {
     mockFetch({ error: "quota habis, key=rahasia" }, false, 500);
     await expect(tanyaAI("halo", [])).rejects.toThrow("Layanan AI sedang sibuk.");
   });
+
+  it("key format baru (AQ.) pakai endpoint NATIVE + x-goog-api-key", async () => {
+    process.env.GEMINI_API_KEY = "AQ.Ab8RContohKeyBaru";
+    const calls = mockFetch({
+      candidates: [{ content: { parts: [{ text: "Jawab layanan." }] } }],
+    });
+    const hasil = await tanyaAI("cara reservasi?", []);
+    expect(hasil.balasan).toBe("Jawab layanan.");
+    const { url, init } = calls[0]!;
+    // Endpoint native, bukan /openai/chat/completions.
+    expect(url).toContain(":generateContent");
+    expect(url).not.toContain("/openai/");
+    const h = init.headers as Record<string, string>;
+    expect(h["x-goog-api-key"]).toBe("AQ.Ab8RContohKeyBaru");
+    expect(h.Authorization).toBeUndefined();
+    // Payload native: contents[].parts[].
+    const body = JSON.parse(String(init.body));
+    expect(Array.isArray(body.contents[0].parts)).toBe(true);
+    expect(body.contents[0].parts.at(-1).text).toContain("cara reservasi?");
+  });
+
+  it("key lama (AIza) tetap pakai endpoint OpenAI-compatible", async () => {
+    process.env.GEMINI_API_KEY = "AIzaSyContohKeyLama";
+    const calls = mockFetch({ choices: [{ message: { content: "ok" } }] });
+    await tanyaAI("halo layanan", []);
+    expect(calls[0]!.url).toContain("/openai/chat/completions");
+  });
 });

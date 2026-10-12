@@ -86,7 +86,9 @@ Tanpa kunci, tab AI menampilkan pesan "belum diaktifkan" tetapi tab
 
 ```
 GEMINI_API_KEY="kunci-anda-di-sini"
-GEMINI_MODEL="gemini-2.5-flash-lite"
+# AI Studio kini menerbitkan Auth key ("AQ.…"); kode otomatis memakai
+# endpoint NATIVE untuk AQ. (Standard key "AIza…" tetap jalan).
+GEMINI_MODEL="gemini-3.5-flash-lite"
 ```
 
 3. Restart server (`npm run start`).
