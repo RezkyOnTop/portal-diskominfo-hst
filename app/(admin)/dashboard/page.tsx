@@ -4,17 +4,19 @@ import { getStatistikRingkas } from "@/lib/services/visitor";
 import { countSubscribers } from "@/lib/services/subscriber";
 import { countReservations } from "@/lib/services/reservation";
 import { countSurveys, getRingkasanSurvei } from "@/lib/services/survey";
+import { countPengaduan } from "@/lib/services/pengaduan";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard Admin" };
 
 export default async function DashboardPage() {
-  const [stats, subscribers, reservasi, surveiCount, survei] = await Promise.all([
+  const [stats, subscribers, reservasi, surveiCount, survei, pengaduan] = await Promise.all([
     getStatistikRingkas(7),
     countSubscribers(),
     countReservations(),
     countSurveys(),
     getRingkasanSurvei(),
+    countPengaduan(),
   ]);
 
   return (
@@ -27,12 +29,13 @@ export default async function DashboardPage() {
         <StatCard label="Subscriber radio" value={subscribers} />
         <StatCard label="Reservasi menunggu" value={reservasi.menunggu} />
         <StatCard label="Reservasi total" value={reservasi.total} />
+        <StatCard label="Pengaduan baru" value={pengaduan.baru} />
         <StatCard label="Jawaban survei IKM" value={surveiCount} />
       </div>
 
       <p className="text-sm text-neutral-600 dark:text-slate-400">
         Data di halaman ini berasal dari database lokal (VisitorStat,
-        RadioSubscriber, ServiceReservation, ServiceSurvey). Konten
+        RadioSubscriber, ServiceReservation, ServiceSurvey, Pengaduan). Konten
         berita/pengumuman dikelola di Media Center HST, bukan di sini.
       </p>
 

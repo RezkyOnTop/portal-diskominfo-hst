@@ -208,3 +208,18 @@ export function radioStreamUrl(): string {
 
 /** Nama radio pemerintah daerah. */
 export const RADIO_NAME = "Radio Swara Murakata";
+
+/**
+ * URL chat WhatsApp resmi — dari nomor telepon utama.
+ * Nomor dinormalisasi ke format internasional (62...) agar bisa dibuka
+ * lewat wa.me di ponsel maupun desktop.
+ */
+export function whatsappNumber(): string {
+  const digit = SITE.phone.replace(/\D/g, "");
+  return digit.startsWith("0") ? `62${digit.slice(1)}` : digit;
+}
+
+/** URL wa.me dengan sapaan awal. */
+export function whatsappUrl(sapa = "Assalamu'alaikum, saya ingin menghubungi Diskominfo SP HST."): string {
+  return `https://wa.me/${whatsappNumber()}?text=${encodeURIComponent(sapa)}`;
+}

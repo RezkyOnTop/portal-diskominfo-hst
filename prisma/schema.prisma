@@ -113,6 +113,31 @@ model ServiceSurvey {
   @@index([createdAt])
 }
 
+/// Pengaduan & aspirasi masyarakat (data lokal).
+/// Warga mengirim lewat form di /kontak tanpa perlu akun/email aktif; setiap
+/// pengaduan menerima kode lacak. Petugas menanggapi lewat /dashboard/pengaduan.
+model Pengaduan {
+  id        String   @id @default(cuid())
+  /// Kode lacak singkat yang diberikan ke pengadu (mis. PGD-7K2M9Q).
+  kode      String   @unique
+  nama      String
+  /// Kontak pengadu: nomor WhatsApp/telepon atau email (bebas).
+  kontak    String
+  /// Kategori pengaduan (lihat KATEGORI_PENGADUAN).
+  kategori  String
+  /// Isi pengaduan/aspirasi.
+  isi       String
+  /// BARU | DIPROSES | SELESAI
+  status    String   @default("BARU")
+  /// Tanggapan/respons petugas (tampil ke pengadu lewat cek status).
+  tanggapan String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}
+
 /// Data pegawai dinas (data lokal).
 /// Dikelola admin lewat /dashboard/pegawai; ditampilkan publik di
 /// /profil/data-pegawai. Foto diunggah ke berkas terpisah (lihat

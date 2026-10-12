@@ -234,6 +234,70 @@ export type UpdateReservasiStatusInput = z.infer<typeof UpdateReservasiStatusSch
 
 /**
  * ============================================================================
+ *  Pengaduan & Aspirasi masyarakat
+ * ============================================================================
+ *  Warga mengirim lewat form di /kontak (tanpa perlu akun/email aktif) dan
+ *  menerima kode lacak untuk memantau status + tanggapan petugas.
+ */
+
+/** Kategori pengaduan/aspirasi. */
+export const KATEGORI_PENGADUAN = [
+  "Layanan Publik & Perizinan",
+  "Infrastruktur & Jaringan Internet",
+  "Konten & Informasi Publik",
+  "Saran / Aspirasi",
+  "Lainnya",
+] as const;
+
+/** Status alur pengaduan. */
+export const STATUS_PENGADUAN = ["BARU", "DIPROSES", "SELESAI"] as const;
+export type StatusPengaduan = (typeof STATUS_PENGADUAN)[number];
+
+/** Label bahasa Indonesia untuk tiap status pengaduan. */
+export const LABEL_STATUS_PENGADUAN: Record<StatusPengaduan, string> = {
+  BARU: "Baru",
+  DIPROSES: "Sedang Diproses",
+  SELESAI: "Selesai",
+};
+
+export const PengaduanInputSchema = z.object({
+  nama: z.string().trim().min(2, "Nama minimal 2 karakter").max(120, "Nama maksimal 120 karakter"),
+  kontak: z
+    .string()
+    .trim()
+    .min(5, "Kontak minimal 5 karakter")
+    .max(160, "Kontak maksimal 160 karakter"),
+  kategori: z.enum(KATEGORI_PENGADUAN, { error: "Pilih kategori pengaduan" }),
+  isi: z
+    .string()
+    .trim()
+    .min(15, "Uraian minimal 15 karakter")
+    .max(2000, "Uraian maksimal 2000 karakter"),
+});
+
+export type PengaduanInput = z.infer<typeof PengaduanInputSchema>;
+
+/** Validasi input admin saat menanggapi pengaduan. */
+export const TanggapiPengaduanSchema = z.object({
+  id: z.string().trim().min(1),
+  status: z.enum(STATUS_PENGADUAN, { error: "Status tidak dikenal" }),
+  tanggapan: z.string().trim().max(2000, "Tanggapan maksimal 2000 karakter").optional().or(z.literal("")),
+});
+
+export type TanggapiPengaduanInput = z.infer<typeof TanggapiPengaduanSchema>;
+
+/** Kode lacak pengaduan, tanpa karakter yang mudah tertukar (0/O, 1/I/L). */
+export function buatKodePengaduan(): string {
+  const alfabet = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
+  let kode = "";
+  for (let i = 0; i < 6; i += 1) {
+    kode += alfabet[Math.floor(Math.random() * alfabet.length)];
+  }
+  return `PGD-${kode}`;
+}
+
+/**
+ * ============================================================================
  *  Data Pegawai (Staff)
  * ============================================================================
  *  Dikelola admin lewat /dashboard/pegawai, tampil publik di /profil/data-pegawai.
