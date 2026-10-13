@@ -1,4 +1,4 @@
-import type { CuacaSlot } from "@/types/cuaca";
+import type { CuacaSlot } from "@/lib/types/cuaca";
 
 /**
  * Ikon cuaca inline (SVG) — sengaja TIDAK memakai gambar dari BMKG agar

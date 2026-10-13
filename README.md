@@ -71,7 +71,7 @@ Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Prisma 6 · PostgreS
 
 ## Menjalankan
 
-> **Baru pertama kali?** Baca **[SETUP.md](./SETUP.md)** — panduan langkah demi langkah
+> **Baru pertama kali?** Baca **[SETUP.md](./docs/SETUP.md)** — panduan langkah demi langkah
 > untuk pemula (termasuk memasang Node.js & PostgreSQL, serta menjalankan mode presentasi).
 > Cara cepat: `node scripts/setup-lokal.mjs` untuk membuat `.env.local` + kunci sesi otomatis.
 

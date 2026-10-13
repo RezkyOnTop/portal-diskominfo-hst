@@ -7,7 +7,7 @@ import { ApiErrorFallback } from "@/components/news/ApiErrorFallback";
 import { getPengumuman } from "@/lib/api/media-center";
 import { formatDate } from "@/lib/utils/format";
 import { sanitizeHtml } from "@/lib/utils/sanitize";
-import type { PaginatedResponse, Pengumuman } from "@/types/media-center";
+import type { PaginatedResponse, Pengumuman } from "@/lib/types/media-center";
 
 const PER_PAGE = 10;
 

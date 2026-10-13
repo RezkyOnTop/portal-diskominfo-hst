@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import type { CuacaHari, CuacaSlot, PrakiraanCuaca } from "@/types/cuaca";
+import type { CuacaHari, CuacaSlot, PrakiraanCuaca } from "@/lib/types/cuaca";
 
 export interface CuacaPayload {
   data: PrakiraanCuaca;

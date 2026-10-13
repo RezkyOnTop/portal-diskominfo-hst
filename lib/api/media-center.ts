@@ -14,7 +14,7 @@ import type {
   MediaCenterApi,
   PaginatedResponse,
   Pengumuman,
-} from "@/types/media-center";
+} from "@/lib/types/media-center";
 
 /**
  * ============================================================================

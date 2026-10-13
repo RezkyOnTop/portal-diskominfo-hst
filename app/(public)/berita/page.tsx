@@ -5,7 +5,7 @@ import { NewsCard } from "@/components/news/NewsCard";
 import { Pagination } from "@/components/ui/Pagination";
 import { ApiErrorFallback } from "@/components/news/ApiErrorFallback";
 import { getBerita, getKategori } from "@/lib/api/media-center";
-import type { Berita, PaginatedResponse } from "@/types/media-center";
+import type { Berita, PaginatedResponse } from "@/lib/types/media-center";
 
 const PER_PAGE = 9;
 

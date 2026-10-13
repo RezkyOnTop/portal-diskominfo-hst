@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/Button";
-import { subscribeAction } from "@/app/(public)/radio/actions";
+import { subscribeAction } from "@/lib/actions/subscribe";
 
 /** Form pendaftaran subscriber radio (data lokal: RadioSubscriber). */
 export function SubscriberForm() {

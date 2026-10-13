@@ -1,9 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 /**
- * proxy (pengganti `middleware` di Next.js 16) — pengalihan awal untuk area
- * admin. Ini hanya lapisan pertama; otorisasi sesungguhnya diverifikasi di
- * app/(admin)/layout.tsx via auth().
+ * ============================================================================
+ *  proxy.ts — BERKAS KONVENSI FRAMEWORK. JANGAN DIPINDAH.
+ * ============================================================================
+ *
+ * Di Next.js 16, berkas ini adalah pengganti `middleware.ts` dan WAJIB berada
+ * di root proyek agar dikenali (sama seperti `next.config.ts`). Ia bukan util
+ * biasa, jadi jangan "dirapikan" ke dalam folder lain — memindahkannya membuat
+ * pengalihan area admin berhenti bekerja tanpa error yang jelas.
+ *
+ * Fungsi: pengalihan awal untuk area admin. Ini hanya lapisan pertama;
+ * otorisasi sesungguhnya diverifikasi di app/(admin)/layout.tsx via auth().
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { formatDate } from "@/lib/utils/format";
 import { gambarBerita } from "@/lib/utils/gambar";
-import type { Berita } from "@/types/media-center";
+import type { Berita } from "@/lib/types/media-center";
 
 /**
  * NewsCard — kartu berita. Data berasal dari API Media Center HST (via adapter).

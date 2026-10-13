@@ -1,7 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
-import type { PrakiraanCuaca, CuacaHari, CuacaSlot } from "@/types/cuaca";
+import type { PrakiraanCuaca, CuacaHari, CuacaSlot } from "@/lib/types/cuaca";
 
 /**
  * ============================================================================

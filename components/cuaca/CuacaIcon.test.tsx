@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { CuacaIcon, jenisIkon, labelJenis } from "./CuacaIcon";
-import type { CuacaSlot } from "@/types/cuaca";
+import type { CuacaSlot } from "@/lib/types/cuaca";
 
 function slot(p: Partial<CuacaSlot> = {}): CuacaSlot {
   return {

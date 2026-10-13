@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Berita } from "@/types/media-center";
+import type { Berita } from "@/lib/types/media-center";
 
 /**
  * NewsTicker — pita berita berjalan (marquee CSS). Berhenti saat di-hover

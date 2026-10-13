@@ -8,7 +8,7 @@ import {
   LAYANAN_SURVEI,
   labelMutu,
 } from "@/lib/validations/local.schema";
-import { submitSurveyAction, type SurveiActionState } from "@/app/(public)/survei/actions";
+import { submitSurveyAction, type SurveiActionState } from "@/lib/actions/survei";
 
 const UNSUR_KEYS = ["u1", "u2", "u3", "u4", "u5", "u6", "u7", "u8", "u9"] as const;
 

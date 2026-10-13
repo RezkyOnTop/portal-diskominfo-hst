@@ -6,7 +6,7 @@ import type {
   OpenDataFilter,
   OpenDataPage,
   GetDatasetParams,
-} from "@/types/opendata";
+} from "@/lib/types/opendata";
 
 /**
  * ============================================================================
