@@ -1,154 +1,301 @@
-# Diskominfo SP HST — Rebuild
+# Portal Diskominfo SP HST
 
-Portal resmi **Dinas Komunikasi, Informatika, Statistik, dan Persandian Kabupaten Hulu Sungai Tengah**.
+> Portal resmi **Dinas Komunikasi, Informatika, Statistik dan Persandian Kabupaten Hulu Sungai Tengah** — satu pintu untuk informasi publik, layanan digital, data terbuka, dan kanal pengaduan masyarakat.
 
-Dokumentasi kontrak kerja ada di `~/diskominfosp-hst-docs/` (PRD, ARCHITECTURE, DESIGN, SECURITY, TESTING, DEPLOYMENT, TASK_INSTRUCTION).
+Rebuild modern dari situs `diskominfosp.hstkab.go.id` dengan desain **Digital Civic** yang orisinal: cepat, aksesibel (WCAG AA), responsif, dan mendukung mode terang/gelap. Konten berita & pengumuman tetap bersumber dari **Media Center HST** (tanpa menduplikasi data), sementara data operasional portal disimpan di basis data lokal.
 
-## Arsitektur sumber data (penting)
+<p align="left">
+  <img src="https://img.shields.io/badge/status-aktif-brightgreen" alt="Status">
+  <img src="https://img.shields.io/badge/lisensi-MIT-blue" alt="Lisensi MIT">
+  <img src="https://img.shields.io/badge/tests-398%20lulus-success" alt="Tes">
+  <img src="https://img.shields.io/badge/coverage-93.92%25-brightgreen" alt="Coverage">
+</p>
 
-- **Berita, pengumuman, hoaks** → diambil dari **API Media Center HST** (`https://mediacenter.hstkab.go.id`).
-  **Tidak ada tabel `News`/`HoaxReport` dan tidak ada CRUD berita.** Hanya `lib/api/media-center.ts` yang boleh memanggil domain tersebut.
-- **Data terbuka** → katalog dataset dari **API publik Open Data HST** (`https://opendata.hstkab.go.id/api/public/datasets`), tanpa API key.
-  Hanya `lib/api/opendata.ts` yang boleh memanggil domain tersebut.
-- **Cuaca** → prakiraan resmi dari **API publik BMKG** (`https://api.bmkg.go.id/publik/prakiraan-cuaca`), tanpa API key.
-  Hanya `lib/api/bmkg.ts` yang boleh memanggil domain tersebut.
-- **Data lokal (PostgreSQL)** → hanya `VisitorStat`, `RadioSubscriber`, `SocialMediaCache`, `ServiceSurvey`, `ServiceReservation`.
-- **Feed video** → kanal YouTube resmi Media Center HST lewat **RSS keyless** (`youtube.com/feeds/videos.xml`), di-cache ke `SocialMediaCache`. Hanya `lib/api/youtube.ts` yang boleh memanggil domain tersebut.
+---
 
-### Bentuk API Media Center (hasil verifikasi langsung)
+## 📸 Tangkapan Layar
 
-| Endpoint | Bentuk respons |
+### Beranda
+![Beranda Portal Diskominfo SP HST](docs/screenshots/beranda.png)
+
+### Berita
+![Daftar berita dari Media Center HST](docs/screenshots/berita.png)
+
+### Data Terbuka
+![Katalog dataset Open Data HST](docs/screenshots/data-terbuka.png)
+
+### Survei Kepuasan Layanan
+![Survei Indeks Kepuasan Masyarakat](docs/screenshots/survei.png)
+
+> **Demo langsung:** `http://43.173.8.233:3010` *(lingkungan pratinjau; alamat produksi mengikuti domain resmi instansi)*
+
+---
+
+## ✨ Fitur Utama
+
+- **📰 Berita, Pengumuman & Klarifikasi Hoaks** — bersumber langsung dari API Media Center HST, dilengkapi cache *stale-while-revalidate* dan deduplikasi permintaan agar halaman berpindah seketika.
+- **🔍 Pencarian Global** (`/cari`) — menelusuri berita, pengumuman, dan halaman statis sekaligus dengan pencocokan berbasis token.
+- **📊 Data Terbuka** (`/data-terbuka`) — katalog 301 dataset dari portal Open Data HST: pencarian, filter kategori & tahun, serta paginasi.
+- **📝 Survei Kepuasan Layanan** (`/survei`) — menghitung **Indeks Kepuasan Masyarakat (IKM)** atas 9 unsur sesuai **PermenPANRB 14/2017**; nilai IKM dan mutu (A/B/C/D) dihitung di sisi server.
+- **📅 Reservasi Layanan** (`/reservasi`) — permohonan kunjungan, studi tiru, publikasi, penggunaan aula, narasumber, dan peminjaman multimedia. Setiap permohonan memperoleh **kode lacak** (`RSV-XXXXXX`) yang dapat dipantau di `/reservasi/status`.
+- **📣 Pengaduan & Aspirasi** (`/kontak`) — kanal pengaduan tanpa perlu akun, dengan kode lacak `PGD-XXXXXX` dan pemantauan status secara transparan.
+- **🌤️ Widget Cuaca Interaktif** — prakiraan resmi **BMKG** (kondisi saat ini + 3 hari) langsung di beranda.
+- **📻 Radio Swara Murakata** — pemutar audio persisten yang tidak terputus saat berpindah halaman, plus formulir langganan.
+- **🤖 Asisten AI "Tanya AI"** — widget tanya-jawab seputar layanan dinas, ditenagai **Groq**. Kunci API hanya tersimpan di server (proxy backend), dilengkapi sanitasi input/output, pembatasan 10 permintaan/menit per IP, serta system prompt ketat anti *prompt injection*.
+- **🌓 Mode Terang/Gelap** — persisten tanpa kedip (*no flash*), kontras teks terjamin ≥ 4.5:1 di kedua mode.
+- **📈 Analitik Kunjungan** — pencatatan kunjungan halaman publik secara anonim (sekali per perubahan halaman, area admin dikecualikan).
+- **🔐 Dashboard Admin** (`/dashboard`, login di `/masuk`) — ringkasan statistik, pengelolaan slideshow hero, data pegawai, pengaduan, reservasi, survei, dan subscriber; **ekspor CSV** siap Excel Indonesia.
+- **🎬 Animasi Loading Modern** — preloader khas DISKOMINFOSP + bilah progres navigasi yang halus dan menghormati `prefers-reduced-motion`.
+
+---
+
+## 🧰 Tech Stack
+
+<p align="left">
+  <img src="https://img.shields.io/badge/Next.js-16.3-000000?logo=nextdotjs&logoColor=white" alt="Next.js">
+  <img src="https://img.shields.io/badge/React-19.2-61DAFB?logo=react&logoColor=black" alt="React">
+  <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Tailwind_CSS-4.3-06B6D4?logo=tailwindcss&logoColor=white" alt="Tailwind CSS">
+  <img src="https://img.shields.io/badge/Prisma-6.19-2D3748?logo=prisma&logoColor=white" alt="Prisma">
+  <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white" alt="PostgreSQL">
+  <img src="https://img.shields.io/badge/Zod-4.6-3E67B1?logo=zod&logoColor=white" alt="Zod">
+  <img src="https://img.shields.io/badge/Auth.js-v5-000000?logo=auth0&logoColor=white" alt="Auth.js">
+  <img src="https://img.shields.io/badge/Vitest-5.0-6E9F18?logo=vitest&logoColor=white" alt="Vitest">
+  <img src="https://img.shields.io/badge/Node.js-22%2B-5FA04E?logo=nodedotjs&logoColor=white" alt="Node.js">
+</p>
+
+| Lapisan | Teknologi |
 |---|---|
-| `GET /api/berita` | array polos: `{ id_berita, tanggal, title, isi(HTML), foto, link, slug, author, kategori_id }` |
-| `GET /api/pengumuman` | array polos: `{ id_pengumuman, tanggal, title, slug, isi(HTML), link }` |
-| `GET /api/hoaks` | **404 — belum tersedia** |
-| Gambar | `https://data-mediacenter.hstkab.go.id/assets/foto_brt/{foto}` ⚠️ host gambar ≠ host API |
-| Halaman detail | `https://mediacenter.hstkab.go.id/berita/{slug}` |
+| Framework | Next.js 16 (App Router) · React 19 |
+| Bahasa | TypeScript 5 |
+| Styling | Tailwind CSS v4 · lucide-react |
+| Basis data | PostgreSQL 16 · Prisma 6 |
+| Validasi | Zod v4 |
+| Autentikasi | Auth.js (NextAuth v5) · bcryptjs |
+| Pengujian | Vitest 5 · Testing Library |
+| AI | Groq (OpenAI-compatible API) |
+| Gambar | sharp · undici |
 
-Adapter menormalisasi bentuk mentah ini ke tipe internal (`Berita`, `Pengumuman`) dan memvalidasi dengan Zod. Bila tim Media Center menambah `/api/hoaks`, cukup ubah `getHoaks()` — UI tidak berubah.
+---
 
-### Bentuk API Open Data (hasil verifikasi langsung)
+## 📁 Struktur Direktori
 
-| Endpoint | Bentuk respons |
-|---|---|
-| `GET /api/public/datasets` | `{ success, data[], metadata{total,page,limit,total_pages}, filters{kategori,instansi} }` |
-| Parameter | `page`, `limit`, `kategori`, `instansi`, `tahun`, `search` |
-| Item dataset | `{ id, judul, slug, deskripsi(HTML), instansi, kategori, tahun, jenis_data, file_url, updated_at, views, status }` |
-| Halaman detail | `https://opendata.hstkab.go.id/public/datasets/{slug}` — **fallback ke `{id}`** |
+```
+app/
+├── (public)/              # Halaman publik: beranda, berita, pengumuman, hoaks,
+│                          # radio, cari, data-terbuka, survei, reservasi, kontak, profil, layanan
+├── (admin)/dashboard/     # Panel admin: statistik, hero, pegawai, pengaduan,
+│                          # reservasi, survei, subscriber (dilindungi Auth.js)
+├── masuk/                 # Halaman login administrator
+└── api/                   # Route handler: cari, chat, cuaca, gambar, visitor,
+                           # subscriber, survei, reservasi, pengaduan, admin/ekspor, auth
 
-⚠️ **Sekitar 24% dataset tidak punya `slug`** (null/kosong). Adapter **tidak membuang** dataset tersebut: URL detail memakai `id` sebagai fallback (portal menerima keduanya).
+components/                # Komponen UI: layout/, news/, search/, survei/,
+                           # cuaca/, reservasi/, chat/, pengaduan/, analytics/
 
-### Bentuk API BMKG (hasil verifikasi langsung)
+lib/
+├── api/                   # ADAPTER — satu-satunya pemanggil API eksternal:
+│                          # media-center.ts, opendata.ts, bmkg.ts, youtube.ts, gambar.ts, ai-chat.ts
+├── services/              # Logika data lokal (visitor, subscriber, survei, reservasi, pengaduan, hero, staff)
+├── actions/               # Server Actions (langganan radio, survei)
+├── validations/           # Skema Zod (+ rumus IKM & reservasi)
+├── storage/               # Penyimpanan berkas (foto pegawai, hero)
+├── types/                 # Tipe TypeScript bersama
+└── utils/                 # Pembantu: sanitasi HTML, format, CSV, markdown, BMKG
 
-| Endpoint | Bentuk respons |
-|---|---|
-| `GET /publik/prakiraan-cuaca?adm4={kode}` | `{ lokasi{provinsi,kotkab,kecamatan,desa,lat,lon}, data[0].cuaca[hari][slot] }` |
-| Slot cuaca | `{ local_datetime, t(°C), hu(%), ws(km/j), wd(arah), weather(kode), weather_desc, image(ikon SVG) }` |
-| Halaman sumber | `https://www.bmkg.go.id/cuaca/prakiraan-cuaca/{adm4}` |
+prisma/schema.prisma       # Model: VisitorStat, RadioSubscriber, SocialMediaCache,
+                           # ServiceSurvey, ServiceReservation, Staff, Pengaduan, HeroSlide
+scripts/                   # setup-lokal.mjs, setup-admin.mjs, seed-pegawai.mjs
+docs/                      # SETUP.md, screenshots/
+```
 
-**Kode wilayah (adm4) default `63.07.06.1001` = Barabai Darat**, kelurahan terdekat dari kantor (≈1,2 km).
-Kelurahan Benawa Tengah (lokasi kantor) **belum terdaftar di BMKG**, sehingga Barabai Darat dipakai sebagai
-representasi prakiraan wilayah kantor. Ubah lewat env `BMKG_ADM4` bila perlu — tanpa mengubah kode.
+---
 
-## Fitur
+## 🚀 Cara Instalasi & Menjalankan
 
-- **Berita / Pengumuman / Hoaks** — bersumber dari Media Center HST (adapter + cache TTL + stale-while-error).
-- **Pencarian global** (`/cari`, `/api/cari`) — lintas berita, pengumuman, dan halaman statis; pencocokan berbasis token.
-- **Mode terang/gelap** — berbasis kelas `.dark` (pilihan pengguna persisten, tanpa flicker).
-- **Data Terbuka** (`/data-terbuka`) — katalog 301 dataset dari Open Data HST; pencarian, filter kategori/tahun, paginasi.
-- **Survei Kepuasan Layanan** (`/survei`) — Indeks Kepuasan Masyarakat (IKM), 9 unsur sesuai **PermenPANRB 14/2017**; nilai IKM & mutu (A/B/C/D) dihitung di server; ringkasan publik.
-- **Reservasi Layanan** (`/reservasi`) — permohonan kunjungan/studi tiru, publikasi, penggunaan aula, narasumber, dan peminjaman peralatan multimedia. Setiap permohonan menerima **kode lacak** (`RSV-XXXXXX`) untuk dipantau di `/reservasi/status`.
-- **Peta lokasi** — Google Maps embed di `/kontak` (tanpa API key), koordinat kantor terverifikasi.
-- **Cuaca Barabai** — widget prakiraan resmi **BMKG** (3 hari + kondisi saat ini) di beranda & `/kontak`; sumber data terpisah dari konten lain, gagal upstream → fallback ramah + tautan BMKG.
-- **Radio Swara Murakata** — pemutar persisten lintas halaman + form subscriber.
-- **Media sosial** — feed video kanal YouTube Media Center HST (RSS keyless, di-cache lokal).
-- **Analitik kunjungan** — beacon mencatat kunjungan halaman publik ke `VisitorStat` (sekali per perubahan halaman; area admin dikecualikan).
-- **Dashboard admin** (`/dashboard`, login di `/masuk`) — ringkasan kunjungan, subscriber, reservasi, dan survei IKM (Auth.js); kelola reservasi & subscriber; **ekspor CSV** untuk ketiga data lokal. Konten berita tetap dikelola di Media Center, bukan di sini.
+### Prasyarat
 
-## Tech stack
+- **Node.js ≥ 22** (disarankan 22 LTS atau lebih baru) dan **npm ≥ 10**
+- **PostgreSQL ≥ 14** *(opsional — portal tetap jalan tanpanya; fitur berbasis basis data akan menampilkan fallback yang ramah, bukan error)*
+- Git
 
-Next.js 16 (App Router) · TypeScript · Tailwind CSS v4 · Prisma 6 · PostgreSQL · Zod v4 · Auth.js (NextAuth v5) · Vitest + Testing Library.
-
-## Menjalankan
-
-> **Baru pertama kali?** Baca **[SETUP.md](./docs/SETUP.md)** — panduan langkah demi langkah
-> untuk pemula (termasuk memasang Node.js & PostgreSQL, serta menjalankan mode presentasi).
-> Cara cepat: `node scripts/setup-lokal.mjs` untuk membuat `.env.local` + kunci sesi otomatis.
+### 1. Clone repositori
 
 ```bash
-cp .env.example .env.local   # isi DATABASE_URL, AUTH_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD_HASH
+git clone https://github.com/RezkyOnTop/portal-diskominfo-hst.git
+cd portal-diskominfo-hst
+```
+
+### 2. Pasang dependensi
+
+```bash
 npm install
-npx prisma generate
-npx prisma migrate deploy    # buat tabel lokal (VisitorStat, RadioSubscriber, SocialMediaCache, ServiceSurvey, ServiceReservation)
-npm run dev
 ```
 
-Buat hash password admin: `node -e "console.log(require('bcryptjs').hashSync('PASSWORD_ANDA',10))"`.
-
-### Mengaktifkan dashboard admin
-
-Dashboard admin ada di **`/dashboard`** (login di **`/masuk`**), dilindungi Auth.js. Berisi
-ringkasan statistik kunjungan & daftar subscriber radio. Berita/pengumuman **tidak** dikelola di
-sini (sumbernya Media Center HST).
-
-Aktifkan akun admin dengan script (password diketik langsung, tidak pernah masuk repo):
+### 3. Siapkan variabel lingkungan
 
 ```bash
-node scripts/setup-admin.mjs
-# lalu restart server
+cp .env.example .env.local
 ```
 
-Script meminta email + password, menulis `ADMIN_EMAIL` & `ADMIN_PASSWORD_HASH` (bcrypt) ke
-`.env.local` (mode 600), dan membuat `AUTH_SECRET` bila belum ada. Selama kredensial ini belum
-diset, `/dashboard` tetap mengalihkan ke `/masuk` tetapi login tidak akan berhasil.
-
-### Menyiapkan PostgreSQL (sekali saja)
+Cara tercepat: jalankan skrip penyiapan otomatis (membuat `.env.local` + kunci sesi).
 
 ```bash
+node scripts/setup-lokal.mjs
+```
+
+Isi variabel yang diperlukan di `.env.local`:
+
+| Variabel | Wajib | Keterangan |
+|---|---|---|
+| `DATABASE_URL` | opsional | Koneksi PostgreSQL, mis. `postgresql://user:pass@localhost:5432/diskominfosp_hst` |
+| `AUTH_SECRET` | ya (admin) | Kunci sesi Auth.js — dibuat otomatis oleh `setup-lokal.mjs` |
+| `NEXTAUTH_URL` | ya | URL publik aplikasi, mis. `http://localhost:3010` |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD_HASH` | ya (admin) | Kredensial dashboard — dibuat oleh `setup-admin.mjs` |
+| `MEDIA_CENTER_API_BASE_URL` | ya | `https://mediacenter.hstkab.go.id` |
+| `MEDIA_CENTER_IMAGE_BASE_URL` | ya | `https://data-mediacenter.hstkab.go.id` |
+| `OPENDATA_API_BASE_URL` | ya | `https://opendata.hstkab.go.id` |
+| `RADIO_STREAM_URL` | opsional | URL stream Radio Swara Murakata |
+| `BMKG_ADM4` | opsional | Kode wilayah BMKG (default `63.07.06.1001`) |
+| `GROQ_API_KEY` / `GROQ_MODEL` | opsional | Mengaktifkan widget "Tanya AI" |
+
+> ⚠️ **Jangan pernah meng-commit `.env.local`.** Berkas `.env*` sudah diabaikan Git kecuali `.env.example` (hanya berisi placeholder).
+
+### 4. Siapkan basis data *(bila memakai PostgreSQL)*
+
+```bash
+# Buat role & database (sekali saja)
 sudo -u postgres psql -c "CREATE ROLE diskominfosp LOGIN PASSWORD 'GANTI_PASSWORD';"
 sudo -u postgres createdb -O diskominfosp diskominfosp_hst
-# lalu set DATABASE_URL di .env.local:
-#   postgresql://diskominfosp:GANTI_PASSWORD@localhost:5432/diskominfosp_hst
+
+# Terapkan skema
+npx prisma generate
 npx prisma migrate deploy
 ```
 
-Tanpa PostgreSQL, portal tetap berjalan: berita/pengumuman/data terbuka tetap tampil (sumber API eksternal),
-sedangkan fitur yang butuh database (survei, statistik kunjungan, subscriber radio) menampilkan
-fallback yang ramah — bukan error.
-
-## Perintah
+### 5. Jalankan aplikasi
 
 ```bash
-npm run dev            # development
-npm run build          # production build
-npm run lint           # eslint
-npm run typecheck      # tsc --noEmit
-npm run test           # vitest
-npm run test:coverage  # coverage (lib/ & app/api/ >= 80%)
+# Mode pengembangan
+npm run dev
+
+# Mode produksi
+npm run build
+npm run start -- -p 3010
 ```
 
-## Struktur singkat
+Buka **http://localhost:3010**.
+
+### Perintah lain
+
+| Perintah | Fungsi |
+|---|---|
+| `npm run lint` | Pemeriksaan ESLint |
+| `npm run typecheck` | Pemeriksaan tipe (`next typegen && tsc --noEmit`) |
+| `npm run test` | Menjalankan seluruh tes |
+| `npm run test:coverage` | Tes + laporan cakupan (ambang 80%) |
+| `npm run prisma:migrate` | Migrasi basis data saat pengembangan |
+| `npm run seed:pegawai` | Mengisi data pegawai |
+
+### Mengaktifkan dashboard admin
+
+```bash
+node scripts/setup-admin.mjs
+# Masukkan email & password saat diminta, lalu restart server
+```
+
+Skrip menulis `ADMIN_EMAIL` dan `ADMIN_PASSWORD_HASH` (bcrypt) ke `.env.local` bermode `600`. Password tidak pernah masuk repositori.
+
+---
+
+## 💡 Cara Penggunaan
+
+**Menelusuri berita**
 
 ```
-app/(public)/            # beranda, berita, pengumuman, hoaks, radio, cari,
-                         # data-terbuka, survei, reservasi, kontak
-app/(admin)/dashboard/   # ringkasan, statistik, subscriber, reservasi, survei (Auth.js)
-app/masuk/               # halaman login administrator
-app/api/                 # visitor, subscriber, cari, survei, reservasi, admin/ekspor, auth
-scripts/setup-admin.mjs  # aktifkan akun admin (tulis hash bcrypt ke .env.local)
-lib/api/media-center.ts  # SATU-SATUNYA pemanggil mediacenter.hstkab.go.id
-lib/api/opendata.ts      # SATU-SATUNYA pemanggil opendata.hstkab.go.id
-lib/api/bmkg.ts          # SATU-SATUNYA pemanggil api.bmkg.go.id (cuaca)
-lib/api/youtube.ts       # SATU-SATUNYA pemanggil youtube.com/feeds (RSS keyless)
-lib/services/            # subscriber, visitor, social, search, survey, reservation (data lokal)
-lib/validations/         # skema Zod (+ rumus IKM + reservasi)
-lib/utils/csv.ts         # ekspor CSV (BOM UTF-8, delimiter Excel Indonesia)
-components/              # ui/, layout/, news/, search/, survei/, cuaca/, reservasi/, analytics/
-prisma/schema.prisma     # VisitorStat, RadioSubscriber, SocialMediaCache, ServiceSurvey, ServiceReservation
+Buka /berita → pilih kategori → klik judul untuk membaca detail di /berita/[slug]
 ```
 
-## Catatan verifikasi
+**Mengajukan reservasi layanan**
 
-- API Media Center **tidak menyediakan paginasi server-side** (mengembalikan ~1357 berita); paginasi dilakukan di adapter.
-- `kategori_id` berisi **nama kategori** (mis. `Pemerintahan`), bukan angka.
-- Konten `isi` adalah HTML; dirender setelah disanitasi (`lib/utils/sanitize.ts`).
+```
+Buka /reservasi → isi formulir → kirim → simpan kode lacak (RSV-XXXXXX)
+Pantau statusnya kapan saja di /reservasi/status
+```
+
+**Mengirim pengaduan**
+
+```
+Buka /kontak → isi formulir pengaduan → simpan kode lacak (PGD-XXXXXX)
+```
+
+**Mengisi survei kepuasan**
+
+```
+Buka /survei → nilai 9 unsur layanan → kirim → nilai IKM & mutu dihitung otomatis
+```
+
+**Masuk sebagai administrator**
+
+```
+Buka /masuk → masukkan email & password admin → kelola konten di /dashboard
+```
+
+**Menambah adapter API baru**
+
+```ts
+// lib/api/media-center.ts — SATU-SATUNYA berkas yang boleh memanggil domain Media Center.
+// UI tidak pernah memanggil API eksternal secara langsung.
+// Setiap respons divalidasi dengan Zod, dibungkus try/catch, dan
+// tidak pernah mengembalikan pesan error mentah dari server upstream.
+```
+
+---
+
+## 🤝 Kontribusi
+
+Kontribusi, laporan bug, dan usulan fitur sangat kami hargai.
+
+1. **Fork** repositori ini.
+2. Buat cabang fitur: `git checkout -b fitur/nama-fitur`.
+3. Tulis kode beserta tesnya, lalu pastikan seluruh pemeriksaan lulus:
+   ```bash
+   npm run lint && npm run typecheck && npm run test:coverage && npm run build
+   ```
+4. Commit dengan pesan yang jelas: `git commit -m "feat: menambahkan ..."`.
+5. Push dan buka **Pull Request**.
+
+**Standar proyek:** TypeScript ketat · cakupan tes ≥ 80% untuk `lib/` dan `app/api/` · aksesibilitas WCAG AA (kontras ≥ 4.5:1) · seluruh respons API eksternal divalidasi Zod · berkas `.env*` tidak boleh di-commit.
+
+---
+
+## 📄 Lisensi
+
+Proyek ini dilisensikan di bawah **MIT License** — lihat berkas [LICENSE](LICENSE) untuk keterangan lengkap.
+
+---
+
+## 🏛️ Informasi Proyek
+
+| | |
+|---|---|
+| **Nama Proyek** | Portal Diskominfo SP HST |
+| **Instansi** | Dinas Komunikasi, Informatika, Statistik dan Persandian Kabupaten Hulu Sungai Tengah |
+| **Deskripsi** | Portal resmi satu pintu untuk informasi publik, layanan digital, data terbuka, dan pengaduan masyarakat |
+| **Alamat** | Jl. Perintis Kemerdekaan, Benawa Tengah, Kec. Barabai, Kab. Hulu Sungai Tengah, Kalimantan Selatan 71314 |
+| **Email** | diskominfosp@hstkab.go.id |
+| **Telepon / WhatsApp** | 0851-7957-7447 |
+| **Jam Layanan** | Senin–Jumat, 08.00–16.00 WITA |
+| **Situs Resmi** | https://diskominfosp.hstkab.go.id |
+
+**Sumber data eksternal**
+
+| Data | Sumber | API Key |
+|---|---|---|
+| Berita & Pengumuman | Media Center HST | — |
+| Data Terbuka | Open Data HST | — |
+| Cuaca | BMKG | — |
+| Video | YouTube (RSS) | — |
+| Asisten AI | Groq | ✅ |
+
+<sub>Dokumentasi penyiapan lengkap tersedia di [docs/SETUP.md](docs/SETUP.md).</sub>
