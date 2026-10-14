@@ -15,17 +15,11 @@ Rebuild modern dari situs `diskominfosp.hstkab.go.id` dengan desain **Digital Ci
 
 ## 📸 Tangkapan Layar
 
-### Beranda
-![Beranda Portal Diskominfo SP HST](docs/screenshots/beranda.png)
+<p align="center">
+  <img src="docs/screenshots/beranda.webp" alt="Beranda Portal Diskominfo SP HST — tampilan penuh mode gelap" width="100%">
+</p>
 
-### Berita
-![Daftar berita dari Media Center HST](docs/screenshots/berita.png)
-
-### Data Terbuka
-![Katalog dataset Open Data HST](docs/screenshots/data-terbuka.png)
-
-### Survei Kepuasan Layanan
-![Survei Indeks Kepuasan Masyarakat](docs/screenshots/survei.png)
+<sub align="center">Tampilan penuh beranda dalam mode gelap — hero, sorotan berita, profil dinas, statistik, layanan, pengumuman, kontak, hingga footer.</sub>
 
 > **Demo langsung:** `http://43.173.8.233:3010` *(lingkungan pratinjau; alamat produksi mengikuti domain resmi instansi)*
 
