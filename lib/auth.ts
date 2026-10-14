@@ -7,8 +7,9 @@ import bcrypt from "bcryptjs";
  * (dashboard statistik & manajemen subscriber).
  *
  * Membaca berita/pengumuman/hoaks TIDAK butuh login: sumbernya API Media Center
- * yang bersifat publik. Kredensial admin berasal dari environment:
- *   ADMIN_EMAIL, ADMIN_PASSWORD_HASH (bcrypt), AUTH_SECRET / NEXTAUTH_SECRET
+ * Kredensial admin berasal dari environment:
+ *   ADMIN_EMAIL, ADMIN_PASSWORD_HASH (bcrypt), AUTH_SECRET (NEXTAUTH_SECRET
+ *   masih diterima sebagai cadangan, tetapi AUTH_SECRET dibaca lebih dulu).
  */
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,

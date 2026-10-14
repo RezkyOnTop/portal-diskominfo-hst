@@ -69,10 +69,10 @@ rahasia sesi**. Cara termudah — jalankan perintah ini dan salin hasilnya:
 node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 ```
 
-Tempelkan hasilnya ke baris `NEXTAUTH_SECRET` di `.env.local`, contoh:
+Tempelkan hasilnya ke baris `AUTH_SECRET` di `.env.local`, contoh:
 
 ```
-NEXTAUTH_SECRET="hasil-salinan-tadi"
+AUTH_SECRET="hasil-salinan-tadi"
 ```
 
 ### Kunci chatbot AI (opsional)
@@ -236,7 +236,7 @@ npm install
 
 # 2) Siapkan pengaturan
 cp .env.example .env.local     # Windows: copy .env.example .env.local
-# -> buat NEXTAUTH_SECRET dengan:
+# -> buat AUTH_SECRET dengan:
 node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 # -> tempel hasilnya ke .env.local
 

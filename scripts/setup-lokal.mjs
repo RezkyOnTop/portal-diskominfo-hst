@@ -5,7 +5,7 @@
  * ============================================================================
  *
  * Membuat `.env.local` dari `.env.example` (kalau belum ada) dan mengisi
- * NEXTAUTH_SECRET dengan kunci acak. Aman dijalankan berulang: berkas yang
+ * AUTH_SECRET dengan kunci acak. Aman dijalankan berulang: berkas yang
  * sudah ada TIDAK ditimpa, dan kunci yang sudah terisi tidak diganti.
  *
  * Pemakaian:
@@ -43,13 +43,17 @@ function main() {
 
   let isi = readFileSync(".env.local", "utf8");
 
-  // 1) Isi NEXTAUTH_SECRET kalau masih placeholder.
+  // 1) Isi AUTH_SECRET kalau masih placeholder.
   if (PLACEHOLDER.test(isi)) {
     const kunci = randomBytes(32).toString("base64");
-    isi = isi.replace(/^(\s*NEXTAUTH_SECRET\s*=\s*").*(")\s*$/m, `$1${kunci}$2`);
-    console.log("• NEXTAUTH_SECRET diisi dengan kunci acak baru.");
+    if (/^\s*AUTH_SECRET\s*=/m.test(isi)) {
+      isi = isi.replace(/^(\s*AUTH_SECRET\s*=\s*").*(")\s*$/m, `$1${kunci}$2`);
+    } else {
+      isi = isi.replace(/^(\s*NEXTAUTH_SECRET\s*=\s*").*(")\s*$/m, `$1${kunci}$2`);
+    }
+    console.log("• AUTH_SECRET diisi dengan kunci acak baru.");
   } else {
-    console.log("• NEXTAUTH_SECRET sudah terisi.");
+    console.log("• AUTH_SECRET sudah terisi.");
   }
 
   // 2) Sesuaikan NEXTAUTH_URL bila diminta.

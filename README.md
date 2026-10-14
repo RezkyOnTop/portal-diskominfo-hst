@@ -143,7 +143,7 @@ Isi variabel yang diperlukan di `.env.local`:
 | Variabel | Wajib | Keterangan |
 |---|---|---|
 | `DATABASE_URL` | opsional | Koneksi PostgreSQL, mis. `postgresql://user:pass@localhost:5432/diskominfosp_hst` |
-| `AUTH_SECRET` | ya (admin) | Kunci sesi Auth.js — dibuat otomatis oleh `setup-lokal.mjs` |
+| `AUTH_SECRET` | ya (admin) | Kunci sesi Auth.js — dibuat otomatis oleh `setup-lokal.mjs` (`NEXTAUTH_SECRET` masih diterima sebagai cadangan) |
 | `NEXTAUTH_URL` | ya | URL publik aplikasi, mis. `http://localhost:3010` |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD_HASH` | ya (admin) | Kredensial dashboard — dibuat oleh `setup-admin.mjs` |
 | `MEDIA_CENTER_API_BASE_URL` | ya | `https://mediacenter.hstkab.go.id` |
