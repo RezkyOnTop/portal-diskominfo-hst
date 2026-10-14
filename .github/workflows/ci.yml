@@ -15,6 +15,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
+      # Pakai npm 11: npm bawaan Node 22 (npm 10) berhenti dengan bug internal
+      # "Exit handler never called!" saat menjalankan install script.
+      - run: npm install -g npm@11
       - run: npm ci
       - run: npx prisma generate
       - run: npm run lint
@@ -26,9 +29,11 @@ jobs:
           DATABASE_URL: postgresql://user:pass@localhost:5432/ci
           AUTH_SECRET: ci-placeholder-secret
 
+  # Deploy ke Vercel hanya bila repo punya variabel ENABLE_VERCEL_DEPLOY=true
+  # beserta rahasia VERCEL_*. Tanpa itu job dilewati agar CI tidak selalu merah.
   deploy:
     needs: quality
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && vars.ENABLE_VERCEL_DEPLOY == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
