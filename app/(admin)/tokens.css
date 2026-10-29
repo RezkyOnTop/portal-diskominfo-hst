@@ -1,0 +1,42 @@
+/* Hallmark · checked: 2026-10-29 · genre: modern-minimal · scope: app · theme: Dusk
+ * Token dashboard (prefix --adm-). Situs publik tetap memakai globals.css.
+ * Hue konstan 268/274 di kedua mode; mode gelap menaikkan terang permukaan,
+ * bukan menggelapkan bayangan.
+ */
+:root {
+  --adm-paper: oklch(98.5% 0.004 75);
+  --adm-surface: oklch(99.5% 0.003 75);
+  --adm-surface-2: oklch(95.5% 0.008 75);
+  --adm-rule: oklch(88.5% 0.008 265);
+  --adm-rule-strong: oklch(79% 0.012 265);
+  --adm-ink: oklch(21% 0.016 268);
+  --adm-ink-2: oklch(43% 0.014 265);
+  --adm-muted: oklch(55% 0.012 265);
+  --adm-accent: oklch(48% 0.13 274);
+  --adm-accent-ink: oklch(99% 0.004 274);
+  --adm-accent-soft: oklch(94% 0.03 274);
+  --adm-focus: oklch(55% 0.15 274);
+  --adm-radius: 10px;
+  --adm-radius-sm: 8px;
+  --adm-shadow-1: 0 1px 2px oklch(21% 0.016 268 / 0.06);
+  --adm-shadow-2: 0 1px 2px oklch(21% 0.016 268 / 0.05), 0 14px 28px -22px oklch(21% 0.016 268 / 0.45);
+  --adm-dur-micro: 120ms;
+  --adm-dur-short: 180ms;
+}
+
+.dark {
+  --adm-paper: oklch(17.5% 0.014 268);
+  --adm-surface: oklch(21% 0.016 268);
+  --adm-surface-2: oklch(25% 0.017 268);
+  --adm-rule: oklch(30% 0.016 266);
+  --adm-rule-strong: oklch(38% 0.018 266);
+  --adm-ink: oklch(96% 0.006 75);
+  --adm-ink-2: oklch(85% 0.01 262);
+  --adm-muted: oklch(70% 0.016 262);
+  --adm-accent: oklch(77% 0.1 274);
+  --adm-accent-ink: oklch(19% 0.035 274);
+  --adm-accent-soft: oklch(28% 0.05 274);
+  --adm-focus: oklch(80% 0.1 274);
+  --adm-shadow-1: 0 1px 0 oklch(100% 0 0 / 0.04);
+  --adm-shadow-2: 0 1px 0 oklch(100% 0 0 / 0.05);
+}

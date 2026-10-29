@@ -18,7 +18,7 @@ import {
 } from "./actions";
 
 const inputCls =
-  "w-full rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100";
+  "w-full rounded-md border border-[var(--adm-rule)] bg-[var(--adm-surface)] px-2.5 py-1.5 text-sm border-[var(--adm-rule)] bg-[var(--adm-surface)] text-[var(--adm-ink)]";
 
 function PesanHasil({ state }: { state: UserActionState | null }) {
   if (!state) return null;
@@ -69,19 +69,19 @@ export function UserCreateForm() {
   return (
     <form
       action={formAction}
-      className="space-y-3 rounded-[var(--radius-card)] border border-neutral-200 bg-white p-5 shadow-[var(--shadow-card)] dark:border-slate-700 dark:bg-slate-900"
+      className="space-y-3 rounded-[var(--radius-card)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] p-5 shadow-[var(--shadow-card)] border-[var(--adm-rule)] bg-[var(--adm-surface)]"
     >
-      <h2 className="font-heading text-base font-bold text-neutral-900 dark:text-slate-50">
+      <h2 className="font-heading text-base font-bold text-[var(--adm-ink)]">
         Tambah User
       </h2>
-      <p className="text-xs text-neutral-600 dark:text-slate-400">
+      <p className="text-xs text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
         Akun baru bisa langsung dipakai masuk di{" "}
-        <code className="rounded bg-neutral-100 px-1.5 py-0.5 dark:bg-slate-800">/masuk</code>.
+        <code className="rounded bg-[var(--adm-surface-2)] px-1.5 py-0.5 bg-[var(--adm-surface-2)]">/masuk</code>.
         Password disimpan terenkripsi (hash bcrypt).
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label htmlFor="baru-nama" className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor="baru-nama" className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Nama tampilan *
           </label>
           <input
@@ -94,7 +94,7 @@ export function UserCreateForm() {
           />
         </div>
         <div>
-          <label htmlFor="baru-username" className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor="baru-username" className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Username / email *
           </label>
           <input
@@ -109,7 +109,7 @@ export function UserCreateForm() {
           />
         </div>
         <div>
-          <label htmlFor="baru-password" className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor="baru-password" className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Password *
           </label>
           <div className="flex gap-2">
@@ -129,7 +129,7 @@ export function UserCreateForm() {
               type="button"
               onClick={() => setLihat((v) => !v)}
               aria-label={lihat ? "Sembunyikan password" : "Lihat password"}
-              className="shrink-0 rounded-md border border-neutral-200 px-2.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="shrink-0 rounded-md border border-[var(--adm-rule)] px-2.5 text-xs font-medium text-[var(--adm-ink-2)] hover:bg-[var(--adm-surface-2)] border-[var(--adm-rule)] text-[var(--adm-ink-2)]"
             >
               {lihat ? "Sembunyi" : "Lihat"}
             </button>
@@ -139,25 +139,25 @@ export function UserCreateForm() {
                 setPassword(passwordAcak());
                 setLihat(true);
               }}
-              className="shrink-0 rounded-md border border-neutral-200 px-2.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+              className="shrink-0 rounded-md border border-[var(--adm-rule)] px-2.5 text-xs font-medium text-[var(--adm-ink-2)] hover:bg-[var(--adm-surface-2)] border-[var(--adm-rule)] text-[var(--adm-ink-2)]"
             >
               Acak
             </button>
           </div>
           {lemah ? (
             <p className="mt-1 text-xs text-warning-700 dark:text-warning-300">
-              Password lemah — sebaiknya gunakan minimal 8 karakter dengan huruf &amp; angka.
+              Password lemah: sebaiknya gunakan minimal 8 karakter dengan huruf &amp; angka.
             </p>
           ) : null}
         </div>
         <div>
-          <label htmlFor="baru-role" className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor="baru-role" className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Peran *
           </label>
           <select id="baru-role" name="role" className={inputCls} defaultValue="EDITOR">
             {USER_ROLE.map((r) => (
               <option key={r} value={r}>
-                {LABEL_USER_ROLE[r]} — {DESC_USER_ROLE[r]}
+                {LABEL_USER_ROLE[r]}, {DESC_USER_ROLE[r]}
               </option>
             ))}
           </select>
@@ -177,12 +177,12 @@ export interface UserRow {
   nama: string;
   role: string;
   aktif: boolean;
-  /** Akun utama dari environment — tidak bisa diubah/dihapus di sini. */
+  /** Akun utama dari environment, tidak bisa diubah/dihapus di sini. */
   bawaanSistem?: boolean;
 }
 
 /**
- * Direktori user (dashboard admin) — pencarian + daftar ringkas + dialog
+ * Direktori user (dashboard admin), pencarian + daftar ringkas + dialog
  * ubah/ganti password/hapus per baris. Form hanya dirender saat dialog dibuka
  * agar halaman tetap ringan walau akun bertambah.
  */
@@ -231,38 +231,38 @@ export function UserDirectory({ rows }: { rows: UserRow[] }) {
           placeholder="Cari nama atau username…"
           className={`${inputCls} max-w-sm`}
         />
-        <span className="text-xs text-neutral-500 dark:text-slate-400" role="status" aria-live="polite">
+        <span className="text-xs text-[var(--adm-muted)]" role="status" aria-live="polite">
           {tersaring.length} dari {rows.length} user
         </span>
       </div>
 
       {tersaring.length === 0 ? (
-        <p className="rounded-[var(--radius-card)] border border-dashed border-neutral-200 bg-white p-6 text-sm text-neutral-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+        <p className="rounded-[var(--radius-card)] border border-dashed border-[var(--adm-rule)] bg-[var(--adm-surface)] p-6 text-sm text-[var(--adm-ink-2)] border-[var(--adm-rule)] bg-[var(--adm-surface)] text-[var(--adm-muted)]">
           Tidak ada user yang cocok dengan “{cari}”.
         </p>
       ) : (
-        <ul className="divide-y divide-neutral-100 overflow-hidden rounded-[var(--radius-card)] border border-neutral-200 bg-white shadow-[var(--shadow-card)] dark:divide-slate-800 dark:border-slate-700 dark:bg-slate-900">
+        <ul className="divide-y divide-[var(--adm-rule)] overflow-hidden rounded-[var(--radius-card)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] shadow-[var(--shadow-card)] divide-[var(--adm-rule)] border-[var(--adm-rule)] bg-[var(--adm-surface)]">
           {tersaring.map((r) => (
             <li
               key={r.id}
-              className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-neutral-50 dark:hover:bg-slate-800/60"
+              className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[var(--adm-surface-2)]"
             >
-              <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-primary-100 text-xs font-bold text-primary-700 dark:bg-primary-900/40 dark:text-primary-300">
+              <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--adm-accent-soft)] text-xs font-bold text-[var(--adm-accent)] dark:text-primary-300">
                 <span aria-hidden="true">{inisial(r.nama)}</span>
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium text-neutral-900 dark:text-slate-100">
+                <span className="block truncate text-sm font-medium text-[var(--adm-ink)]">
                   {r.nama}
                 </span>
-                <span className="block truncate text-xs text-neutral-500 dark:text-slate-400">
+                <span className="block truncate text-xs text-[var(--adm-muted)]">
                   {r.username}
                 </span>
               </span>
               <span
                 className={`hidden shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold sm:inline ${
                   r.role === "ADMIN"
-                    ? "bg-primary-600/10 text-primary-700 dark:text-primary-300"
-                    : "bg-neutral-200 text-neutral-700 dark:bg-slate-700 dark:text-slate-300"
+                    ? "bg-[var(--adm-accent)]/10 text-[var(--adm-accent)]"
+                    : "bg-neutral-200 text-[var(--adm-ink-2)] text-[var(--adm-ink-2)]"
                 }`}
               >
                 {LABEL_USER_ROLE[r.role as "ADMIN" | "EDITOR"] ?? r.role}
@@ -271,7 +271,7 @@ export function UserDirectory({ rows }: { rows: UserRow[] }) {
                 className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold ${
                   r.aktif
                     ? "bg-secondary-600/10 text-secondary-700 dark:text-secondary-300"
-                    : "bg-neutral-200 text-neutral-700 dark:bg-slate-700 dark:text-slate-300"
+                    : "bg-neutral-200 text-[var(--adm-ink-2)] text-[var(--adm-ink-2)]"
                 }`}
               >
                 {r.aktif ? "Aktif" : "Nonaktif"}
@@ -323,17 +323,17 @@ function UserDialog({ row, onTutup }: { row: UserRow; onTutup: () => void }) {
         role="dialog"
         aria-modal="true"
         aria-label={`Ubah user ${row.nama}`}
-        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[var(--adm-radius)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] p-5 shadow-[var(--adm-shadow-1)] border-[var(--adm-rule)] bg-[var(--adm-surface)]"
       >
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-heading text-base font-bold text-neutral-900 dark:text-slate-50" tabIndex={-1} data-autofocus>
+          <h3 className="font-heading text-base font-bold text-[var(--adm-ink)]" tabIndex={-1} data-autofocus>
             Ubah: {row.nama}
           </h3>
           <button
             type="button"
             onClick={onTutup}
             aria-label="Tutup dialog"
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100 dark:hover:bg-slate-800"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[var(--adm-muted)] hover:bg-[var(--adm-surface-2)]"
           >
             ✕
           </button>
@@ -361,19 +361,19 @@ function UserUbahForm({ row }: { row: UserRow }) {
       <input type="hidden" name="id" value={row.id} />
       <div className="grid gap-2 sm:grid-cols-2">
         <div>
-          <label htmlFor={`nama-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor={`nama-${row.id}`} className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Nama
           </label>
           <input id={`nama-${row.id}`} name="nama" required maxLength={120} defaultValue={row.nama} className={inputCls} />
         </div>
         <div>
-          <label htmlFor={`username-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor={`username-${row.id}`} className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Username / email
           </label>
           <input id={`username-${row.id}`} name="username" required minLength={3} maxLength={160} defaultValue={row.username} className={inputCls} />
         </div>
         <div>
-          <label htmlFor={`role-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor={`role-${row.id}`} className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Peran
           </label>
           <select id={`role-${row.id}`} name="role" defaultValue={row.role} className={inputCls}>
@@ -385,7 +385,7 @@ function UserUbahForm({ row }: { row: UserRow }) {
           </select>
         </div>
         <div>
-          <label htmlFor={`aktif-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor={`aktif-${row.id}`} className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Status akun
           </label>
           <select id={`aktif-${row.id}`} name="aktif" defaultValue={row.aktif ? "true" : "false"} className={inputCls}>
@@ -415,13 +415,13 @@ function UserPasswordForm({ row }: { row: UserRow }) {
   return (
     <form
       action={formAction}
-      className="space-y-2 border-t border-neutral-100 pt-3 dark:border-slate-800"
+      className="space-y-2 border-t border-neutral-100 pt-3 border-[var(--adm-rule)]"
     >
       <input type="hidden" name="id" value={row.id} />
-      <p className="text-xs font-semibold text-neutral-600 dark:text-slate-400">Ganti Password</p>
+      <p className="text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">Ganti Password</p>
       <div className="flex flex-wrap items-end gap-2">
         <div className="min-w-[200px] flex-1">
-          <label htmlFor={`pw-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor={`pw-${row.id}`} className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Password baru
           </label>
           <input
@@ -440,7 +440,7 @@ function UserPasswordForm({ row }: { row: UserRow }) {
         <button
           type="button"
           onClick={() => setLihat((v) => !v)}
-          className="rounded-md border border-neutral-200 px-2.5 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+          className="rounded-md border border-[var(--adm-rule)] px-2.5 py-1.5 text-xs font-medium text-[var(--adm-ink-2)] hover:bg-[var(--adm-surface-2)] border-[var(--adm-rule)] text-[var(--adm-ink-2)]"
         >
           {lihat ? "Sembunyi" : "Lihat"}
         </button>
@@ -450,7 +450,7 @@ function UserPasswordForm({ row }: { row: UserRow }) {
             setPassword(passwordAcak());
             setLihat(true);
           }}
-          className="rounded-md border border-neutral-200 px-2.5 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+          className="rounded-md border border-[var(--adm-rule)] px-2.5 py-1.5 text-xs font-medium text-[var(--adm-ink-2)] hover:bg-[var(--adm-surface-2)] border-[var(--adm-rule)] text-[var(--adm-ink-2)]"
         >
           Acak
         </button>
@@ -460,7 +460,7 @@ function UserPasswordForm({ row }: { row: UserRow }) {
       </div>
       {lemah ? (
         <p className="text-xs text-warning-700 dark:text-warning-300">
-          Password lemah — sebaiknya minimal 8 karakter dengan huruf &amp; angka.
+          Password lemah: sebaiknya minimal 8 karakter dengan huruf &amp; angka.
         </p>
       ) : null}
       <PesanHasil state={state} />
@@ -478,7 +478,7 @@ function UserHapusForm({ row }: { row: UserRow }) {
   return (
     <form
       action={formAction}
-      className="border-t border-neutral-100 pt-3 dark:border-slate-800"
+      className="border-t border-neutral-100 pt-3 border-[var(--adm-rule)]"
       onSubmit={(e) => {
         if (!window.confirm(`Hapus akun ${row.nama} (${row.username})? Tindakan ini permanen.`)) {
           e.preventDefault();

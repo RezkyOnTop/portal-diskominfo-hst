@@ -21,7 +21,7 @@ interface Props {
 }
 
 /**
- * Jejak audit aktivitas dashboard — HANYA Administrator.
+ * Jejak audit aktivitas dashboard, HANYA Administrator.
  * Menampilkan siapa (admin/editor) melakukan apa, kapan, dari IP mana.
  */
 export default async function AuditPage({ searchParams }: Props) {
@@ -31,7 +31,7 @@ export default async function AuditPage({ searchParams }: Props) {
     return (
       <div className="space-y-4">
         <SectionHeading as="h1">Jejak Audit</SectionHeading>
-        <p className="rounded-[var(--radius-card)] border border-neutral-200 bg-white p-6 text-sm text-neutral-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
+        <p className="rounded-[var(--radius-card)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] p-6 text-sm text-[var(--adm-ink-2)] border-[var(--adm-rule)] bg-[var(--adm-surface)] text-[var(--adm-ink-2)]">
           Halaman ini hanya dapat dibuka oleh <strong>Administrator</strong>. Akun Anda
           berperan <strong>Editor</strong>.
         </p>
@@ -65,9 +65,9 @@ export default async function AuditPage({ searchParams }: Props) {
   return (
     <div className="space-y-6">
       <SectionHeading as="h1">Jejak Audit</SectionHeading>
-      <p className="text-sm text-neutral-600 dark:text-slate-400">
+      <p className="text-sm text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
         Catatan aktivitas dashboard: masuk/keluar, ubah data, unggah/hapus foto, dan
-        ekspor CSV. Pencatatan bersifat best-effort — kegagalan mencatat tidak
+        ekspor CSV. Pencatatan bersifat best-effort, kegagalan mencatat tidak
         menggagalkan aksi yang sedang dijalankan.
       </p>
 
@@ -80,17 +80,17 @@ export default async function AuditPage({ searchParams }: Props) {
       {/* Filter: form GET biasa supaya bisa di-bookmark & tanpa JavaScript */}
       <form
         method="get"
-        className="flex flex-wrap items-end gap-2 rounded-[var(--radius-card)] border border-neutral-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900"
+        className="flex flex-wrap items-end gap-2 rounded-[var(--radius-card)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] p-4 border-[var(--adm-rule)] bg-[var(--adm-surface)]"
       >
         <div>
-          <label htmlFor="f-aksi" className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor="f-aksi" className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Jenis aksi
           </label>
           <select
             id="f-aksi"
             name="aksi"
             defaultValue={aksi ?? ""}
-            className="rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            className="rounded-md border border-[var(--adm-rule)] bg-[var(--adm-surface)] px-2.5 py-1.5 text-sm border-[var(--adm-rule)] bg-[var(--adm-surface)] text-[var(--adm-ink)]"
           >
             <option value="">Semua aksi</option>
             {Object.entries(LABEL_AKSI).map(([kode, label]) => (
@@ -101,14 +101,14 @@ export default async function AuditPage({ searchParams }: Props) {
           </select>
         </div>
         <div>
-          <label htmlFor="f-aktor" className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor="f-aktor" className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Pelaku
           </label>
           <select
             id="f-aktor"
             name="aktor"
             defaultValue={aktor ?? ""}
-            className="rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            className="rounded-md border border-[var(--adm-rule)] bg-[var(--adm-surface)] px-2.5 py-1.5 text-sm border-[var(--adm-rule)] bg-[var(--adm-surface)] text-[var(--adm-ink)]"
           >
             <option value="">Semua pelaku</option>
             {aktorList.map((a) => (
@@ -119,7 +119,7 @@ export default async function AuditPage({ searchParams }: Props) {
           </select>
         </div>
         <div className="min-w-[12rem] flex-1">
-          <label htmlFor="f-q" className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor="f-q" className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Cari (nama / detail / IP)
           </label>
           <input
@@ -127,34 +127,34 @@ export default async function AuditPage({ searchParams }: Props) {
             name="q"
             defaultValue={q ?? ""}
             placeholder="mis. pegawai, 43.156."
-            className="w-full rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
+            className="w-full rounded-md border border-[var(--adm-rule)] bg-[var(--adm-surface)] px-2.5 py-1.5 text-sm border-[var(--adm-rule)] bg-[var(--adm-surface)] text-[var(--adm-ink)]"
           />
         </div>
         <button
           type="submit"
-          className="rounded-md bg-primary-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-primary-700"
+          className="rounded-md bg-[var(--adm-accent)] px-3 py-1.5 text-sm font-semibold text-[var(--adm-accent-ink)] hover:opacity-90"
         >
           Terapkan
         </button>
-        <Link href="/dashboard/audit" className="px-2 py-1.5 text-sm text-neutral-600 underline dark:text-slate-400">
+        <Link href="/dashboard/audit" className="px-2 py-1.5 text-sm text-[var(--adm-ink-2)] underline text-[var(--adm-muted)]">
           Reset
         </Link>
       </form>
 
       {baris.length === 0 ? (
-        <p className="rounded-[var(--radius-card)] border border-dashed border-neutral-200 bg-white p-6 text-sm text-neutral-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+        <p className="rounded-[var(--radius-card)] border border-dashed border-[var(--adm-rule)] bg-[var(--adm-surface)] p-6 text-sm text-[var(--adm-ink-2)] border-[var(--adm-rule)] bg-[var(--adm-surface)] text-[var(--adm-muted)]">
           Belum ada catatan audit yang cocok.
         </p>
       ) : (
         <>
-          <p className="text-xs text-neutral-500 dark:text-slate-400" role="status" aria-live="polite">
+          <p className="text-xs text-[var(--adm-muted)]" role="status" aria-live="polite">
             Menampilkan {baris.length} dari {total} baris · halaman {halaman}/{totalHalaman}
           </p>
-          <div className="overflow-x-auto rounded-[var(--radius-card)] border border-neutral-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+          <div className="overflow-x-auto rounded-[var(--radius-card)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] border-[var(--adm-rule)] bg-[var(--adm-surface)]">
             <table className="w-full border-collapse text-sm">
               <caption className="sr-only">Jejak audit aktivitas dashboard</caption>
               <thead>
-                <tr className="border-b border-neutral-200 text-left text-neutral-600 dark:border-slate-700 dark:text-slate-400">
+                <tr className="border-b border-[var(--adm-rule)] text-left text-[var(--adm-ink-2)] border-[var(--adm-rule)] text-[var(--adm-muted)]">
                   <th scope="col" className="px-3 py-2">Waktu</th>
                   <th scope="col" className="px-3 py-2">Pelaku</th>
                   <th scope="col" className="px-3 py-2">Aksi</th>
@@ -168,44 +168,44 @@ export default async function AuditPage({ searchParams }: Props) {
                   return (
                     <tr
                       key={b.id}
-                      className={`border-b border-neutral-100 align-top dark:border-slate-800 ${
+                      className={`border-b border-neutral-100 align-top border-[var(--adm-rule)] ${
                         sensitif ? "bg-danger-600/5" : ""
                       }`}
                     >
-                      <td className="whitespace-nowrap px-3 py-2 text-xs text-neutral-600 dark:text-slate-400">
+                      <td className="whitespace-nowrap px-3 py-2 text-xs text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
                         {formatDateTime(b.createdAt)}
                       </td>
                       <td className="px-3 py-2">
-                        <span className="block font-medium text-neutral-900 dark:text-slate-100">
+                        <span className="block font-medium text-[var(--adm-ink)]">
                           {b.actorName}
                         </span>
                         <span
                           className={`mt-0.5 inline-block rounded-full px-2 py-0.5 text-[11px] font-bold ${
                             b.actorRole === "ADMIN"
-                              ? "bg-primary-600/10 text-primary-700 dark:text-primary-300"
+                              ? "bg-[var(--adm-accent)]/10 text-[var(--adm-accent)]"
                               : b.actorRole === "EDITOR"
                                 ? "bg-secondary-600/10 text-secondary-700 dark:text-secondary-300"
-                                : "bg-neutral-200 text-neutral-700 dark:bg-slate-700 dark:text-slate-300"
+                                : "bg-neutral-200 text-[var(--adm-ink-2)] text-[var(--adm-ink-2)]"
                           }`}
                         >
                           {b.actorRole}
                         </span>
                       </td>
                       <td className="px-3 py-2">
-                        <span className={sensitif ? "font-semibold text-danger-600" : "text-neutral-800 dark:text-slate-200"}>
+                        <span className={sensitif ? "font-semibold text-danger-600" : "text-[var(--adm-ink)] text-[var(--adm-ink-2)]"}>
                           {LABEL_AKSI[b.aksi] ?? b.aksi}
                         </span>
                         {b.target ? (
-                          <span className="mt-0.5 block text-[11px] text-neutral-500 dark:text-slate-500">
+                          <span className="mt-0.5 block text-[11px] text-[var(--adm-muted)]">
                             {b.target}
                           </span>
                         ) : null}
                       </td>
-                      <td className="max-w-[28rem] px-3 py-2 text-neutral-700 dark:text-slate-300">
-                        {b.detail ?? "—"}
+                      <td className="max-w-[28rem] px-3 py-2 text-[var(--adm-ink-2)]">
+                        {b.detail ?? ","}
                       </td>
-                      <td className="whitespace-nowrap px-3 py-2 text-xs text-neutral-600 dark:text-slate-400">
-                        {b.ip ?? "—"}
+                      <td className="whitespace-nowrap px-3 py-2 text-xs text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
+                        {b.ip ?? ","}
                       </td>
                     </tr>
                   );
@@ -216,15 +216,15 @@ export default async function AuditPage({ searchParams }: Props) {
 
           <div className="flex items-center justify-between gap-2 text-sm">
             {halaman > 1 ? (
-              <Link href={buatUrl(halaman - 1)} className="rounded-md border border-neutral-200 px-3 py-1.5 font-medium hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-300">
-                ← Sebelumnya
+              <Link href={buatUrl(halaman - 1)} className="rounded-md border border-[var(--adm-rule)] px-3 py-1.5 font-medium hover:bg-[var(--adm-surface-2)] border-[var(--adm-rule)] text-[var(--adm-ink-2)]">
+                Sebelumnya
               </Link>
             ) : (
               <span />
             )}
             {halaman < totalHalaman ? (
-              <Link href={buatUrl(halaman + 1)} className="rounded-md border border-neutral-200 px-3 py-1.5 font-medium hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-300">
-                Berikutnya →
+              <Link href={buatUrl(halaman + 1)} className="rounded-md border border-[var(--adm-rule)] px-3 py-1.5 font-medium hover:bg-[var(--adm-surface-2)] border-[var(--adm-rule)] text-[var(--adm-ink-2)]">
+                Berikutnya
               </Link>
             ) : (
               <span />
@@ -238,11 +238,11 @@ export default async function AuditPage({ searchParams }: Props) {
 
 function Kartu({ label, nilai, tare = false }: { label: string; nilai: number; tare?: boolean }) {
   return (
-    <div className="rounded-[var(--radius-card)] border border-neutral-200 bg-white p-4 shadow-[var(--shadow-card)] dark:border-slate-700 dark:bg-slate-900">
-      <p className="text-xs text-neutral-600 dark:text-slate-400">{label}</p>
+    <div className="rounded-[var(--radius-card)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] p-4 shadow-[var(--shadow-card)] border-[var(--adm-rule)] bg-[var(--adm-surface)]">
+      <p className="text-xs text-[var(--adm-ink-2)] text-[var(--adm-muted)]">{label}</p>
       <p
         className={`mt-1 font-heading text-2xl font-bold ${
-          tare ? "text-danger-600" : "text-neutral-900 dark:text-slate-50"
+          tare ? "text-danger-600" : "text-[var(--adm-ink)]"
         }`}
       >
         {nilai.toLocaleString("id-ID")}

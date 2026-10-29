@@ -11,7 +11,7 @@ import {
 } from "./actions";
 
 const inputCls =
-  "w-full rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100";
+  "w-full rounded-md border border-[var(--adm-rule)] bg-[var(--adm-surface)] px-2.5 py-1.5 text-sm border-[var(--adm-rule)] bg-[var(--adm-surface)] text-[var(--adm-ink)]";
 
 function PesanHasil({ state }: { state: HeroActionState | null }) {
   if (!state) return null;
@@ -43,22 +43,22 @@ export function HeroCreateForm() {
   );
 
   return (
-    <form action={formAction} className="space-y-3 rounded-[var(--radius-card)] border border-neutral-200 bg-white p-5 shadow-[var(--shadow-card)] dark:border-slate-700 dark:bg-slate-900">
-      <h2 className="font-heading text-base font-bold text-neutral-900 dark:text-slate-50">
+    <form action={formAction} className="space-y-3 rounded-[var(--radius-card)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] p-5 shadow-[var(--shadow-card)] border-[var(--adm-rule)] bg-[var(--adm-surface)]">
+      <h2 className="font-heading text-base font-bold text-[var(--adm-ink)]">
         Tambah Slide
       </h2>
-      <p className="text-xs text-neutral-600 dark:text-slate-400">
+      <p className="text-xs text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
         Tambahkan slide dulu, lalu unggah fotonya lewat tombol <strong>Ubah</strong> pada daftar.
       </p>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label htmlFor="baru-label" className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor="baru-label" className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Keterangan foto *
           </label>
           <input id="baru-label" name="label" required maxLength={160} placeholder="cth. Monumen Kabupaten HST" className={inputCls} />
         </div>
         <div>
-          <label htmlFor="baru-urutan" className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor="baru-urutan" className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Urutan tampil (kecil lebih dulu)
           </label>
           <input id="baru-urutan" name="urutan" type="number" min={0} max={9999} defaultValue={0} className={inputCls} />
@@ -81,7 +81,7 @@ export interface HeroSlideRow {
 }
 
 /**
- * Direktori slide hero (dashboard admin) — daftar ringkas + dialog ubah.
+ * Direktori slide hero (dashboard admin), daftar ringkas + dialog ubah.
  * Form ubah/foto/hapus HANYA dirender saat dialog dibuka untuk satu slide,
  * sehingga daftar awal tetap ringan.
  */
@@ -104,7 +104,7 @@ export function HeroDirectory({ rows }: { rows: HeroSlideRow[] }) {
 
   if (rows.length === 0) {
     return (
-      <p className="rounded-[var(--radius-card)] border border-dashed border-neutral-200 bg-white p-6 text-sm text-neutral-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+      <p className="rounded-[var(--radius-card)] border border-dashed border-[var(--adm-rule)] bg-[var(--adm-surface)] p-6 text-sm text-[var(--adm-ink-2)] border-[var(--adm-rule)] bg-[var(--adm-surface)] text-[var(--adm-muted)]">
         Belum ada slide. Tambahkan lewat formulir di atas.
       </p>
     );
@@ -112,10 +112,10 @@ export function HeroDirectory({ rows }: { rows: HeroSlideRow[] }) {
 
   return (
     <div className="space-y-3">
-      <ul className="divide-y divide-neutral-100 overflow-hidden rounded-[var(--radius-card)] border border-neutral-200 bg-white shadow-[var(--shadow-card)] dark:divide-slate-800 dark:border-slate-700 dark:bg-slate-900">
+      <ul className="divide-y divide-[var(--adm-rule)] overflow-hidden rounded-[var(--radius-card)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] shadow-[var(--shadow-card)] divide-[var(--adm-rule)] border-[var(--adm-rule)] bg-[var(--adm-surface)]">
         {rows.map((r) => (
-          <li key={r.id} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-neutral-50 dark:hover:bg-slate-800/60">
-            <span className="grid h-14 w-20 shrink-0 place-items-center overflow-hidden rounded-md bg-neutral-100 text-[10px] text-neutral-500 dark:bg-slate-800 dark:text-slate-400">
+          <li key={r.id} className="flex items-center gap-3 px-4 py-2.5 transition-colors hover:bg-[var(--adm-surface-2)]">
+            <span className="grid h-14 w-20 shrink-0 place-items-center overflow-hidden rounded-md bg-[var(--adm-surface-2)] text-[10px] text-[var(--adm-muted)] bg-[var(--adm-surface-2)] text-[var(--adm-muted)]">
               {r.fotoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={r.fotoUrl} alt="" aria-hidden="true" className="h-full w-full object-cover" loading="lazy" />
@@ -124,10 +124,10 @@ export function HeroDirectory({ rows }: { rows: HeroSlideRow[] }) {
               )}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-medium text-neutral-900 dark:text-slate-100">
+              <span className="block truncate text-sm font-medium text-[var(--adm-ink)]">
                 {r.label}
               </span>
-              <span className="block text-xs text-neutral-500 dark:text-slate-400">
+              <span className="block text-xs text-[var(--adm-muted)]">
                 Urutan {r.urutan}
                 {r.fotoUrl ? "" : " · foto belum diunggah (dilewati di slideshow)"}
               </span>
@@ -136,7 +136,7 @@ export function HeroDirectory({ rows }: { rows: HeroSlideRow[] }) {
               className={`hidden shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold sm:inline ${
                 r.aktif
                   ? "bg-secondary-600/10 text-secondary-700 dark:text-secondary-300"
-                  : "bg-neutral-200 text-neutral-700 dark:bg-slate-700 dark:text-slate-300"
+                  : "bg-neutral-200 text-[var(--adm-ink-2)] text-[var(--adm-ink-2)]"
               }`}
             >
               {r.aktif ? "Tampil" : "Sembunyi"}
@@ -170,17 +170,17 @@ function HeroDialog({ row, onTutup }: { row: HeroSlideRow; onTutup: () => void }
         role="dialog"
         aria-modal="true"
         aria-label={`Ubah slide ${row.label}`}
-        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-neutral-200 bg-white p-5 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+        className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-[var(--adm-radius)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] p-5 shadow-[var(--adm-shadow-1)] border-[var(--adm-rule)] bg-[var(--adm-surface)]"
       >
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-heading text-base font-bold text-neutral-900 dark:text-slate-50" tabIndex={-1} data-autofocus>
+          <h3 className="font-heading text-base font-bold text-[var(--adm-ink)]" tabIndex={-1} data-autofocus>
             Ubah slide
           </h3>
           <button
             type="button"
             onClick={onTutup}
             aria-label="Tutup dialog"
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-neutral-500 hover:bg-neutral-100 dark:hover:bg-slate-800"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[var(--adm-muted)] hover:bg-[var(--adm-surface-2)]"
           >
             ✕
           </button>
@@ -208,19 +208,19 @@ function HeroUbahForm({ row }: { row: HeroSlideRow }) {
       <input type="hidden" name="id" value={row.id} />
       <div className="grid gap-2 sm:grid-cols-2">
         <div className="sm:col-span-2">
-          <label htmlFor={`label-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor={`label-${row.id}`} className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Keterangan foto
           </label>
           <input id={`label-${row.id}`} name="label" required maxLength={160} defaultValue={row.label} className={inputCls} />
         </div>
         <div>
-          <label htmlFor={`urutan-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor={`urutan-${row.id}`} className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Urutan
           </label>
           <input id={`urutan-${row.id}`} name="urutan" type="number" min={0} max={9999} defaultValue={row.urutan} className={inputCls} />
         </div>
         <div>
-          <label htmlFor={`aktif-${row.id}`} className="mb-1 block text-xs font-semibold text-neutral-600 dark:text-slate-400">
+          <label htmlFor={`aktif-${row.id}`} className="mb-1 block text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
             Tampil di slideshow
           </label>
           <select id={`aktif-${row.id}`} name="aktif" defaultValue={row.aktif ? "true" : "false"} className={inputCls}>
@@ -247,7 +247,7 @@ function HeroHapusForm({ row }: { row: HeroSlideRow }) {
   return (
     <form
       action={formAction}
-      className="border-t border-neutral-100 pt-3 dark:border-slate-800"
+      className="border-t border-neutral-100 pt-3 border-[var(--adm-rule)]"
       onSubmit={(e) => {
         if (!window.confirm(`Hapus slide "${row.label}"? Fotonya ikut terhapus.`)) {
           e.preventDefault();
@@ -288,16 +288,16 @@ function HeroFotoForm({ id, adaFoto }: { id: string; adaFoto: boolean }) {
   };
 
   return (
-    <form onSubmit={unggah} className="flex flex-wrap items-center gap-2 rounded-lg bg-neutral-50 p-3 dark:bg-slate-800/60">
-      <label htmlFor={`foto-${id}`} className="text-xs font-semibold text-neutral-600 dark:text-slate-400">
-        Foto {adaFoto ? "(sudah ada — unggah untuk mengganti)" : "(belum ada — slide dilewati di slideshow)"}
+    <form onSubmit={unggah} className="flex flex-wrap items-center gap-2 rounded-lg bg-[var(--adm-surface-2)] p-3 bg-[var(--adm-surface-2)]/60">
+      <label htmlFor={`foto-${id}`} className="text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
+        Foto {adaFoto ? "(sudah ada, unggah untuk mengganti)" : "(belum ada, slide dilewati di slideshow)"}
       </label>
       <input
         id={`foto-${id}`}
         name="foto"
         type="file"
         accept="image/jpeg,image/png,image/webp"
-        className="text-xs text-neutral-600 dark:text-slate-300"
+        className="text-xs text-[var(--adm-ink-2)]"
       />
       <Button type="submit" size="sm" variant="secondary">
         Unggah Foto
@@ -306,12 +306,12 @@ function HeroFotoForm({ id, adaFoto }: { id: string; adaFoto: boolean }) {
         <button
           type="button"
           onClick={hapus}
-          className="rounded-md border border-neutral-200 px-2.5 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-300"
+          className="rounded-md border border-[var(--adm-rule)] px-2.5 py-1.5 text-xs font-medium text-[var(--adm-ink-2)] hover:bg-[var(--adm-surface-2)] border-[var(--adm-rule)] text-[var(--adm-ink-2)]"
         >
           Hapus Foto
         </button>
       ) : null}
-      <span data-pesan role="status" aria-live="polite" className="text-xs text-neutral-600 dark:text-slate-400" />
+      <span data-pesan role="status" aria-live="polite" className="text-xs text-[var(--adm-ink-2)] text-[var(--adm-muted)]" />
     </form>
   );
 }

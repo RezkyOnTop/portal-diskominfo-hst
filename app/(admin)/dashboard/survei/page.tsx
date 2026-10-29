@@ -2,6 +2,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { listSurveys, getRingkasanSurvei } from "@/lib/services/survey";
 import { formatDateTime } from "@/lib/utils/format";
 import { IKM_UNSUR, labelMutu } from "@/lib/validations/local.schema";
+import { ExportLink } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Survei IKM" };
@@ -12,7 +13,7 @@ function warnaMutu(mutu: string): string {
     case "A":
       return "bg-secondary-600/10 text-secondary-700 dark:text-secondary-300";
     case "B":
-      return "bg-primary-600/10 text-primary-700 dark:text-primary-300";
+      return "bg-[var(--adm-accent)]/10 text-[var(--adm-accent)]";
     case "C":
       return "bg-warning-600/15 text-warning-700 dark:text-warning-300";
     default:
@@ -26,9 +27,9 @@ export default async function SurveiAdminPage() {
   return (
     <div className="space-y-6">
       <SectionHeading as="h1">Survei IKM</SectionHeading>
-      <p className="text-sm text-neutral-600 dark:text-slate-400">
+      <p className="text-sm text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
         Data lokal (ServiceSurvey). Survei diisi warga melalui halaman{" "}
-        <code className="rounded bg-neutral-100 px-1.5 py-0.5 text-xs dark:bg-slate-800">
+        <code className="rounded bg-[var(--adm-surface-2)] px-1.5 py-0.5 text-xs bg-[var(--adm-surface-2)]">
           /survei
         </code>
         .
@@ -36,18 +37,18 @@ export default async function SurveiAdminPage() {
 
       {/* Ringkasan agregat */}
       {ringkasan && ringkasan.responden > 0 ? (
-        <div className="rounded-[var(--radius-card)] border border-neutral-200 bg-white p-5 shadow-[var(--shadow-card)] dark:border-slate-700 dark:bg-slate-900">
+        <div className="rounded-[var(--radius-card)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] p-5 shadow-[var(--shadow-card)] border-[var(--adm-rule)] bg-[var(--adm-surface)]">
           <div className="flex flex-wrap items-baseline gap-4">
             <div>
-              <p className="text-xs text-neutral-600 dark:text-slate-400">Nilai IKM</p>
-              <p className="font-heading text-3xl font-bold text-neutral-900 dark:text-slate-50">
+              <p className="text-xs text-[var(--adm-ink-2)] text-[var(--adm-muted)]">Nilai IKM</p>
+              <p className="font-heading text-3xl font-bold text-[var(--adm-ink)]">
                 {ringkasan.ikm.toFixed(2)}
               </p>
             </div>
             <span className={`rounded-lg px-2.5 py-1 text-xs font-bold ${warnaMutu(ringkasan.mutu)}`}>
               Mutu {ringkasan.mutu} · {labelMutu(ringkasan.mutu)}
             </span>
-            <p className="text-xs text-neutral-500 dark:text-slate-400">
+            <p className="text-xs text-[var(--adm-muted)]">
               dari {ringkasan.responden.toLocaleString("id-ID")} responden
             </p>
           </div>
@@ -61,13 +62,13 @@ export default async function SurveiAdminPage() {
                 return (
                   <li key={u.key}>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-neutral-700 dark:text-slate-300">{unsur.label}</span>
-                      <span className="font-semibold text-neutral-900 dark:text-slate-100">
+                      <span className="text-[var(--adm-ink-2)]">{unsur.label}</span>
+                      <span className="font-semibold text-[var(--adm-ink)]">
                         {u.nrr.toFixed(2)}
                       </span>
                     </div>
-                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-neutral-100 dark:bg-slate-800">
-                      <div className="h-full rounded-full bg-primary-500" style={{ width: `${pct}%` }} />
+                    <div className="mt-1 h-1.5 overflow-hidden rounded-full bg-[var(--adm-surface-2)] bg-[var(--adm-surface-2)]">
+                      <div className="h-full rounded-full bg-[var(--adm-accent)]" style={{ width: `${pct}%` }} />
                     </div>
                   </li>
                 );
@@ -78,16 +79,11 @@ export default async function SurveiAdminPage() {
       ) : null}
 
       <div className="flex flex-wrap gap-3">
-        <a
-          href="/api/admin/ekspor?jenis=survei"
-          className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-        >
-          ⬇ Ekspor CSV
-        </a>
+        <ExportLink href="/api/admin/ekspor?jenis=survei">Ekspor CSV</ExportLink>
       </div>
 
       {rows.length === 0 ? (
-        <p className="rounded-[var(--radius-card)] border border-dashed border-neutral-200 bg-white p-6 text-sm text-neutral-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+        <p className="rounded-[var(--radius-card)] border border-dashed border-[var(--adm-rule)] bg-[var(--adm-surface)] p-6 text-sm text-[var(--adm-ink-2)] border-[var(--adm-rule)] bg-[var(--adm-surface)] text-[var(--adm-muted)]">
           Belum ada jawaban survei.
         </p>
       ) : (
@@ -95,19 +91,19 @@ export default async function SurveiAdminPage() {
           {rows.map((s) => (
             <li
               key={s.id}
-              className="rounded-[var(--radius-card)] border border-neutral-200 bg-white p-5 shadow-[var(--shadow-card)] dark:border-slate-700 dark:bg-slate-900"
+              className="rounded-[var(--radius-card)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] p-5 shadow-[var(--shadow-card)] border-[var(--adm-rule)] bg-[var(--adm-surface)]"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="font-medium text-neutral-900 dark:text-slate-100">{s.layanan}</p>
-                  <p className="mt-0.5 text-xs text-neutral-500 dark:text-slate-400">
+                  <p className="font-medium text-[var(--adm-ink)]">{s.layanan}</p>
+                  <p className="mt-0.5 text-xs text-[var(--adm-muted)]">
                     {formatDateTime(s.createdAt)}
                     {s.nama ? ` · ${s.nama}` : " · anonim"}
                     {s.kontak ? ` · ${s.kontak}` : ""}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-heading text-lg font-bold text-neutral-900 dark:text-slate-50">
+                  <span className="font-heading text-lg font-bold text-[var(--adm-ink)]">
                     {s.ikm.toFixed(2)}
                   </span>
                   <span className={`rounded-lg px-2 py-0.5 text-xs font-bold ${warnaMutu(s.mutu)}`}>
@@ -117,9 +113,9 @@ export default async function SurveiAdminPage() {
               </div>
 
               {s.saran ? (
-                <div className="mt-3 rounded-lg bg-neutral-50 p-3 dark:bg-slate-800/60">
-                  <p className="text-xs font-semibold text-neutral-600 dark:text-slate-400">Saran</p>
-                  <p className="mt-1 text-sm text-neutral-700 dark:text-slate-300">{s.saran}</p>
+                <div className="mt-3 rounded-lg bg-[var(--adm-surface-2)] p-3 bg-[var(--adm-surface-2)]/60">
+                  <p className="text-xs font-semibold text-[var(--adm-ink-2)] text-[var(--adm-muted)]">Saran</p>
+                  <p className="mt-1 text-sm text-[var(--adm-ink-2)]">{s.saran}</p>
                 </div>
               ) : null}
             </li>

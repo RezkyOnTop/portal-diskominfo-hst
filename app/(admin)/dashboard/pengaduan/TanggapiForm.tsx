@@ -28,7 +28,7 @@ export function TanggapiForm({
   );
 
   const inputCls =
-    "rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100";
+    "rounded-md border border-[var(--adm-rule)] bg-[var(--adm-surface)] px-2.5 py-1.5 text-sm border-[var(--adm-rule)] bg-[var(--adm-surface)] text-[var(--adm-ink)]";
 
   return (
     <form action={formAction} className="space-y-2">

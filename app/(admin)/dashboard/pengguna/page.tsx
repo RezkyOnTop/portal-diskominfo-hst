@@ -3,12 +3,13 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { auth } from "@/lib/auth";
 import { countUsers, listUsers } from "@/lib/services/user";
 import { UserCreateForm, UserDirectory, type UserRow } from "./UserForms";
+import { ExportLink } from "@/components/admin/ui";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Kelola User" };
 
 /**
- * Halaman "Kelola User" — hanya untuk Administrator.
+ * Halaman "Kelola User", hanya untuk Administrator.
  * Editor yang mencoba membukanya dialihkan ke ringkasan dashboard.
  * Akun utama dari environment (ADMIN_EMAIL) ditampilkan sebagai baris
  * "Bawaan" yang tidak bisa diubah/dihapus dari sini (dikelola lewat
@@ -50,11 +51,11 @@ export default async function PenggunaAdminPage() {
   return (
     <div className="space-y-6">
       <SectionHeading as="h1">Kelola User</SectionHeading>
-      <p className="text-sm text-neutral-600 dark:text-slate-400">
+      <p className="text-sm text-[var(--adm-ink-2)] text-[var(--adm-muted)]">
         Kelola akun yang bisa masuk ke dashboard. Setiap akun punya peran:
         <strong> Administrator</strong> (akses penuh, termasuk kelola user) atau
         <strong> Editor</strong> (kelola konten saja). Password disimpan sebagai
-        hash bcrypt — tidak ada yang bisa melihat password aslinya, termasuk
+        hash bcrypt, tidak ada yang bisa melihat password aslinya, termasuk
         Administrator.
       </p>
 
@@ -69,16 +70,11 @@ export default async function PenggunaAdminPage() {
       <UserCreateForm />
 
       <div className="flex flex-wrap gap-3">
-        <a
-          href="/api/admin/ekspor?jenis=user"
-          className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
-        >
-          ⬇ Ekspor CSV
-        </a>
+        <ExportLink href="/api/admin/ekspor?jenis=user">Ekspor CSV</ExportLink>
       </div>
 
       <section aria-label="Daftar user" className="space-y-3">
-        <h2 className="font-heading text-base font-bold text-neutral-900 dark:text-slate-50">
+        <h2 className="font-heading text-base font-bold text-[var(--adm-ink)]">
           Daftar User
         </h2>
         <UserDirectory rows={semua} />
@@ -89,9 +85,9 @@ export default async function PenggunaAdminPage() {
 
 function Kartu({ label, nilai }: { label: string; nilai: number }) {
   return (
-    <div className="rounded-[var(--radius-card)] border border-neutral-200 bg-white p-4 shadow-[var(--shadow-card)] dark:border-slate-700 dark:bg-slate-900">
-      <p className="text-xs text-neutral-600 dark:text-slate-400">{label}</p>
-      <p className="mt-1 font-heading text-2xl font-bold text-neutral-900 dark:text-slate-50">
+    <div className="rounded-[var(--radius-card)] border border-[var(--adm-rule)] bg-[var(--adm-surface)] p-4 shadow-[var(--shadow-card)] border-[var(--adm-rule)] bg-[var(--adm-surface)]">
+      <p className="text-xs text-[var(--adm-ink-2)] text-[var(--adm-muted)]">{label}</p>
+      <p className="mt-1 font-heading text-2xl font-bold text-[var(--adm-ink)]">
         {nilai.toLocaleString("id-ID")}
       </p>
     </div>

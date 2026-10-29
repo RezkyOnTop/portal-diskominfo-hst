@@ -1,0 +1,41 @@
+/* Hallmark · checked: 2026-10-29 · genre: modern-minimal · scope: app · theme: Dusk
+ * critique: accents mark only the primary action, the current selection and state; figures set in tabular numerals; no icon tiles, no gradients, no tracked capitals.
+ * waivers: none
+ *
+ * Token scope for the dashboard only ([data-admin]). The public site keeps its
+ * own system in globals.css; Dusk's palette, radius and surfaces live here.
+ * Hue stays at 268/274 in both modes, per Hallmark's dark-mode derivation.
+ */
+/* Floor 6 & 26a: focus is always visible, and it appears instantly. */
+[data-admin] :where(a, button, [role="button"], summary, input, select, textarea):focus-visible {
+  outline: 2px solid var(--adm-focus);
+  outline-offset: 2px;
+  border-radius: var(--adm-radius-sm);
+}
+
+/* Floor 7: motion is state, and it stops when the visitor asks it to. */
+@media (prefers-reduced-motion: reduce) {
+  [data-admin] *,
+  [data-admin] *::before,
+  [data-admin] *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Browser surfaces (F16). */
+[data-admin] {
+  accent-color: var(--adm-accent);
+  caret-color: var(--adm-accent);
+}
+[data-admin] ::selection {
+  background: var(--adm-accent-soft);
+  color: var(--adm-ink);
+}
+
+/* State tekan: pergeseran 1px, tanpa animasi. */
+[data-admin] :where(a, button, [role="button"]):active {
+  transform: translateY(0.5px);
+}
