@@ -6,6 +6,12 @@ on:
   pull_request:
     branches: [main]
 
+# Push berturut-turut ke branch yang sama membatalkan run lama,
+# supaya commit terbaru tidak mengantre di belakang build usang.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality:
     runs-on: ubuntu-latest
