@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { createStaff, deleteStaff, updateStaff } from "@/lib/services/staff";
+import { catatAuditSesi } from "@/lib/services/audit";
 
 export interface StaffActionState {
   ok: boolean;
@@ -47,6 +48,13 @@ export async function createStaffAction(
     return { ok: false, message: result.message, fieldErrors: result.fieldErrors };
   }
 
+  await catatAuditSesi(session, {
+    aksi: "TAMBAH_PEGAWAI",
+    target: "Staff",
+    targetId: result.id,
+    detail: `Tambah pegawai "${input.nama}" (${input.jabatan}, ${input.unit})`,
+  });
+
   revalidatePath("/dashboard/pegawai");
   revalidatePath("/profil/data-pegawai");
   return { ok: true, message: "Pegawai berhasil ditambahkan." };
@@ -62,10 +70,18 @@ export async function updateStaffAction(
     return { ok: false, message: "Tidak diizinkan. Silakan masuk sebagai admin." };
   }
 
-  const result = await updateStaff(bacaForm(formData));
+  const input = bacaForm(formData);
+  const result = await updateStaff(input);
   if (!result.ok) {
     return { ok: false, message: result.message, fieldErrors: result.fieldErrors };
   }
+
+  await catatAuditSesi(session, {
+    aksi: "UBAH_PEGAWAI",
+    target: "Staff",
+    targetId: input.id,
+    detail: `Ubah pegawai "${input.nama}" (${input.jabatan}, ${input.unit}) — tampil: ${input.aktif ? "ya" : "tidak"}`,
+  });
 
   revalidatePath("/dashboard/pegawai");
   revalidatePath("/profil/data-pegawai");
@@ -86,6 +102,13 @@ export async function deleteStaffAction(
   if (!result.ok) {
     return { ok: false, message: result.message };
   }
+
+  await catatAuditSesi(session, {
+    aksi: "HAPUS_PEGAWAI",
+    target: "Staff",
+    targetId: "id" in result ? result.id : null,
+    detail: "Hapus satu data pegawai beserta fotonya",
+  });
 
   revalidatePath("/dashboard/pegawai");
   revalidatePath("/profil/data-pegawai");

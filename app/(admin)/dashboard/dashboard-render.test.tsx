@@ -2,11 +2,16 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 
 // --- Mock prasyarat server ---
-vi.mock("@/lib/auth", () => ({ auth: vi.fn(async () => ({ user: { email: "admin@example.com" } })) }));
+vi.mock("@/lib/auth", () => ({
+  auth: vi.fn(async () => ({ user: { email: "admin@example.com", role: "ADMIN" } })),
+}));
 vi.mock("next/cache", () => ({ revalidatePath: vi.fn() }));
 vi.mock("server-only", () => ({}));
 
 // --- Mock service layer (data lokal) ---
+vi.mock("@/lib/services/user", () => ({
+  countUsers: vi.fn(async () => ({ total: 4, admin: 2, editor: 2, aktif: 3, nonaktif: 1 })),
+}));
 vi.mock("@/lib/services/visitor", () => ({
   getStatistikRingkas: vi.fn(async () => ({
     total: 1234,

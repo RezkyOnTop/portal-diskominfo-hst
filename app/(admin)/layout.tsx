@@ -17,15 +17,19 @@ export default async function AdminLayout({
 }) {
   const session = await auth();
   if (!session) redirect("/masuk");
+  const isAdmin = session.user?.role === "ADMIN";
 
   return (
     <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[220px_1fr]">
       <aside>
         <div className="rounded-[var(--radius-card)] border border-neutral-200 bg-white p-4 shadow-[var(--shadow-card)]">
           <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">
-            Administrator
+            {isAdmin ? "Administrator" : "Editor"}
           </p>
           <p className="mt-1 truncate text-sm font-medium text-neutral-900">
+            {session.user?.name || session.user?.email}
+          </p>
+          <p className="truncate text-xs text-neutral-500 dark:text-slate-400">
             {session.user?.email}
           </p>
           <nav aria-label="Navigasi admin" className="mt-4 space-y-1">
@@ -77,6 +81,22 @@ export default async function AdminLayout({
             >
               Survei IKM
             </Link>
+            {isAdmin ? (
+              <Link
+                href="/dashboard/pengguna"
+                className="block rounded-md px-3 py-2 text-sm text-neutral-700 hover:bg-primary-50"
+              >
+                Kelola User
+              </Link>
+            ) : null}
+            {isAdmin ? (
+              <Link
+                href="/dashboard/audit"
+                className="block rounded-md px-3 py-2 text-sm text-neutral-700 hover:bg-primary-50"
+              >
+                Jejak Audit
+              </Link>
+            ) : null}
           </nav>
           <form action={logoutAction} className="mt-4">
             <button

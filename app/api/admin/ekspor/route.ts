@@ -4,13 +4,22 @@ import { listReservations } from "@/lib/services/reservation";
 import { listSurveys } from "@/lib/services/survey";
 import { listStaffAdmin } from "@/lib/services/staff";
 import { listPengaduan } from "@/lib/services/pengaduan";
+import { listUsers } from "@/lib/services/user";
 import { csvHeaders, namaBerkasCsv, toCsv } from "@/lib/utils/csv";
-import { IKM_UNSUR, LABEL_STATUS_PENGADUAN, type StatusPengaduan } from "@/lib/validations/local.schema";
+import { catatAuditSesi, type SesiAudit } from "@/lib/services/audit";
+import { clientIp } from "@/lib/rate-limit";
+import {
+  IKM_UNSUR,
+  LABEL_STATUS_PENGADUAN,
+  LABEL_USER_ROLE,
+  type StatusPengaduan,
+  type UserRole,
+} from "@/lib/validations/local.schema";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type JenisEkspor = "subscriber" | "survei" | "reservasi" | "pegawai" | "pengaduan";
+type JenisEkspor = "subscriber" | "survei" | "reservasi" | "pegawai" | "pengaduan" | "user";
 
 function isJenis(v: string): v is JenisEkspor {
   return (
@@ -18,14 +27,36 @@ function isJenis(v: string): v is JenisEkspor {
     v === "survei" ||
     v === "reservasi" ||
     v === "pegawai" ||
-    v === "pengaduan"
+    v === "pengaduan" ||
+    v === "user"
   );
 }
 
 /**
- * GET /api/admin/ekspor?jenis=subscriber|survei|reservasi|pegawai|pengaduan
+ * GET /api/admin/ekspor?jenis=subscriber|survei|reservasi|pegawai|pengaduan|user
  * Unduh data lokal sebagai CSV. HANYA untuk sesi admin (Auth.js).
+ * `jenis=user` khusus Administrator (berisi daftar akun dashboard).
  */
+/** Balas CSV sekaligus catat jejak audit unduhan (satu pintu, tidak terlewat). */
+async function balasCsv(
+  session: SesiAudit,
+  request: Request,
+  jenis: JenisEkspor,
+  csv: string,
+  nama: string,
+): Promise<Response> {
+  await catatAuditSesi(
+    session,
+    {
+      aksi: "EKSPOR_CSV",
+      target: "Ekspor",
+      detail: `Unduh data "${jenis}" sebagai CSV`,
+    },
+    { ip: clientIp(request), userAgent: request.headers.get("user-agent") },
+  );
+  return new Response(csv, { headers: csvHeaders(namaBerkasCsv(nama)) });
+}
+
 export async function GET(request: Request) {
   const session = await auth();
   if (!session) {
@@ -38,12 +69,44 @@ export async function GET(request: Request) {
   const jenis = new URL(request.url).searchParams.get("jenis") ?? "";
   if (!isJenis(jenis)) {
     return new Response(
-      "Parameter `jenis` harus subscriber, survei, reservasi, pegawai, atau pengaduan.",
+      "Parameter `jenis` harus subscriber, survei, reservasi, pegawai, pengaduan, atau user.",
       {
         status: 400,
         headers: { "Content-Type": "text/plain; charset=utf-8" },
       },
     );
+  }
+
+  if (jenis === "user") {
+    // Daftar akun hanya untuk Administrator.
+    if (session.user?.role !== "ADMIN") {
+      await catatAuditSesi(
+        session,
+        {
+          aksi: "EKSPOR_CSV",
+          target: "Ekspor",
+          detail: "Percobaan ekspor daftar user ditolak (bukan Administrator)",
+        },
+        { ip: clientIp(request), userAgent: request.headers.get("user-agent") },
+      );
+      return new Response("Hanya Administrator yang boleh mengunduh daftar user.", {
+        status: 403,
+        headers: { "Content-Type": "text/plain; charset=utf-8" },
+      });
+    }
+    const rows = await listUsers();
+    const csv = toCsv(
+      ["Nama", "Username", "Peran", "Status", "Dibuat", "Diperbarui"],
+      rows.map((u) => [
+        u.nama,
+        u.username,
+        LABEL_USER_ROLE[u.role as UserRole] ?? u.role,
+        u.aktif ? "Aktif" : "Nonaktif",
+        u.createdAt,
+        u.updatedAt,
+      ]),
+    );
+    return balasCsv(session, request, jenis, csv, "user");
   }
 
   if (jenis === "pengaduan") {
@@ -62,7 +125,7 @@ export async function GET(request: Request) {
         p.updatedAt,
       ]),
     );
-    return new Response(csv, { headers: csvHeaders(namaBerkasCsv("pengaduan")) });
+    return balasCsv(session, request, jenis, csv, "pengaduan");
   }
 
   if (jenis === "pegawai") {
@@ -79,7 +142,7 @@ export async function GET(request: Request) {
         s.fotoUrl ? "Ya" : "Tidak",
       ]),
     );
-    return new Response(csv, { headers: csvHeaders(namaBerkasCsv("pegawai")) });
+    return balasCsv(session, request, jenis, csv, "pegawai");
   }
 
   if (jenis === "subscriber") {
@@ -94,7 +157,7 @@ export async function GET(request: Request) {
         s.subscribedAt,
       ]),
     );
-    return new Response(csv, { headers: csvHeaders(namaBerkasCsv("subscriber")) });
+    return balasCsv(session, request, jenis, csv, "subscriber");
   }
 
   if (jenis === "survei") {
@@ -129,7 +192,7 @@ export async function GET(request: Request) {
         s.createdAt,
       ]),
     );
-    return new Response(csv, { headers: csvHeaders(namaBerkasCsv("survei-ikm")) });
+    return balasCsv(session, request, jenis, csv, "survei-ikm");
   }
 
   const rows = await listReservations();
@@ -167,5 +230,5 @@ export async function GET(request: Request) {
       r.createdAt,
     ]),
   );
-  return new Response(csv, { headers: csvHeaders(namaBerkasCsv("reservasi")) });
+  return balasCsv(session, request, jenis, csv, "reservasi");
 }

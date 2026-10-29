@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useActionState } from "react";
 import { Button } from "@/components/ui/Button";
-import { UNIT_PEGAWAI } from "@/lib/validations/local.schema";
+import { UNIT_PEGAWAI, FOTO_PEGAWAI_MAX_BYTES } from "@/lib/validations/local.schema";
 import {
   createStaffAction,
   deleteStaffAction,
@@ -373,26 +373,79 @@ function StaffHapusForm({ row }: { row: StaffRow }) {
 
 /** Form unggah/ganti foto + hapus foto (kembali ke avatar default). */
 function FotoForm({ id, adaFoto }: { id: string; adaFoto: boolean }) {
+  const [pesan, setPesan] = useState<{ teks: string; galat: boolean } | null>(null);
+  const [sibuk, setSibuk] = useState(false);
+
   const unggah = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (sibuk) return;
     const form = e.currentTarget;
     const input = form.elements.namedItem("foto") as HTMLInputElement | null;
     const berkas = input?.files?.[0];
-    if (!berkas) return;
-    const fd = new FormData();
-    fd.append("foto", berkas);
-    const res = await fetch(`/api/pegawai/foto/${id}`, { method: "POST", body: fd });
-    const pesan = form.querySelector<HTMLElement>("[data-pesan]");
-    if (pesan) {
-      pesan.textContent = res.ok ? "Foto tersimpan. Memuat ulang…" : "Gagal mengunggah foto.";
+
+    // Tanpa berkas terpilih: BUKA jendela pemilih berkas (bukan memarahi
+    // pengguna). Tombol "Unggah Foto" adalah langkah pertama yang wajar
+    // ditekan orang, jadi ia harus memunculkan dialog pilih foto.
+    if (!berkas) {
+      setPesan({ teks: "Pilih berkas foto dari jendela yang terbuka…", galat: false });
+      input?.click();
+      return;
     }
-    if (res.ok) window.location.reload();
+    if (berkas.size > FOTO_PEGAWAI_MAX_BYTES) {
+      setPesan({
+        teks: `Foto ini ${(berkas.size / 1048576).toFixed(1)} MB — melebihi batas 2 MB. Kecilkan dulu.`,
+        galat: true,
+      });
+      return;
+    }
+
+    setSibuk(true);
+    setPesan({ teks: "Mengunggah…", galat: false });
+    try {
+      const fd = new FormData();
+      fd.append("foto", berkas);
+      const res = await fetch(`/api/pegawai/foto/${id}`, { method: "POST", body: fd });
+      if (!res.ok) {
+        // Tampilkan alasan dari server (2 MB / format / sesi), bukan pesan buta.
+        let teks = "Gagal mengunggah foto.";
+        try {
+          const data: unknown = await res.json();
+          if (data && typeof data === "object" && "message" in data) {
+            const m = (data as { message?: unknown }).message;
+            if (typeof m === "string" && m.trim()) teks = m;
+          }
+        } catch {
+          /* balasan bukan JSON — pakai pesan bawaan */
+        }
+        if (res.status === 401) teks = "Sesi berakhir. Silakan masuk ulang.";
+        setPesan({ teks, galat: true });
+        return;
+      }
+      setPesan({ teks: "Foto tersimpan. Memuat ulang…", galat: false });
+      window.location.reload();
+    } catch {
+      setPesan({ teks: "Tidak dapat menghubungi server. Coba lagi.", galat: true });
+    } finally {
+      setSibuk(false);
+    }
   };
 
   const hapus = async () => {
+    if (sibuk) return;
     if (!window.confirm("Hapus foto? Halaman publik kembali memakai avatar default.")) return;
-    await fetch(`/api/pegawai/foto/${id}`, { method: "DELETE" });
-    window.location.reload();
+    setSibuk(true);
+    try {
+      const res = await fetch(`/api/pegawai/foto/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        setPesan({ teks: "Gagal menghapus foto.", galat: true });
+        return;
+      }
+      window.location.reload();
+    } catch {
+      setPesan({ teks: "Tidak dapat menghubungi server. Coba lagi.", galat: true });
+    } finally {
+      setSibuk(false);
+    }
   };
 
   return (
@@ -405,21 +458,48 @@ function FotoForm({ id, adaFoto }: { id: string; adaFoto: boolean }) {
         name="foto"
         type="file"
         accept="image/jpeg,image/png,image/webp"
-        className="text-xs text-neutral-600 dark:text-slate-300"
+        disabled={sibuk}
+        onChange={(e) => {
+          const f = e.currentTarget.files?.[0];
+          if (!f) {
+            setPesan(null);
+            return;
+          }
+          if (f.size > FOTO_PEGAWAI_MAX_BYTES) {
+            setPesan({
+              teks: `Foto ini ${(f.size / 1048576).toFixed(1)} MB — melebihi batas 2 MB. Kecilkan dulu.`,
+              galat: true,
+            });
+            return;
+          }
+          setPesan({
+            teks: `Dipilih: ${f.name} (${Math.max(1, Math.round(f.size / 1024))} KB) — tekan Unggah Foto.`,
+            galat: false,
+          });
+        }}
+        className="w-full max-w-full text-xs text-neutral-600 file:mr-2 file:cursor-pointer file:rounded-md file:border-0 file:bg-primary-600 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white hover:file:bg-primary-700 disabled:opacity-50 dark:text-slate-300 sm:w-auto"
       />
-      <Button type="submit" size="sm" variant="secondary">
-        Unggah Foto
+      <Button type="submit" size="sm" variant="secondary" disabled={sibuk}>
+        {sibuk ? "Mengunggah…" : "Unggah Foto"}
       </Button>
       {adaFoto ? (
         <button
           type="button"
           onClick={hapus}
-          className="rounded-md border border-neutral-200 px-2.5 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-300"
+          disabled={sibuk}
+          className="rounded-md border border-neutral-200 px-2.5 py-1.5 text-xs font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-50 dark:border-slate-700 dark:text-slate-300"
         >
           Hapus Foto
         </button>
       ) : null}
-      <span data-pesan role="status" aria-live="polite" className="text-xs text-neutral-600 dark:text-slate-400" />
+      <span
+        data-pesan
+        role="status"
+        aria-live="polite"
+        className={`text-xs ${pesan?.galat ? "text-danger-600" : "text-neutral-600 dark:text-slate-400"}`}
+      >
+        {pesan?.teks ?? ""}
+      </span>
     </form>
   );
 }

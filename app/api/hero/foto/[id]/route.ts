@@ -3,6 +3,8 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { bacaFotoHero, hapusSemuaFotoHero, simpanFotoHero } from "@/lib/storage/foto-hero";
 import { getHeroSlideById, setFotoHeroSlide } from "@/lib/services/hero";
+import { catatAuditSesi } from "@/lib/services/audit";
+import { clientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -76,6 +78,17 @@ export async function POST(
   }
 
   revalidatePath("/");
+  await catatAuditSesi(
+    session,
+    {
+      aksi: "UNGGAH_FOTO_HERO",
+      target: "HeroSlide",
+      targetId: id,
+      detail: `Unggah foto slide "${slide.label}" (${Math.max(1, Math.round(berkas.size / 1024))} KB, ${berkas.type})`,
+    },
+    { ip: clientIp(request), userAgent: request.headers.get("user-agent") },
+  );
+
   return NextResponse.json({ ok: true, url: simpan.url }, { status: 201 });
 }
 
@@ -83,7 +96,7 @@ export async function POST(
  * DELETE /api/hero/foto/[id] — hapus foto, slide dilewati di slideshow (HANYA admin).
  */
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await auth();
@@ -103,5 +116,17 @@ export async function DELETE(
   await hapusSemuaFotoHero(id);
   await setFotoHeroSlide(id, "");
   revalidatePath("/");
+
+  await catatAuditSesi(
+    session,
+    {
+      aksi: "HAPUS_FOTO_HERO",
+      target: "HeroSlide",
+      targetId: id,
+      detail: `Hapus foto slide "${slide.label}"`,
+    },
+    { ip: clientIp(request), userAgent: request.headers.get("user-agent") },
+  );
+
   return NextResponse.json({ ok: true });
 }

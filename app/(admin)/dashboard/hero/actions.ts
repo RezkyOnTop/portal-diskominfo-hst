@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { createHeroSlide, deleteHeroSlide, updateHeroSlide } from "@/lib/services/hero";
+import { catatAuditSesi } from "@/lib/services/audit";
 
 export interface HeroActionState {
   ok: boolean;
@@ -50,6 +51,13 @@ export async function createHeroSlideAction(
     return { ok: false, message: result.message, fieldErrors: result.fieldErrors };
   }
 
+  await catatAuditSesi(session, {
+    aksi: "TAMBAH_HERO",
+    target: "HeroSlide",
+    targetId: result.id,
+    detail: `Tambah slide hero "${input.label}" (urutan ${input.urutan})`,
+  });
+
   segarkan();
   return { ok: true, message: "Slide ditambahkan. Unggah fotonya lewat formulir di bawah." };
 }
@@ -64,10 +72,18 @@ export async function updateHeroSlideAction(
     return { ok: false, message: "Tidak diizinkan. Silakan masuk sebagai admin." };
   }
 
-  const result = await updateHeroSlide(bacaForm(formData));
+  const input = bacaForm(formData);
+  const result = await updateHeroSlide(input);
   if (!result.ok) {
     return { ok: false, message: result.message, fieldErrors: result.fieldErrors };
   }
+
+  await catatAuditSesi(session, {
+    aksi: "UBAH_HERO",
+    target: "HeroSlide",
+    targetId: input.id,
+    detail: `Ubah slide hero "${input.label}" — tampil: ${input.aktif ? "ya" : "tidak"}`,
+  });
 
   segarkan();
   return { ok: true, message: "Slide diperbarui." };
@@ -87,6 +103,13 @@ export async function deleteHeroSlideAction(
   if (!result.ok) {
     return { ok: false, message: result.message };
   }
+
+  await catatAuditSesi(session, {
+    aksi: "HAPUS_HERO",
+    target: "HeroSlide",
+    targetId: "id" in result ? result.id : null,
+    detail: "Hapus satu slide hero beserta fotonya",
+  });
 
   segarkan();
   return { ok: true, message: "Slide dihapus." };

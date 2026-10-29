@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 vi.mock("@/lib/auth", () => ({ auth: vi.fn() }));
+vi.mock("@/lib/services/audit", () => ({
+  catatAuditSesi: vi.fn(),
+  catatAudit: vi.fn(),
+}));
 vi.mock("@/lib/services/subscriber", () => ({ listSubscribers: vi.fn() }));
 vi.mock("@/lib/services/reservation", () => ({ listReservations: vi.fn() }));
 vi.mock("@/lib/services/survey", () => ({ listSurveys: vi.fn() }));

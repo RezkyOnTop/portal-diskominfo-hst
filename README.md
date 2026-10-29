@@ -7,8 +7,8 @@ Rebuild modern dari situs `diskominfosp.hstkab.go.id` dengan desain **Digital Ci
 <p align="left">
   <img src="https://img.shields.io/badge/status-aktif-brightgreen" alt="Status">
   <img src="https://img.shields.io/badge/lisensi-MIT-blue" alt="Lisensi MIT">
-  <img src="https://img.shields.io/badge/tests-398%20lulus-success" alt="Tes">
-  <img src="https://img.shields.io/badge/coverage-93.92%25-brightgreen" alt="Coverage">
+  <img src="https://img.shields.io/badge/tests-426%20lulus-success" alt="Tes">
+  <img src="https://img.shields.io/badge/coverage-94.08%25-brightgreen" alt="Coverage">
 </p>
 
 ---
@@ -38,7 +38,7 @@ Rebuild modern dari situs `diskominfosp.hstkab.go.id` dengan desain **Digital Ci
 - **🤖 Asisten AI "Tanya AI"** — widget tanya-jawab seputar layanan dinas, ditenagai **Groq**. Kunci API hanya tersimpan di server (proxy backend), dilengkapi sanitasi input/output, pembatasan 10 permintaan/menit per IP, serta system prompt ketat anti *prompt injection*.
 - **🌓 Mode Terang/Gelap** — persisten tanpa kedip (*no flash*), kontras teks terjamin ≥ 4.5:1 di kedua mode.
 - **📈 Analitik Kunjungan** — pencatatan kunjungan halaman publik secara anonim (sekali per perubahan halaman, area admin dikecualikan).
-- **🔐 Dashboard Admin** (`/dashboard`, login di `/masuk`) — ringkasan statistik, pengelolaan slideshow hero, data pegawai, pengaduan, reservasi, survei, dan subscriber; **ekspor CSV** siap Excel Indonesia.
+- **🔐 Dashboard Admin** (`/dashboard`, login di `/masuk`) — ringkasan statistik, pengelolaan slideshow hero, data pegawai, pengaduan, reservasi, survei, subscriber, dan **Kelola User** (akun dashboard dengan peran Administrator/Editor, ganti password, aktif/nonaktif); **ekspor CSV** siap Excel Indonesia.
 - **🎬 Animasi Loading Modern** — preloader khas DISKOMINFOSP + bilah progres navigasi yang halus dan menghormati `prefers-reduced-motion`.
 
 ---
@@ -79,7 +79,7 @@ app/
 ├── (public)/              # Halaman publik: beranda, berita, pengumuman, hoaks,
 │                          # radio, cari, data-terbuka, survei, reservasi, kontak, profil, layanan
 ├── (admin)/dashboard/     # Panel admin: statistik, hero, pegawai, pengaduan,
-│                          # reservasi, survei, subscriber (dilindungi Auth.js)
+│                          # reservasi, survei, subscriber, pengguna (kelola user) — dilindungi Auth.js
 ├── masuk/                 # Halaman login administrator
 └── api/                   # Route handler: cari, chat, cuaca, gambar, visitor,
                            # subscriber, survei, reservasi, pengaduan, admin/ekspor, auth
@@ -90,7 +90,7 @@ components/                # Komponen UI: layout/, news/, search/, survei/,
 lib/
 ├── api/                   # ADAPTER — satu-satunya pemanggil API eksternal:
 │                          # media-center.ts, opendata.ts, bmkg.ts, youtube.ts, gambar.ts, ai-chat.ts
-├── services/              # Logika data lokal (visitor, subscriber, survei, reservasi, pengaduan, hero, staff)
+├── services/              # Logika data lokal (visitor, subscriber, survei, reservasi, pengaduan, hero, staff, user)
 ├── actions/               # Server Actions (langganan radio, survei)
 ├── validations/           # Skema Zod (+ rumus IKM & reservasi)
 ├── storage/               # Penyimpanan berkas (foto pegawai, hero)
@@ -98,8 +98,8 @@ lib/
 └── utils/                 # Pembantu: sanitasi HTML, format, CSV, markdown, BMKG
 
 prisma/schema.prisma       # Model: VisitorStat, RadioSubscriber, SocialMediaCache,
-                           # ServiceSurvey, ServiceReservation, Staff, Pengaduan, HeroSlide
-scripts/                   # setup-lokal.mjs, setup-admin.mjs, seed-pegawai.mjs
+                           # ServiceSurvey, ServiceReservation, Staff, Pengaduan, HeroSlide, User
+scripts/                   # setup-lokal.mjs, setup-admin.mjs, seed-pegawai.mjs, seed-user.mjs
 docs/                      # SETUP.md, screenshots/
 ```
 
@@ -190,6 +190,7 @@ Buka **http://localhost:3010**.
 | `npm run test:coverage` | Tes + laporan cakupan (ambang 80%) |
 | `npm run prisma:migrate` | Migrasi basis data saat pengembangan |
 | `npm run seed:pegawai` | Mengisi data pegawai |
+| `npm run seed:user` | Membuat akun dashboard contoh (`admin` / `123`) |
 
 ### Mengaktifkan dashboard admin
 
@@ -232,7 +233,15 @@ Buka /survei → nilai 9 unsur layanan → kirim → nilai IKM & mutu dihitung o
 **Masuk sebagai administrator**
 
 ```
-Buka /masuk → masukkan email & password admin → kelola konten di /dashboard
+Buka /masuk → masukkan username/email & password admin → kelola konten di /dashboard
+```
+
+**Mengelola akun dashboard (Kelola User)**
+
+```
+Masuk sebagai Administrator → /dashboard → Kelola User
+Tambah akun, ubah peran (Administrator/Editor), ganti password, aktif/nonaktif, atau hapus.
+Editor dapat mengelola konten, tetapi menu Kelola User tidak muncul untuknya.
 ```
 
 **Menambah adapter API baru**

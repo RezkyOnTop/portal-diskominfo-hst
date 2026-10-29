@@ -1,23 +1,31 @@
 import Link from "next/link";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { auth } from "@/lib/auth";
 import { getStatistikRingkas } from "@/lib/services/visitor";
 import { countSubscribers } from "@/lib/services/subscriber";
 import { countReservations } from "@/lib/services/reservation";
 import { countSurveys, getRingkasanSurvei } from "@/lib/services/survey";
 import { countPengaduan } from "@/lib/services/pengaduan";
+import { countUsers } from "@/lib/services/user";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Dashboard Admin" };
 
 export default async function DashboardPage() {
-  const [stats, subscribers, reservasi, surveiCount, survei, pengaduan] = await Promise.all([
-    getStatistikRingkas(7),
-    countSubscribers(),
-    countReservations(),
-    countSurveys(),
-    getRingkasanSurvei(),
-    countPengaduan(),
-  ]);
+  const session = await auth();
+  const isAdmin = session?.user?.role === "ADMIN";
+
+  const [stats, subscribers, reservasi, surveiCount, survei, pengaduan, pengguna] =
+    await Promise.all([
+      getStatistikRingkas(7),
+      countSubscribers(),
+      countReservations(),
+      countSurveys(),
+      getRingkasanSurvei(),
+      countPengaduan(),
+      // Statistik user hanya untuk Administrator (Editor tidak boleh tahu).
+      isAdmin ? countUsers() : Promise.resolve(null),
+    ]);
 
   return (
     <div className="space-y-8">
@@ -31,6 +39,7 @@ export default async function DashboardPage() {
         <StatCard label="Reservasi total" value={reservasi.total} />
         <StatCard label="Pengaduan baru" value={pengaduan.baru} />
         <StatCard label="Jawaban survei IKM" value={surveiCount} />
+        {pengguna ? <StatCard label="Akun user" value={pengguna.total} /> : null}
       </div>
 
       <p className="text-sm text-neutral-600 dark:text-slate-400">
@@ -101,6 +110,14 @@ export default async function DashboardPage() {
         >
           Lihat Survei IKM
         </Link>
+        {isAdmin ? (
+          <Link
+            href="/dashboard/pengguna"
+            className="rounded-lg border border-neutral-200 px-4 py-2 text-sm font-semibold text-neutral-700 hover:bg-neutral-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            Kelola User
+          </Link>
+        ) : null}
       </div>
 
       <div className="flex flex-wrap gap-3 border-t border-neutral-200 pt-6 dark:border-slate-700">

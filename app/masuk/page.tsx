@@ -19,19 +19,20 @@ export default function MasukPage() {
           Masuk Administrator
         </h1>
         <p className="mt-1 text-sm text-neutral-600">
-          Area terbatas untuk pengelolaan statistik dan subscriber radio.
+          Area terbatas untuk pengelolaan konten, statistik, dan kelola user.
         </p>
         <form action={loginAction} className="mt-6 space-y-4">
           <div className="space-y-1">
             <label htmlFor="email" className="text-sm font-medium text-neutral-700">
-              Email
+              Username atau Email
             </label>
             <input
               id="email"
               name="email"
-              type="email"
+              type="text"
               required
               autoComplete="username"
+              placeholder="cth. admin"
               className="w-full rounded-lg border border-neutral-200 px-3 py-2 text-sm"
             />
           </div>

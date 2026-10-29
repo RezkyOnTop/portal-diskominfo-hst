@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { createHash } from "node:crypto";
 import { auth } from "@/lib/auth";
 import { bacaFotoPegawai, simpanFotoPegawai } from "@/lib/storage/foto";
 import { getStaffById, setFotoStaff } from "@/lib/services/staff";
+import { catatAuditSesi } from "@/lib/services/audit";
+import { clientIp } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -20,11 +23,27 @@ export async function GET(
   if (!foto) {
     return new NextResponse("Foto tidak ditemukan.", { status: 404 });
   }
+
+  // ETag dari isi berkas: admin yang baru mengganti foto langsung melihat
+  // gambar baru setelah reload, sementara pengunjung lain tetap dapat 304
+  // murah. Tanpa ini, `max-age=3600` membuat foto lama bertahan sejam penuh
+  // sehingga unggahan terasa "tidak berfungsi".
+  const etag = `"${createHash("sha1").update(foto.isi).digest("hex").slice(0, 20)}"`;
+  const ifNoneMatch = _request.headers.get("if-none-match");
+  if (ifNoneMatch && ifNoneMatch.split(",").some((v) => v.trim() === etag)) {
+    return new NextResponse(null, {
+      status: 304,
+      headers: { ETag: etag, "Cache-Control": "public, no-cache" },
+    });
+  }
+
   return new NextResponse(new Uint8Array(foto.isi), {
     status: 200,
     headers: {
       "Content-Type": foto.mime,
-      "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+      ETag: etag,
+      // `no-cache` = boleh disimpan, tetapi WAJIB revalidasi (murah: 304).
+      "Cache-Control": "public, no-cache",
       "X-Content-Type-Options": "nosniff",
     },
   });
@@ -74,6 +93,17 @@ export async function POST(
     return NextResponse.json({ ok: false, message: "Pegawai tidak ditemukan." }, { status: 404 });
   }
 
+  await catatAuditSesi(
+    session,
+    {
+      aksi: "UNGGAH_FOTO_PEGAWAI",
+      target: "Staff",
+      targetId: id,
+      detail: `Unggah foto pegawai "${pegawai.nama}" (${Math.max(1, Math.round(berkas.size / 1024))} KB, ${berkas.type})`,
+    },
+    { ip: clientIp(request), userAgent: request.headers.get("user-agent") },
+  );
+
   return NextResponse.json({ ok: true, url: simpan.url }, { status: 201 });
 }
 
@@ -81,7 +111,7 @@ export async function POST(
  * DELETE /api/pegawai/foto/[id] — hapus foto, kembali ke avatar default (HANYA admin).
  */
 export async function DELETE(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const session = await auth();
@@ -101,5 +131,17 @@ export async function DELETE(
   const { hapusSemuaFoto } = await import("@/lib/storage/foto");
   await hapusSemuaFoto(id);
   await setFotoStaff(id, "");
+
+  await catatAuditSesi(
+    session,
+    {
+      aksi: "HAPUS_FOTO_PEGAWAI",
+      target: "Staff",
+      targetId: id,
+      detail: `Hapus foto pegawai "${pegawai.nama}"`,
+    },
+    { ip: clientIp(request), userAgent: request.headers.get("user-agent") },
+  );
+
   return NextResponse.json({ ok: true });
 }

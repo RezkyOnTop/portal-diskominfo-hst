@@ -167,6 +167,63 @@ model Staff {
   @@index([aktif])
 }
 
+/// Jejak audit aktivitas dashboard admin (data lokal).
+/// Dicatat dari lib/services/audit.ts setiap kali admin/editor melakukan
+/// tindakan berarti: masuk/keluar, ubah data, unggah/hapus foto, ekspor CSV.
+/// Penulisan bersifat best-effort — kegagalan mencatat TIDAK boleh menggagalkan
+/// aksi utama yang sedang dijalankan pengguna.
+model AuditLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  /// Id akun pelaku (id tabel User, atau "env-admin" untuk akun environment).
+  actorId   String?
+  /// Nama tampilan pelaku saat aksi terjadi (disalin, bukan relasi).
+  actorName String
+  /// Peran pelaku: ADMIN | EDITOR | ANONIM.
+  actorRole String
+  /// Kode aksi, mis. MASUK, UBAH_PEGAWAI, UNGGAH_FOTO_PEGAWAI.
+  aksi      String
+  /// Jenis objek yang disentuh (Staff, Pengaduan, User, …).
+  target    String?
+  /// Id objek yang disentuh.
+  targetId  String?
+  /// Ringkasan manusiawi (apa yang berubah).
+  detail    String?
+  /// Alamat IP pelaku (dari X-Forwarded-For / X-Real-IP bila ada).
+  ip        String?
+  userAgent String?
+
+  @@index([createdAt])
+  @@index([actorId])
+  @@index([aksi])
+}
+
+/// Akun pengguna dashboard admin (data lokal).
+/// Dikelola admin lewat /dashboard/pengguna ("Kelola User"): tambah akun,
+/// ubah nama/email/peran, ganti password, aktif/nonaktif, dan hapus.
+/// Password TIDAK pernah disimpan polos — hanya hash bcrypt (lihat
+/// lib/services/user.ts). Akun utama dari environment (ADMIN_EMAIL /
+/// ADMIN_PASSWORD_HASH) tetap berlaku sebagai cadangan/super admin.
+model User {
+  id           String   @id @default(cuid())
+  /// Identitas login (huruf kecil, unik) — boleh email atau username singkat
+  /// seperti "admin". Dipakai untuk masuk di /masuk.
+  username     String   @unique
+  /// Nama tampilan pemilik akun.
+  nama         String
+  /// Hash bcrypt password (cost 12). Tidak pernah ditampilkan ke UI.
+  passwordHash String
+  /// Peran: ADMIN (akses penuh) | EDITOR (kelola konten, tanpa kelola user).
+  role         String   @default("EDITOR")
+  /// Nonaktifkan akun tanpa menghapus riwayatnya.
+  aktif        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([role])
+  @@index([aktif])
+}
+
 /// Slide foto slideshow hero beranda (data lokal).
 /// Dikelola admin lewat /dashboard/hero; ditampilkan publik di Hero.
 /// Foto diunggah ke berkas terpisah (lihat lib/storage/foto-hero.ts) dan

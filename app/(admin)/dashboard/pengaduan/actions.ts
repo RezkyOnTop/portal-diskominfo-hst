@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { tanggapiPengaduan } from "@/lib/services/pengaduan";
+import { catatAuditSesi } from "@/lib/services/audit";
 
 export interface TanggapiState {
   ok: boolean;
@@ -31,6 +32,13 @@ export async function tanggapiAction(
   if (!result.ok) {
     return { ok: false, message: result.message };
   }
+
+  await catatAuditSesi(session, {
+    aksi: "UBAH_STATUS_PENGADUAN",
+    target: "Pengaduan",
+    targetId: String(formData.get("id") ?? ""),
+    detail: `Ubah status pengaduan menjadi "${String(formData.get("status") ?? "")}"`,
+  });
 
   revalidatePath("/dashboard/pengaduan");
   revalidatePath("/dashboard");

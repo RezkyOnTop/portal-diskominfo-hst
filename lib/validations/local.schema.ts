@@ -421,3 +421,104 @@ export const DeleteHeroSlideInputSchema = z.object({
 });
 
 export type DeleteHeroSlideInput = z.infer<typeof DeleteHeroSlideInputSchema>;
+
+/**
+ * ============================================================================
+ *  Akun Pengguna Dashboard (User) — "Kelola User"
+ * ============================================================================
+ *  Dikelola admin lewat /dashboard/pengguna. Mendukung tambah akun, ubah
+ *  nama/email/peran, ganti password, aktif/nonaktif, dan hapus.
+ *
+ *  Peran:
+ *    ADMIN  — akses penuh, termasuk kelola user.
+ *    EDITOR — kelola konten (pegawai, hero, pengaduan, reservasi, survei)
+ *             tanpa bisa membuka menu Kelola User.
+ *
+ *  Catatan keamanan: password TIDAK pernah disimpan polos; service menyimpan
+ *  hash bcrypt (cost 12). Panjang minimal dibuat longgar (3) supaya akun uji
+ *  seperti "admin / 123" tetap bisa dibuat — UI menandai password lemah.
+ */
+
+/** Peran akun pengguna dashboard. */
+export const USER_ROLE = ["ADMIN", "EDITOR"] as const;
+export type UserRole = (typeof USER_ROLE)[number];
+
+/** Label bahasa Indonesia untuk tiap peran. */
+export const LABEL_USER_ROLE: Record<UserRole, string> = {
+  ADMIN: "Administrator",
+  EDITOR: "Editor",
+};
+
+/** Deskripsi singkat peran (ditampilkan sebagai bantuan di form). */
+export const DESC_USER_ROLE: Record<UserRole, string> = {
+  ADMIN: "Akses penuh, termasuk kelola user.",
+  EDITOR: "Kelola konten, tanpa akses kelola user.",
+};
+
+/** Panjang password minimal yang diterima. */
+export const PASSWORD_MIN = 3;
+
+/**
+ * Identitas login: boleh email (admin@dinas.go.id) ATAU username singkat
+ * (mis. "admin"). Huruf kecil, tanpa spasi. Dipakai sebagai kunci unik akun.
+ */
+const UsernamePengguna = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .min(3, "Username minimal 3 karakter")
+  .max(160, "Username maksimal 160 karakter")
+  .regex(
+    /^[a-z0-9][a-z0-9._@-]*$/,
+    "Username hanya boleh huruf, angka, serta . _ @ - (tanpa spasi)",
+  );
+const NamaPengguna = z
+  .string()
+  .trim()
+  .min(2, "Nama minimal 2 karakter")
+  .max(120, "Nama maksimal 120 karakter");
+const PasswordPengguna = z
+  .string()
+  .min(PASSWORD_MIN, `Password minimal ${PASSWORD_MIN} karakter`)
+  .max(72, "Password maksimal 72 karakter");
+
+/** Validasi input admin saat menambah akun pengguna baru. */
+export const CreateUserInputSchema = z.object({
+  nama: NamaPengguna,
+  username: UsernamePengguna,
+  password: PasswordPengguna,
+  role: z.enum(USER_ROLE, { error: "Pilih peran akun" }),
+});
+
+export type CreateUserInput = z.infer<typeof CreateUserInputSchema>;
+
+/** Validasi input admin saat mengubah nama/username/peran akun (tanpa password). */
+export const UpdateUserInputSchema = z.object({
+  id: z.string().trim().min(1),
+  nama: NamaPengguna,
+  username: UsernamePengguna,
+  role: z.enum(USER_ROLE, { error: "Pilih peran akun" }),
+  aktif: z.boolean({ error: "Status aktif harus benar/salah" }),
+});
+
+export type UpdateUserInput = z.infer<typeof UpdateUserInputSchema>;
+
+/** Validasi input admin saat mengganti password akun. */
+export const ChangePasswordInputSchema = z.object({
+  id: z.string().trim().min(1),
+  password: PasswordPengguna,
+});
+
+export type ChangePasswordInput = z.infer<typeof ChangePasswordInputSchema>;
+
+/** Validasi input admin saat menghapus akun (konfirmasi via id). */
+export const DeleteUserInputSchema = z.object({
+  id: z.string().trim().min(1),
+});
+
+export type DeleteUserInput = z.infer<typeof DeleteUserInputSchema>;
+
+/** Heuristik sederhana: tandai password lemah untuk peringatan di UI. */
+export function passwordLemah(password: string): boolean {
+  return password.length < 8 || /^[0-9]+$/.test(password) || /^(.)\1+$/.test(password);
+}

@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@/lib/auth";
 import { updateReservationStatus } from "@/lib/services/reservation";
+import { catatAuditSesi } from "@/lib/services/audit";
 
 export interface UpdateStatusState {
   ok: boolean;
@@ -31,6 +32,13 @@ export async function updateStatusAction(
   if (!result.ok) {
     return { ok: false, message: result.message };
   }
+
+  await catatAuditSesi(session, {
+    aksi: "UBAH_STATUS_RESERVASI",
+    target: "ServiceReservation",
+    targetId: String(formData.get("id") ?? ""),
+    detail: `Ubah status reservasi menjadi "${String(formData.get("status") ?? "")}"`,
+  });
 
   revalidatePath("/dashboard/reservasi");
   revalidatePath("/dashboard");
