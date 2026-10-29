@@ -9,7 +9,7 @@ ikuti saja urutannya. Perkiraan waktu: **15–25 menit** (termasuk unduh paket).
 
 | Kebutuhan | Keterangan |
 |---|---|
-| **Node.js versi 20 atau lebih baru** | Untuk menjalankan aplikasinya. Unduh di https://nodejs.org (pilih **LTS**). |
+| **Node.js versi 22 atau lebih baru** | Untuk menjalankan aplikasinya. Unduh di https://nodejs.org (pilih **LTS 22**). Node 20 **tidak cukup** — paket `undici` yang dipakai proxy gambar menolak jalan di bawah 22.19, sehingga semua foto berita gagal dimuat. |
 | **PostgreSQL** | Database lokal untuk survei, reservasi, dan statistik. **Opsional** — tanpa ini portal tetap jalan, hanya fitur tersebut yang tidak aktif. |
 | **Koneksi internet** | Berita, data terbuka, cuaca, dan video diambil langsung dari sumber resmi (Media Center, Open Data, BMKG, YouTube). |
 | **Peramban** | Chrome, Edge, Firefox, atau Safari. |
@@ -188,8 +188,9 @@ menampilkan pesan pengembangan.
 | `/radio` | Pemutar Radio Swara Murakata |
 | `/survei` | Survei kepuasan layanan (IKM) |
 | `/kontak` | Alamat, telepon, email, peta lokasi |
-| `/masuk` | Halaman login administrator |
+| `/masuk` | Halaman login administrator (username/email + password) |
 | `/dashboard/pegawai` | Kelola data pegawai (tambah/ubah/hapus/unggah foto) — admin |
+| `/dashboard/pengguna` | **Kelola User**: tambah akun, ubah peran, ganti password, aktif/nonaktif, hapus — Administrator |
 
 ---
 
@@ -205,6 +206,36 @@ Script akan meminta **email** dan **password** Anda (password tidak terlihat saa
 lalu menyimpannya dalam bentuk terenkripsi ke `.env.local`. Setelah itu **hentikan server
 lalu jalankan ulang** (`Ctrl + C`, lalu `npm run start`), baru masuk di `/masuk`.
 
+### 8a. Mengelola banyak akun (Kelola User)
+
+Selain akun utama di atas, Administrator bisa membuat akun tambahan lewat menu
+**Kelola User** di dashboard (`/dashboard/pengguna`):
+
+- **Tambah user** — isi nama, username (boleh email), password, dan peran.
+- **Peran**: *Administrator* (akses penuh, termasuk kelola user) atau *Editor*
+  (kelola konten saja — menu Kelola User tidak muncul untuk Editor).
+- **Ganti password** — Administrator dapat mengganti password akun mana pun
+  (password lama tidak diminta). Password selalu disimpan sebagai hash bcrypt;
+  tidak ada yang bisa melihat password aslinya, termasuk Administrator.
+- **Aktif / nonaktif** — menonaktifkan akun langsung memblokir login akun itu.
+- **Hapus user** — menghapus akun secara permanen.
+
+> **Pengaman:** Administrator aktif terakhir tidak bisa dinonaktifkan, diturunkan
+> perannya, atau dihapus — mencegah portal terkunci dari kelola user.
+
+Ingin akun contoh cepat (username `admin`, password `123`)?
+
+```bash
+npm run seed:user
+```
+
+> ⚠️ Password `123` hanya untuk uji coba. **Segera ganti** lewat menu Kelola User
+> setelah masuk. Untuk membuat akun dengan password sendiri:
+> `node scripts/seed-user.mjs --username admin --password 'RahasiaAnda' --nama Administrator`
+
+Akun utama dari `setup-admin.mjs` (environment) tetap berlaku sebagai cadangan dan
+tampil sebagai baris **Bawaan** di daftar user (tidak bisa diubah dari menu ini).
+
 ---
 
 ## 9. Kalau ada masalah
@@ -214,7 +245,7 @@ lalu jalankan ulang** (`Ctrl + C`, lalu `npm run start`), baru masuk di `/masuk`
 | `npm: command not found` | Node.js belum terpasang. Pasang dari https://nodejs.org lalu buka ulang terminal. |
 | Halaman berita/data kosong | Tidak ada koneksi internet, atau sumber resmi sedang tidak bisa diakses. Portal tetap tampil dengan pesan ramah — bukan error. |
 | Fitur survei/reservasi error | Database belum disiapkan. Ulangi langkah 5. |
-| Login admin gagal | Belum menjalankan langkah 8, atau server belum di-restart setelah mengaktifkan admin. |
+| Login admin gagal | Belum menjalankan langkah 8, atau server belum di-restart setelah mengaktifkan admin. Untuk akun tambahan, pastikan akun **aktif** di menu Kelola User. |
 | Port 3000 sedang dipakai | Jalankan di port lain: `npm run dev -- -p 3001`, lalu buka `http://localhost:3001`. |
 | Muncul "site can't be reached" setelah login | `NEXTAUTH_URL` di `.env.local` tidak sama dengan alamat yang Anda buka. Samakan keduanya. |
 

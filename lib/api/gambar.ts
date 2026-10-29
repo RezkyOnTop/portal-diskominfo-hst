@@ -29,7 +29,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
-import { Agent } from "undici";
+import { Agent, request } from "undici";
 
 /** Host gambar yang diizinkan (allowlist ketat — cegah SSRF). */
 const HOST_DIIZINKAN = new Set([
@@ -131,16 +131,21 @@ export async function ambilGambarBerita(
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   let mentah: Buffer;
   try {
+    // Catatan: JANGAN pakai `fetch` global dengan opsi `dispatcher` di sini.
+    // Node 22 membawa salinan undici INTERNAL sendiri; dispatcher dari paket
+    // `undici` proyek ditolak dengan UND_ERR_INVALID_ARG (beda salinan kelas).
+    // `request()` dari paket proyek menerima dispatcher-nya dengan benar.
     const dp = getDispatcher();
-    const res = await fetch(url, {
+    const res = await request(url, {
+      dispatcher: dp ?? undefined,
       signal: controller.signal,
       headers: { Accept: "image/*" },
-      cache: "no-store",
-      // @ts-expect-error -- `dispatcher` adalah opsi undici, bukan fetch standar.
-      dispatcher: dp ?? undefined,
     });
-    if (!res.ok) throw new Error(`HTTP_${res.status}`);
-    mentah = Buffer.from(await res.arrayBuffer());
+    if (res.statusCode < 200 || res.statusCode >= 300) {
+      await res.body.dump();
+      throw new Error(`HTTP_${res.statusCode}`);
+    }
+    mentah = Buffer.from(await res.body.arrayBuffer());
   } catch (err) {
     const code =
       err instanceof Error && err.name === "AbortError" ? "TIMEOUT" : "NETWORK";
