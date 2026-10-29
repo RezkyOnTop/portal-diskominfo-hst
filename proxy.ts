@@ -10,23 +10,44 @@ import { NextResponse, type NextRequest } from "next/server";
  * biasa, jadi jangan "dirapikan" ke dalam folder lain — memindahkannya membuat
  * pengalihan area admin berhenti bekerja tanpa error yang jelas.
  *
- * Fungsi: pengalihan awal untuk area admin. Ini hanya lapisan pertama;
- * otorisasi sesungguhnya diverifikasi di app/(admin)/layout.tsx via auth().
+ * Perannya: penjaga lapis pertama (murah, tanpa query database).
+ *   - /dashboard/*  tanpa cookie sesi  -> redirect ke /masuk?callbackUrl=…
+ *   - /api/admin/*  tanpa cookie sesi  -> 401 JSON (bukan halaman HTML)
+ *
+ * Lapis kedua ada di app/(admin)/layout.tsx yang memanggil auth() untuk
+ * memvalidasi sesi sungguhan, dan di tiap route/aksi admin untuk memeriksa
+ * peran ADMIN. Cookie yang dipalsukan akan lolos lapis ini tetapi gagal di
+ * lapis kedua.
  */
-export function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const hasSession =
-    request.cookies.has("authjs.session-token") ||
-    request.cookies.has("__Secure-authjs.session-token");
 
-  if (pathname.startsWith("/dashboard") && !hasSession) {
+const KUNCI_SESI = ["authjs.session-token", "__Secure-authjs.session-token"] as const;
+
+function punyaSesi(request: NextRequest): boolean {
+  return KUNCI_SESI.some((nama) => request.cookies.has(nama));
+}
+
+export function proxy(request: NextRequest) {
+  const { pathname, search } = request.nextUrl;
+
+  if (punyaSesi(request)) return NextResponse.next();
+
+  if (pathname.startsWith("/dashboard")) {
     const url = new URL("/masuk", request.nextUrl);
-    url.searchParams.set("callbackUrl", pathname);
+    // Sertakan query string agar filter/paginasi tidak hilang setelah login.
+    url.searchParams.set("callbackUrl", `${pathname}${search}`);
     return NextResponse.redirect(url);
   }
+
+  if (pathname.startsWith("/api/admin")) {
+    return NextResponse.json(
+      { error: "Tidak terautentikasi." },
+      { status: 401, headers: { "cache-control": "no-store" } },
+    );
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/dashboard/:path*", "/api/admin/:path*"],
 };

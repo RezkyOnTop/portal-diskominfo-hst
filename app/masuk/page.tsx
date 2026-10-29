@@ -13,7 +13,7 @@ async function loginAction(formData: FormData) {
 
 export default function MasukPage() {
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-16">
+    <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-16">
       <div className="rounded-[var(--radius-card)] border border-neutral-200 bg-white p-8 shadow-[var(--shadow-card)]">
         <h1 className="font-heading text-2xl font-bold text-neutral-900">
           Masuk Administrator

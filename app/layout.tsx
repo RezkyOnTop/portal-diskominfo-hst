@@ -1,15 +1,7 @@
 import type { Metadata } from "next";
 import { Sora, DM_Sans } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
-import { RadioPlayerProvider } from "@/components/layout/RadioPlayerProvider";
-import { BackToTop } from "@/components/layout/BackToTop";
-import { ComboMelayang } from "@/components/chat/ComboMelayang";
-import { VisitorBeacon } from "@/components/analytics/VisitorBeacon";
 import { ThemeProvider, themeInitScript } from "@/components/layout/ThemeProvider";
-import { Preloader } from "@/components/layout/Preloader";
-import { NavProgress } from "@/components/layout/NavProgress";
 import { SITE } from "@/lib/config";
 
 const sora = Sora({
@@ -57,6 +49,14 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * Root layout: HANYA kerangka dokumen (html/body/font/tema).
+ *
+ * Kerangka tampilan sengaja tidak diletakkan di sini supaya area publik dan
+ * area dashboard tidak saling mewarisi. Chrome publik (navbar, footer, radio,
+ * preloader) ada di `app/(public)/layout.tsx`; kerangka admin (sidebar, header)
+ * ada di `app/(admin)/layout.tsx`.
+ */
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
@@ -75,20 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Lompat ke konten utama
         </a>
-        <ThemeProvider>
-          <RadioPlayerProvider>
-            <Preloader />
-            <NavProgress />
-            <Navbar />
-            <main id="konten-utama" className="flex-1 pb-16">
-              {children}
-            </main>
-            <Footer />
-            <BackToTop />
-            <ComboMelayang />
-            <VisitorBeacon />
-          </RadioPlayerProvider>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );
