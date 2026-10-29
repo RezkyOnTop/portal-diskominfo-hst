@@ -26,7 +26,30 @@ describe("clientIp", () => {
     });
     expect(clientIp(req)).toBe("1.2.3.4");
   });
-  it("fallback ke 'unknown' bila header tidak ada", () => {
-    expect(clientIp(new Request("http://localhost"))).toBe("unknown");
+  it("fallback ke 'tanpa-proxy' bila header tidak ada", () => {
+    expect(clientIp(new Request("http://localhost"))).toBe("tanpa-proxy");
+  });
+
+  it("memakai x-real-ip bila x-forwarded-for tidak ada", () => {
+    const req = new Request("http://localhost", {
+      headers: { "x-real-ip": "203.0.113.9" },
+    });
+    expect(clientIp(req)).toBe("203.0.113.9");
+  });
+});
+
+describe("rateLimit — ember global (anti pemalsuan X-Forwarded-For)", () => {
+  it("memblokir walau identitas diputar-putar", () => {
+    const fitur = `uji-${Math.random()}`;
+    const batas = 2; // ember global = max(50, batas*10)
+    let diblokir = false;
+    for (let i = 0; i < 80; i++) {
+      const hasil = rateLimit(`${fitur}:ip-${i}`, batas, 60_000);
+      if (!hasil.ok) {
+        diblokir = true;
+        break;
+      }
+    }
+    expect(diblokir).toBe(true);
   });
 });
