@@ -14,7 +14,7 @@ jobs:
 
       # Satu sumber kebenaran: pnpm-lock.yaml. Versi pnpm dipin di sini
       # (bukan lewat field packageManager) agar tidak ada dua sumber versi.
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 9.15.9
 
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
         with:
           version: 9.15.9
       - uses: actions/setup-node@v5
