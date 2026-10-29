@@ -53,3 +53,6 @@ next-env.d.ts
 # Berkas aturan agen yang dibuat otomatis oleh `next dev`
 AGENTS.md
 CLAUDE.md
+
+# Satu lockfile saja: proyek memakai pnpm (lihat .github/workflows/ci.yml).
+package-lock.json

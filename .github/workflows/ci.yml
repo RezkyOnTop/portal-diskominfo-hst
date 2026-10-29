@@ -10,20 +10,28 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+
+      # Satu sumber kebenaran: pnpm-lock.yaml. Versi pnpm dipin di sini
+      # (bukan lewat field packageManager) agar tidak ada dua sumber versi.
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+
+      # cache: pnpm harus diletakkan setelah pnpm terpasang.
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
-          cache: npm
-      # Pakai npm 11: npm bawaan Node 22 (npm 10) berhenti dengan bug internal
-      # "Exit handler never called!" saat menjalankan install script.
-      - run: npm install -g npm@11
-      - run: npm ci
-      - run: npx prisma generate
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm run test:coverage
-      - run: npm run build
+          cache: pnpm
+
+      # --frozen-lockfile: gagal cepat bila pnpm-lock.yaml tidak sinkron
+      # dengan package.json (pengganti pemeriksaan "npm ci").
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec prisma generate
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test:coverage
+      - run: pnpm build
         env:
           MEDIA_CENTER_API_BASE_URL: https://mediacenter.hstkab.go.id
           DATABASE_URL: postgresql://user:pass@localhost:5432/ci
@@ -36,8 +44,16 @@ jobs:
     if: github.ref == 'refs/heads/main' && vars.ENABLE_VERCEL_DEPLOY == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: npx vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm dlx vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
