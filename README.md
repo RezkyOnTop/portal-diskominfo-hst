@@ -7,7 +7,7 @@ Rebuild modern dari situs `diskominfosp.hstkab.go.id`: cepat, aksesibel (WCAG AA
 <p align="left">
   <img src="https://img.shields.io/badge/status-aktif-brightgreen" alt="Status">
   <img src="https://img.shields.io/badge/lisensi-MIT-blue" alt="Lisensi MIT">
-  <img src="https://img.shields.io/badge/tests-441%20lulus-success" alt="Tes">
+  <img src="https://img.shields.io/badge/tests-447%20lulus-success" alt="Tes">
   <img src="https://img.shields.io/badge/coverage-93.88%25-brightgreen" alt="Coverage">
   <img src="https://img.shields.io/badge/CI-pnpm%20hijau-2ea44f?logo=githubactions&logoColor=white" alt="CI">
   <img src="https://img.shields.io/badge/Node.js-22.19%2B-5FA04E?logo=nodedotjs&logoColor=white" alt="Node.js">
@@ -39,6 +39,7 @@ Rebuild modern dari situs `diskominfosp.hstkab.go.id`: cepat, aksesibel (WCAG AA
 - **📻 Radio Swara Murakata** — pemutar audio persisten yang tidak terputus saat berpindah halaman, plus formulir langganan.
 - **🤖 Asisten AI "Tanya AI"** — widget tanya-jawab seputar layanan dinas, ditenagai **Groq**. Kunci API hanya tersimpan di server (proxy backend), dilengkapi sanitasi input/output, pembatasan 10 permintaan/menit per IP, serta system prompt ketat anti *prompt injection*.
 - **🌓 Mode Terang/Gelap** — persisten tanpa kedip (*no flash*), kontras teks terjamin ≥ 4.5:1 di kedua mode. Tersedia di situs publik **dan** di dashboard admin.
+- **♿ Menu Aksesibilitas** — tombol melayang dengan panel preferensi: skala teks 90–160 %, kontras tinggi, skala abu-abu, garis bawah tautan, font mudah dibaca, hentikan animasi, serta bantuan suara (`speechSynthesis`). Pilihan disimpan di `localStorage` dan dipasang sebelum halaman dilukis, jadi tidak berkedip.
 - **📈 Analitik Kunjungan** — pencatatan kunjungan halaman publik secara anonim (sekali per perubahan halaman, area admin dikecualikan).
 - **🎬 Animasi Loading Modern** — preloader khas DISKOMINFOSP + bilah progres navigasi yang halus dan menghormati `prefers-reduced-motion`.
 
@@ -94,7 +95,7 @@ Masuk lewat `/masuk`. Semua rute `/dashboard/*` dijaga dua lapis: `proxy.ts` men
 | Basis data | PostgreSQL 16 · Prisma 6.19 (9 migrasi) |
 | Validasi | Zod v4 |
 | Autentikasi | Auth.js (NextAuth v5) · bcryptjs (cost 12) |
-| Pengujian | Vitest 5 · Testing Library — 441 tes di 52 berkas |
+| Pengujian | Vitest 5 · Testing Library — 447 tes di 53 berkas |
 | HTTP klien | undici `request()` (butuh Node ≥ 22.19) |
 | AI | Groq (OpenAI-compatible API) |
 | Gambar | sharp · undici |
@@ -231,7 +232,7 @@ Buka **http://localhost:3010**.
 |---|---|
 | `pnpm lint` | Pemeriksaan ESLint |
 | `pnpm typecheck` | Pemeriksaan tipe (`next typegen && tsc --noEmit`) |
-| `pnpm test` | Menjalankan seluruh tes (441 tes / 52 berkas) |
+| `pnpm test` | Menjalankan seluruh tes (447 tes / 53 berkas) |
 | `pnpm test:coverage` | Tes + laporan cakupan (ambang 80% baris/fungsi/cabang/pernyataan) |
 | `pnpm build` | Build produksi |
 | `pnpm prisma:migrate` | Migrasi basis data saat pengembangan |
