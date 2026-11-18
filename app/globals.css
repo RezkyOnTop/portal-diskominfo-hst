@@ -682,3 +682,168 @@ html[data-preloader="lewat"] .preloader {
     opacity: 1;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════
+   MENU AKSESIBILITAS
+   Preferensi dipasang sebagai kelas pada <html> oleh
+   components/layout/AccessibilityProvider.tsx.
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  --a11y-skala: 1;
+}
+
+/* Skala ukuran teks (90%–160%). Semua utility rem ikut menyesuaikan. */
+html {
+  font-size: calc(100% * var(--a11y-skala));
+}
+
+/* Skala abu-abu untuk seluruh isi halaman. */
+html.a11y-abu-abu body {
+  filter: grayscale(1);
+}
+
+/* Hentikan animasi & transisi (termasuk smooth scroll). */
+html.a11y-tanpa-animasi,
+html.a11y-tanpa-animasi *,
+html.a11y-tanpa-animasi *::before,
+html.a11y-tanpa-animasi *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Garis bawah pada semua tautan agar tidak hanya dibedakan warna. */
+html.a11y-garis-bawah a {
+  text-decoration: underline !important;
+  text-underline-offset: 0.18em;
+}
+
+/* Font mudah dibaca: huruf lebar, jarak baris lega. */
+html.a11y-font-mudah body,
+html.a11y-font-mudah button,
+html.a11y-font-mudah input,
+html.a11y-font-mudah select,
+html.a11y-font-mudah textarea {
+  font-family: Verdana, Tahoma, "DejaVu Sans", sans-serif !important;
+  letter-spacing: 0.01em;
+}
+
+html.a11y-font-mudah p,
+html.a11y-font-mudah li {
+  line-height: 1.8 !important;
+}
+
+/* Kontras tinggi: teks & permukaan dipaksa ke hitam-putih murni. */
+html.a11y-kontras body {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+html.a11y-kontras p,
+html.a11y-kontras li,
+html.a11y-kontras dd,
+html.a11y-kontras td,
+html.a11y-kontras th,
+html.a11y-kontras label,
+html.a11y-kontras h1,
+html.a11y-kontras h2,
+html.a11y-kontras h3,
+html.a11y-kontras h4,
+html.a11y-kontras h5,
+html.a11y-kontras h6 {
+  color: #000000 !important;
+}
+
+html.a11y-kontras a {
+  color: #0000cc !important;
+  text-decoration: underline !important;
+}
+
+html.a11y-kontras button,
+html.a11y-kontras input,
+html.a11y-kontras select,
+html.a11y-kontras textarea,
+html.a11y-kontras [role="button"] {
+  border-color: #000000 !important;
+}
+
+html.a11y-kontras :focus-visible {
+  outline: 3px solid #b45309 !important;
+  outline-offset: 2px !important;
+}
+
+html.a11y-kontras.dark body {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+html.a11y-kontras.dark p,
+html.a11y-kontras.dark li,
+html.a11y-kontras.dark dd,
+html.a11y-kontras.dark td,
+html.a11y-kontras.dark th,
+html.a11y-kontras.dark label,
+html.a11y-kontras.dark h1,
+html.a11y-kontras.dark h2,
+html.a11y-kontras.dark h3,
+html.a11y-kontras.dark h4,
+html.a11y-kontras.dark h5,
+html.a11y-kontras.dark h6 {
+  color: #ffffff !important;
+}
+
+html.a11y-kontras.dark a {
+  color: #8fd6ff !important;
+}
+
+html.a11y-kontras.dark button,
+html.a11y-kontras.dark input,
+html.a11y-kontras.dark select,
+html.a11y-kontras.dark textarea,
+html.a11y-kontras.dark [role="button"] {
+  border-color: #ffffff !important;
+}
+
+/* Kontras tinggi: paksa warna teks isi ke hitam/putih murni, termasuk
+   span di dalam judul yang biasanya memakai warna redup (text-neutral-*).
+   Teks di dalam tautan/tombol dibiarkan mewarisi warna tombolnya. */
+html.a11y-kontras :where(h1, h2, h3, h4, h5, h6, p, li, dt, dd, small, time, figcaption, blockquote) {
+  color: #000000 !important;
+}
+
+html.a11y-kontras :where(a, button, [role="button"], summary) :where(span, strong, em, small, b, i) {
+  color: inherit !important;
+}
+
+html.a11y-kontras.dark :where(h1, h2, h3, h4, h5, h6, p, li, dt, dd, small, time, figcaption, blockquote) {
+  color: #ffffff !important;
+}
+
+/* Kontras tinggi: teks di dalam judul/paragraf (termasuk span bergradien
+   seperti .hero-text-gradient) dipaksa memakai warna solid yang terbaca. */
+html.a11y-kontras :where(h1, h2, h3, h4, h5, h6, p, li, dt, dd, small, time, figcaption, blockquote) :where(span, strong, em, b, i) {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  background-image: none !important;
+}
+
+html.a11y-kontras.dark :where(h1, h2, h3, h4, h5, h6, p, li, dt, dd, small, time, figcaption, blockquote) :where(span, strong, em, b, i) {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* Tautan tetap memakai warna tautan walau berada di dalam paragraf. */
+html.a11y-kontras a :where(span, strong, em, b, i) {
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* Menu aksesibilitas berukuran besar tidak boleh memecah label navigasi
+   menjadi dua baris (caret dropdown jadi bertumpuk). */
+header nav a,
+header nav button {
+  white-space: nowrap;
+}

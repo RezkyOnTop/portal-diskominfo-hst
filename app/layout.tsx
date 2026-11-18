@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Sora, DM_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider, themeInitScript } from "@/components/layout/ThemeProvider";
+import { a11yInitScript } from "@/components/layout/AccessibilityProvider";
 import { SITE } from "@/lib/config";
 
 const sora = Sora({
@@ -67,6 +68,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        <script dangerouslySetInnerHTML={{ __html: a11yInitScript }} />
       </head>
       <body className="min-h-full flex flex-col bg-neutral-50 text-neutral-900">
         <a

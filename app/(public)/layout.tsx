@@ -3,6 +3,8 @@ import { Footer } from "@/components/layout/Footer";
 import { RadioPlayerProvider } from "@/components/layout/RadioPlayerProvider";
 import { BackToTop } from "@/components/layout/BackToTop";
 import { ComboMelayang } from "@/components/chat/ComboMelayang";
+import { AccessibilityProvider } from "@/components/layout/AccessibilityProvider";
+import { AccessibilityWidget } from "@/components/layout/AccessibilityWidget";
 import { VisitorBeacon } from "@/components/analytics/VisitorBeacon";
 import { Preloader } from "@/components/layout/Preloader";
 import { NavProgress } from "@/components/layout/NavProgress";
@@ -13,20 +15,26 @@ import { NavProgress } from "@/components/layout/NavProgress";
  * Chrome publik tinggal di sini, bukan di root layout, agar area dashboard
  * (`app/(admin)`) tidak ikut memuat navbar, footer, preloader, tombol radio,
  * maupun chat melayang.
+ *
+ * AccessibilityProvider membungkus semuanya karena preferensi aksesibilitas
+ * (skala teks, kontras, suara) berlaku untuk seluruh halaman publik.
  */
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
-    <RadioPlayerProvider>
-      <Preloader />
-      <NavProgress />
-      <Navbar />
-      <main id="konten-utama" className="flex-1 pb-16">
-        {children}
-      </main>
-      <Footer />
-      <BackToTop />
-      <ComboMelayang />
-      <VisitorBeacon />
-    </RadioPlayerProvider>
+    <AccessibilityProvider>
+      <RadioPlayerProvider>
+        <Preloader />
+        <NavProgress />
+        <Navbar />
+        <main id="konten-utama" className="flex-1 pb-16">
+          {children}
+        </main>
+        <Footer />
+        <BackToTop />
+        <ComboMelayang />
+        <VisitorBeacon />
+        <AccessibilityWidget />
+      </RadioPlayerProvider>
+    </AccessibilityProvider>
   );
 }
